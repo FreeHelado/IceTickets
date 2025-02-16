@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import axios from "axios";
 
 import Header from "./componentes/Header"; // ✅ Header normal
@@ -8,6 +9,7 @@ import Eventos from "./componentes/Eventos";
 import EventoDetalle from "./pages/EventoDetalle";
 import Login from "./admin/Login";
 import Register from "./admin/Register";
+import VerificarCodigo from "./admin/VerificarCodigo";
 import AdminEventos from "./admin/AdminEventos";
 import AdminIndex from "./admin/AdminIndex";
 import AdminEventosList from "./admin/AdminEventosList";
@@ -52,7 +54,7 @@ function AppContent({ token, setToken, usuario }) {
   return (
     <>
       {/* 🔥 No mostramos ningún header si estamos en /login */}
-      {location.pathname !== "/login" && location.pathname !== "/register" && (esRutaAdmin ? <HeaderAdmin token={token} /> : <Header token={token} />)}
+      {location.pathname !== "/login" && location.pathname !== "/register" && location.pathname !== "/verificar" && (esRutaAdmin ? <HeaderAdmin token={token} /> : <Header token={token} />)}
 
       <Routes>
         <Route path="/" element={<Eventos />} /> {/* Página principal con los eventos */}
@@ -68,6 +70,7 @@ function AppContent({ token, setToken, usuario }) {
         
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verificar" element={<VerificarCodigo />} />
       </Routes>
     </>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2"; // â Importamos SweetAlert2
+import Swal from "sweetalert2";
 import { FaEye, FaEyeSlash, FaIceCream } from "react-icons/fa6";
 
 function Login({ setToken }) {
@@ -31,6 +31,18 @@ function Login({ setToken }) {
       const data = await response.json();
 
       if (response.ok) {
+        if (!data.verificado) { // 🔥 Verificamos si el usuario está verificado
+          Swal.fire({
+            title: "Cuenta no verificada",
+            text: "Debes verificar tu cuenta antes de iniciar sesión.",
+            icon: "warning",
+            confirmButtonText: "Verificar ahora"
+          }).then(() => {
+            localStorage.setItem("pendingEmail", email);
+            navigate("/verificar"); // Redirigir a la verificación
+          });
+          return; // 🔥 Detenemos el proceso de login aquí
+        }
         localStorage.setItem("token", data.token);
         localStorage.setItem("isAdmin", data.isAdmin); // 🔥 Guardamos isAdmin
         setToken(data.token);
@@ -39,7 +51,7 @@ function Login({ setToken }) {
         localStorage.removeItem("prevPage");
         navigate(prevPage, { replace: true });
 
-        // â Mostrar un Toast de Ã©xito
+        // Mostrar un Toast de éxito
         Swal.fire({
           title: "¡Bienvenido!",
           text: "Has iniciado sesión con éxito",
@@ -67,7 +79,7 @@ function Login({ setToken }) {
     } catch (error) {
       console.error("Error en login:", error);
 
-      //Mostrar un Toast si hay un error de conexiÃ³n
+      //Mostrar un Toast si hay un error de conexión
       Swal.fire({
         title: "Error",
         text: "Hubo un problema de conexión con el servidor",

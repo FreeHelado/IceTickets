@@ -93,6 +93,26 @@
             }
         }
     }
+
+        .codigo__cont {
+            @include flex();
+            margin-block: 10px 25px;
+        }
+    
+        .codigo__input {
+            
+            height: 70px;
+            font-size: 24px;
+            text-align: center;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s;
+        }
+    
+        .codigo__input:focus {
+            border-color: $colorTagDestacado;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
 }
 
 .registro {

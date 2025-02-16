@@ -4,12 +4,12 @@ import { FaEye, FaEyeSlash, FaIceCream } from "react-icons/fa6";
 import Swal from "sweetalert2";
 
 function Register() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [nombre, setNombre] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [nombre, setNombre] = useState("");
     const [telefono, setTelefono] = useState("");
     const [mostrarPassword, setMostrarPassword] = useState(false);
-const navigate = useNavigate();
+    const navigate = useNavigate();
     
 // 🔥 Redirigir si el usuario ya está logueado
     useEffect(() => {
@@ -31,14 +31,16 @@ const navigate = useNavigate();
 
       const data = await response.json();
 
-      if (response.ok) {
+        if (response.ok) {
+          // 🔥 Guardamos el email en localStorage para la verificación
+        localStorage.setItem("pendingEmail", email);
         Swal.fire({
           title: "¡Registro exitoso!",
           text: "Ahora puedes iniciar sesión",
           icon: "success",
           confirmButtonText: "Ir al login"
         }).then(() => {
-          navigate("/login"); // Redirigir al login después del registro
+          navigate("/verificar");
         });
       } else {
         Swal.fire({
