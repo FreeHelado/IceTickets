@@ -113,6 +113,35 @@
             border-color: $colorTagDestacado;
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
         }
+
+        .reenviar-codigo {
+            @include flex();
+            padding-top: 15px;
+            span {
+                font-size: 14px
+            }
+            button {
+                background-color: transparent;
+                padding: 0;
+                font-size: 14px;
+                color: $colorTag;
+                text-decoration: underline;
+                font-weight: 500;
+                width: fit-content;
+                &:hover {
+                    color: $amarelo;
+                    box-shadow: none;
+                    border-radius: 0;
+                }
+
+                &:disabled {
+                    color: #fff;
+                    opacity: .5;
+                    text-decoration: none;
+
+                }
+            }
+        }
 }
 
 .registro {

@@ -103,6 +103,47 @@ router.post("/verify", async (req, res) => {
 });
 
 /* =====================================
+// 📩 Reenvio de Codigo de verificación
+===================================== */
+router.post("/resend-code", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Buscar usuario
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Usuario no encontrado" });
+    }
+
+    // Si ya está verificado, no debería necesitar otro código
+    if (user.verificado) {
+      return res.status(400).json({ message: "Este usuario ya está verificado." });
+    }
+
+    // 🔥 Generar nuevo código de 6 dígitos
+    const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // 🔥 Nueva expiración en 5 minutos
+    const nuevaExpiracion = new Date();
+    nuevaExpiracion.setMinutes(nuevaExpiracion.getMinutes() + 5);
+
+    // Actualizar el usuario en la base de datos
+    user.codigoVerificacion = nuevoCodigo;
+    user.expiracionCodigo = nuevaExpiracion;
+    await user.save();
+
+    console.log(`Nuevo código de verificación para ${email}: ${nuevoCodigo}`);
+
+    res.json({ message: "Se ha enviado un nuevo código de verificación." });
+
+  } catch (error) {
+    console.error("Error en reenvío de código:", error);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+});
+
+
+/* =====================================
 // 🔐 Login de usuario
 ===================================== */
 router.post("/login", async (req, res) => {
