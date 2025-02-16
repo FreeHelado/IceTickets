@@ -7,6 +7,7 @@ import HeaderAdmin from "./admin/HeaderAdmin"; // ✅ Header para Admin
 import Eventos from "./componentes/Eventos";
 import EventoDetalle from "./pages/EventoDetalle";
 import Login from "./admin/Login";
+import Register from "./admin/Register";
 import AdminEventos from "./admin/AdminEventos";
 import AdminIndex from "./admin/AdminIndex";
 import AdminEventosList from "./admin/AdminEventosList";
@@ -51,7 +52,7 @@ function AppContent({ token, setToken, usuario }) {
   return (
     <>
       {/* 🔥 No mostramos ningún header si estamos en /login */}
-      {location.pathname !== "/login" && (esRutaAdmin ? <HeaderAdmin token={token} /> : <Header token={token} />)}
+      {location.pathname !== "/login" && location.pathname !== "/register" && (esRutaAdmin ? <HeaderAdmin token={token} /> : <Header token={token} />)}
 
       <Routes>
         <Route path="/" element={<Eventos />} /> {/* Página principal con los eventos */}
@@ -64,8 +65,9 @@ function AppContent({ token, setToken, usuario }) {
         <Route path="/admin/evento/editar/:id" element={token ? <AdminEventos setToken={setToken} /> : <Navigate to="/login" />} />
         <Route path="/checkout" element={token ? <Checkout usuario={usuario} /> : <Navigate to="/login" />} />
 
-        {/* ?? Ruta de login de Administrador */}
+        
         <Route path="/login" element={<Login setToken={setToken} />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </>
   );

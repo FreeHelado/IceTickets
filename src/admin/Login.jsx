@@ -117,7 +117,9 @@ function Login({ setToken }) {
         </form>
       </div>
       <div className="login__crear">
-        <span>Si aun no tienes cuenta, <strong>puedes crearla aquí</strong> </span>
+         <span>
+          Si aún no tienes cuenta, <strong onClick={() => navigate("/register")}>puedes crearla aquí</strong>
+        </span>
       </div>
     </main>
   );

@@ -73,4 +73,124 @@
                }
            }
     }
+
+    &__crear {
+        @include flex();
+        justify-content: center;
+        padding-bottom: 15px;
+        color: #fff;
+        span, strong {
+            font-size: 16px;
+        }
+
+        strong {
+            color: $colorTagDestacado;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+            &:hover {
+                color: $amarelo;
+            }
+        }
+    }
+}
+
+.registro {
+    @include flexColumn(20px);
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+
+    &__header {
+            @include flex();
+            justify-content: center;
+            align-items: center;
+    
+            i {
+                font-size: 50px;
+            }
+    
+            h1 {
+                font-size: 30px;
+            }
+        }
+
+    &__cont {
+        width: 500px;
+        margin: 0 auto;
+        @extend .caja;
+        padding: 30px;
+        @include flexColumn(15px);
+        background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
+        position: relative;
+
+        h2 {
+            font-weight: 500;
+        }
+
+        &--form {
+            @include flexColumn(15px);
+            width: 100%;
+
+            &--campo {
+                @include flexColumn(5px);
+                width: 100%;
+                position: relative;
+
+                i {
+                    font-size: 30px;
+                    color: #ffffff99;
+                    position: absolute;
+                    bottom: 15px;
+                    right: 20px;
+                    cursor: pointer;
+                    @include hover();
+
+                    &:hover {
+                        color: #fff;
+                    }
+                }
+            }
+
+            button {
+                width: 100%;
+                background-color: $colorTagDestacado;
+                font-size: 22px;
+                border-radius: 10px;
+                cursor: pointer;
+                @include hover();
+
+                &:hover {
+                    background-color: $colorTag;
+                    box-shadow: 0 0 50px 0 color-opacity($colorTagDestacado, .5);
+                }
+            }
+        }
+
+        
+    }
+
+    &__crear {
+        @include flex();
+        justify-content: center;
+        padding-bottom: 15px;
+        color: #fff;
+
+        span,
+        strong {
+            font-size: 16px;
+        }
+
+        strong {
+            color: $colorTagDestacado;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+
+            &:hover {
+                color: $amarelo;
+            }
+        }
+    }
 }

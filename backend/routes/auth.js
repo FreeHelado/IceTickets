@@ -12,7 +12,7 @@ const router = express.Router();
 ===================================== */
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, nombre, telefono, isAdmin } = req.body;
+    const { email, password, nombre, telefono } = req.body;
 
     // Verificar si el usuario ya existe
     const userExistente = await User.findOne({ email });
@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
       password: hashedPassword, 
       nombre, 
       telefono, 
-      isAdmin: isAdmin || false 
+      isAdmin: false // 🔥 Siempre false
     });
 
     await newUser.save();
