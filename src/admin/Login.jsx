@@ -32,6 +32,7 @@ function Login({ setToken }) {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("isAdmin", data.isAdmin); // 🔥 Guardamos isAdmin
         setToken(data.token);
 
         const prevPage = localStorage.getItem("prevPage") || "/";
@@ -51,7 +52,7 @@ function Login({ setToken }) {
         });
 
       } else {
-        // â Mostrar un Toast de error si la respuesta no es exitosa
+        
         Swal.fire({
           title: "Error",
           text: data.message || "Usuario no encontrado o contraseña incorrecta",
@@ -66,7 +67,7 @@ function Login({ setToken }) {
     } catch (error) {
       console.error("Error en login:", error);
 
-      // â Mostrar un Toast si hay un error de conexiÃ³n
+      //Mostrar un Toast si hay un error de conexiÃ³n
       Swal.fire({
         title: "Error",
         text: "Hubo un problema de conexión con el servidor",

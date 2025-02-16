@@ -8,11 +8,11 @@ import verificarToken from "../middleware/auth.js";
 const router = express.Router();
 
 /* =====================================
-ð Registro de Usuario
+// 🔑 Registro de Usuario
 ===================================== */
 router.post("/register", async (req, res) => {
   try {
-    const { email, password,nombre, telefono } = req.body;
+    const { email, password, nombre, telefono, isAdmin } = req.body;
 
     // Verificar si el usuario ya existe
     const userExistente = await User.findOne({ email });
@@ -20,14 +20,22 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "El usuario ya existe" });
     }
 
-    // Hashear la contraseÃ±aa antes de guardarla
+    // Hashear la contraseña antes de guardarla
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = new User({ email, password: hashedPassword });
+    // Si no se especifica isAdmin en la solicitud, se asigna false por defecto
+    const newUser = new User({ 
+      email, 
+      password: hashedPassword, 
+      nombre, 
+      telefono, 
+      isAdmin: isAdmin || false 
+    });
+
     await newUser.save();
 
-    res.status(201).json({ message: "Usuario registrado con Ã©xito" });
+    res.status(201).json({ message: "Usuario registrado con éxito" });
   } catch (error) {
     console.error("Error en registro:", error);
     res.status(500).json({ message: "Error en el servidor" });
@@ -35,7 +43,7 @@ router.post("/register", async (req, res) => {
 });
 
 /* =====================================
-// â Login de usuario
+// 🔐 Login de usuario
 ===================================== */
 router.post("/login", async (req, res) => {
   try {
@@ -46,16 +54,22 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Usuario no encontrado" });
     }
 
-    // Comparar la contraseÃ±a ingresada con la hasheada en MongoDB
+    // Comparar la contraseña ingresada con la hasheada en MongoDB
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "ContraseÃ±a incorrecta" });
     }
 
-    // Generar un token JWT
-    const token = jwt.sign({ userId: user._id }, "secreto_super_seguro", { expiresIn: "1h" });
+    // Generar un token JWT incluyendo el rol del usuario
+    const token = jwt.sign(
+      { userId: user._id, isAdmin: user.isAdmin }, // Agregamos isAdmin al token
+      "secreto_super_seguro",
+      { expiresIn: "1h" }
+    );
 
-    res.json({ token });
+    // 🔥 Enviar isAdmin en la respuesta del login
+    res.json({ token, isAdmin: user.isAdmin });
+
   } catch (error) {
     console.error("Error en login:", error);
     res.status(500).json({ message: "Error en el servidor" });
@@ -63,7 +77,7 @@ router.post("/login", async (req, res) => {
 });
 
 /* =====================================
-// â Obtener datos del usuario logueado
+// 🔍 Obtener datos del usuario logueado
 ===================================== */
 router.get("/perfil", verificarToken, async (req, res) => {
   try {
@@ -79,7 +93,6 @@ router.get("/perfil", verificarToken, async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
-
 
 
 export default router;

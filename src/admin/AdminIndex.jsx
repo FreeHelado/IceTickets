@@ -6,6 +6,9 @@ import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenTo
 function AdminIndex({ setToken }) {
   const [eventos, setEventos] = useState([]);
   const navigate = useNavigate();
+  const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertir a booleano
+
+
 
   useEffect(() => {
     cargarEventos();
@@ -32,6 +35,9 @@ function AdminIndex({ setToken }) {
           <h1>Bienvenido a IceTicket bro</h1>
           <h2>Desde este panel vas a poder vender tus tickets y administrarlos</h2>
           <span>Ayuda</span>
+
+          {isAdmin && <span>Super Usuario Full Manager</span>}
+
         </div>
 
         <div className="adminPanel__cont--zona2">
