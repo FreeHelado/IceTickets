@@ -1,0 +1,63 @@
+//// MEDIAS QUERY //
+@mixin tablet {
+    @media screen and (max-width: 768px) {
+        @content;
+    }
+}
+
+@mixin mobile {
+    @media screen and (max-width: 576px) {
+        @content;
+    }
+}
+
+// MIXINS FLEX //
+@mixin flex($gap : 10px) {
+    display: flex;
+    align-items: center;
+    gap: $gap;
+}
+
+@mixin flexColumn($gap : 10px) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $gap;
+}
+
+@mixin grid($columnas : 3) {
+    display: grid;
+    grid-template-columns: repeat($columnas, 1fr);
+    gap: 10px;
+}
+
+@mixin gridAuto($ancho , $gap) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax($ancho, 1fr));
+    gap: $gap;
+}
+
+/// MIXIN CUERPOS ///
+@mixin cuerpo($width : 1400px) {
+    & {
+        max-width: $width;
+        margin: 0 auto;
+    } 
+
+    @include mobile {
+        padding-inline: 15px;
+    }
+}
+
+//// MIXIN UTILES
+@mixin hover($tiempo : .2s) {
+    transition: all $tiempo;
+}
+
+//// LIGHT MODE
+@mixin modo {
+    .light-mode & {
+        @content;
+    }
+}
+

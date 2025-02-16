@@ -1,0 +1,285 @@
+.evento {
+    @include cuerpo();
+    padding-top: 25px;
+    padding-bottom: 50px;
+    position: relative;
+    
+    &__cont {
+        @include grid(12);
+        gap: 25px;
+        position: relative;
+        
+        &--info {
+            grid-column: 1 / 9;
+            @include flexColumn();
+
+            h1 {
+                font-weight: 600;
+                font-size: 50px;
+            }
+
+            &--categoria {
+                background-color: $colorCategorias;
+                    color: $colorBg;
+                    padding: 6px 15px;
+                    border-radius: 6px;
+                    @include flex(5px);
+                
+                    &[title*="Teatro"] {
+                        background-color: rgb(198, 21, 71);
+                        color: #FFF;
+                    }
+                
+                    span {
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                
+                    i {
+                        font-size: 24px;
+                    }
+            }
+
+            &--img {
+                overflow: hidden;
+                border-radius: 20px;
+                border: 1px solid oscuro($colorTag, 20%);
+                margin: 0;
+                @include flex();
+                justify-content: center;
+                @include hover();
+                position: relative;
+                background-color: $colorBg;
+                z-index: 0;
+                    
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 50%;
+                        background-image: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, 0) 100%);
+                        z-index: 1;
+                    }
+    
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    z-index: 0;
+                    opacity: .85;
+                }
+                
+                &--data {
+                    position: absolute;
+                    bottom: 30px;
+                    left: 20px;
+                    z-index: 2;
+                    h3 {
+                        font-size: 24px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+
+            &--lugar {
+                @include flexColumn();
+                width: 100%;
+                border-radius: 20px;
+                border: 1px solid oscuro($colorTag, 20%);
+                padding: 25px;
+                
+                &--header {
+                    @include flex(25px);
+                    img {
+                        border-radius: 50%;
+                        overflow: hidden;
+                        max-width: 180px;
+                        border: 3px solid $colorPrimarioClaro;
+                    }
+                    &--data {
+                        @include flexColumn(0px);
+                        h2 {
+                            font-size: 30px;
+                        }
+                        span, strong {
+                            font-size: 18px;
+                        }
+                        strong {
+                            font-weight: 500;
+                        }
+
+                        &--rrss {
+                           @include flex();
+                           a {
+                                font-size: 14px;
+                                padding-right: 10px;
+                                @include hover();
+                                @extend .borderRight, .notUltimo;
+                           } 
+                        }
+                    }
+                }
+            }
+        }
+
+        &--lateral {
+            grid-column: 9 / 13;
+            @extend .caja;
+            position: sticky;
+            top: 25px;
+            height: fit-content;
+            background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
+
+            .compra {
+                @include flexColumn(15px);
+
+                .precios {
+                    width: 100%;
+                    border: 2px solid color-opacity($colorTag, .4);
+                    border-radius: 15px;
+                    padding: 0px;
+
+                    .botones {
+                        @include flexColumn(0px);
+                        width: 100%;
+                        
+                        .addCarrito {
+                            @include flex(15px);
+                            justify-content: space-between;
+                            width: 100%;
+                            padding: 15px;
+                            border-bottom: 2px solid color-opacity($colorTag, .4);
+                            @extend .notUltimo;
+
+                            .entrada {
+                                @include flexColumn(0px);
+                                span {
+                                    font-size: 14px;
+                                }
+                                .precio {
+                                    font-size: 36px;
+                                    font-weight: 600;
+                                }
+                            }
+
+                            .cantidades {
+                                @include flex(0px);
+                                background-color: $colorPrimario;
+                                border-radius: 10px;
+
+                                &.agotada{
+                                    border: 2px dashed $rojo;
+                                }
+
+                                .agotadoTag {
+                                    @include flex();
+                                    justify-content: center;
+                                    background-color: $rojo;
+                                    color: #fff;
+                                    padding: 5px 10px;
+                                    border-radius: 5px;
+                                    font-size: 18px;
+                                    font-weight: 700;
+                                }
+
+                                input {
+                                    width: 65px;
+                                    
+                                    @include flex();
+                                    justify-content: center;
+                                    text-align: center;
+                                    font-size: 22px;
+                                    font-weight: 700;
+                                    background-color: transparent;
+                                    border: none;
+                                    border-radius: 0;
+                                    border-inline: 1px solid $colorPrimarioClaro;
+                                }
+                                input[type="number"] {
+                                    appearance: textfield;
+                                    -moz-appearance: textfield; // Para Firefox
+                                    -webkit-appearance: textfield; // Para Safari y Chrome
+
+                                    &::-webkit-inner-spin-button,
+                                    &::-webkit-outer-spin-button {
+                                        -webkit-appearance: none;
+                                        margin: 0;
+                                    }
+                                }
+                                button {
+                                    background-color: transparent;
+                                    height: 50px;
+                                    @include flex();
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 50px;
+                                    cursor: pointer;
+                                    @include hover();
+                                    &:active {
+                                        transform: translate(1px, 2px);
+                                    }
+                                    &:hover {
+                                        background-color: $colorTag;
+                                    }
+                                    i {
+                                        font-size: 30px;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .comprarBtn {
+                    @include flex();
+                    justify-content: space-between;
+                    width: 100%;
+                    background: linear-gradient(to top, oscuro($colorTagDestacado, 20%) 0%, $colorTagDestacado 100%);
+                    border-radius: 8px;
+                    position: relative;
+                    cursor: pointer;
+                    padding-inline: 36px;
+                    @include hover();
+
+                   
+                    -webkit-mask-image: 
+                        radial-gradient(circle at left center, transparent 20px, black 20px),
+                        radial-gradient(circle at right center, transparent 20px, black 20px);
+                    mask-image: 
+                        radial-gradient(circle at left center, transparent 20px, black 20px),
+                        radial-gradient(circle at right center, transparent 20px, black 20px);
+                    -webkit-mask-composite: destination-in;
+                    mask-composite: intersect;
+
+
+                    &:hover {
+                        box-shadow: 0px 0px 100px color-opacity($colorTag, 0.7);
+                        background: linear-gradient(to top, oscuro($colorTagDestacado, 10%) 0%, claro($colorTagDestacado, 10%) 100%);
+                    }
+
+                
+
+                    span {
+                        font-size: 20px;
+                        border-right: 1px dashed #fff;
+                        padding-right: 25px;
+                    }
+                    .montoTotal {
+                        @include flex(2px);
+                        strong {
+                            font-size: 36px;
+                        }
+                        small {
+                            font-size: 24px;
+                            font-weight: 200;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}

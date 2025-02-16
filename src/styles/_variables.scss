@@ -1,0 +1,82 @@
+/////////////////////
+///fuentes///////////
+/// 
+@import url('https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+$mainFont: 'Prompt', serif;
+
+//// colores ///
+$colorPrimario: #0b1020;
+$colorPrimarioClaro: #1b2442;
+
+$colorSecundario: #0d0d0e;
+
+$colorBg: #07040f;
+$colorTag: #26b1d8;
+$colorTagDestacado: #459ced;
+$colorCategorias: #c4d902;
+$amarelo: #d0e609;
+$rojo: #e61042;
+
+$colorBorde: #23262d;
+$borde: 1px solid $colorBorde;
+
+
+
+//// funciones ///
+@function color-opacity($color, $opacity) {
+    @return transparentize($color, 1 - $opacity);
+}
+
+@function oscuro($color, $amount) {
+    @return darken($color, $amount);
+}
+
+@function claro($color, $amount) {
+    @return lighten($color, $amount);
+}
+
+
+/////////////////////////
+/// Alerts /////////////
+/// 
+$alert: #0090ff;
+$alertWarning: #f5a01b;
+$alertError: #d73133;
+$alertOk: #30d058;
+
+// Funcin para generar el fondo con opacidad
+@function alert-bg($color, $opacity: 0.5) {
+    @return rgba($color, $opacity);
+}
+
+// Funcin para oscurecer el color para el borde
+@function alert-border($color, $amount: 10%) {
+    @return darken($color, $amount);
+}
+
+// Variables con los valores generados
+$alert-bg: alert-bg($alert);
+$alert-border: alert-border($alert);
+
+$alertAdmin-bg: alert-bg($alert);
+$alertAdmin-border: alert-border($alert);
+
+$alertWarning-bg: alert-bg($alertWarning);
+$alertWarning-border: alert-border($alertWarning);
+
+$alertError-bg: alert-bg($alertError);
+$alertError-border: alert-border($alertError);
+
+$alertOk-bg: alert-bg($alertOk);
+$alertOk-border: alert-border($alertOk);
+
+$colorDos: #29c04f;
+$colorDosClaro: #69a779;
+
+$colorCuatro: #C8BCF4;
+$colorCuatroClaro: #eae4fe;
+
+$chatCliente: $colorPrimarioClaro;
+$chatAdmin: $colorPrimario;
+
+

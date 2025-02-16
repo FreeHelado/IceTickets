@@ -1,0 +1,122 @@
+.alert {
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 10px;
+    background-color: $alert-bg;
+    border: 1px solid $alert-border;
+    font-size: 14px;
+    @include flex();
+    width: 100%;
+
+    &.admin {
+        background-color: $alertAdmin-bg;
+    }
+
+    &.alert-warning {
+        background-color: $alertWarning-bg;
+        border: 1px solid $alertWarning-border;
+    }
+
+    &.alert-error {
+        background-color: $alertError-bg;
+        border: 1px solid $alertError-border;
+    }
+
+    &.alert-ok {
+        background-color: $alertOk-bg;
+        border: 1px solid $alertOk-border;
+    }
+}
+
+.grupo-check {
+    @include flex(15px);
+    margin-left: auto;
+    flex-wrap: wrap;
+    padding-block: 25px 0;
+
+    .item-check {
+        border: 3px solid transparent;
+        border-radius: 10px;
+        transition: all 200ms ease-out;
+        background-color: $colorPrimario;
+        padding: 15px;
+        position: relative;
+        cursor: pointer;
+
+        &:active {
+            transform: scale(0.96) translateZ(0);
+        }
+
+        &:hover {
+            border-color: $colorTagDestacado;
+            background-color: $colorPrimarioClaro;
+        }
+
+
+
+        input[type=radio] {
+            display: none;
+        }
+
+        label {
+            @include flexColumn();
+            align-items: center;
+            img {
+                border-radius: 5px;
+                overflow: hidden;
+                max-height: 40px;
+            }
+        }
+
+            &:has(input[type="radio"]:checked) {
+                border-color: $colorTagDestacado;
+                background-color: $colorPrimarioClaro;
+    
+                &::after {
+                    content: '\F633';
+                    font-family: bootstrap-icons !important;
+                    font-style: normal;
+                    font-weight: normal !important;
+                    font-variant: normal;
+                    text-transform: none;
+                    line-height: 1;
+                    vertical-align: -.125em;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                    position: absolute;
+                    top: 5px;
+                    right: 5px;
+                    background-color: $amarelo;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: $colorPrimario;
+                    font-size: 15px;
+                    padding: 5px;
+                    border-radius: 60%;
+    
+                }
+            }
+    }
+}
+
+.react-datepicker-popper {
+    z-index: 1000;
+}
+
+.tox .tox-tinymce .tox-edit-focus {
+    z-index: 1;
+}
+
+.tox-editor-header,
+.tox-menubar,
+.tox-toolbar__primary {
+    background-color: #19191b !important;
+}
+
+.tox-menubar {
+    button {
+        background-color: claro($colorSecundario, 10) !important;
+        cursor: pointer;
+    }
+}

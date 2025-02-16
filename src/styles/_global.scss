@@ -1,0 +1,184 @@
+//////////////////////////
+//        ()            //
+//       (__)           //
+//      (____)          //
+//     (______)         //
+//    (________)        //
+//   (__________)       //
+//    \/\/\/\/\/        //
+//     \/\/\/\/         //
+//      \/\/\/          //
+//       \/\/           //
+//        \/            //
+//////////////////////////
+//////////GLOBALES///////////
+//////////////////////////////
+// Reset //
+// Body //
+// input  //
+
+//Reset
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    color-scheme: dark light;
+
+}
+
+/// FONT - CLAMP
+
+html {
+    scroll-behavior: smooth;
+    color: rgba(255, 255, 255, 0.87);
+    font-family: $mainFont;
+
+    h1 {
+        font-size: clamp(2rem, calc(3.00vw + 1rem), 4rem);
+        line-height: 1.25;
+        font-weight: 800;
+    }
+
+    h2 {
+        font-size: clamp(1.25rem, calc(1.75vw + 1rem), 2.50rem);
+        line-height: 1.25;
+        font-weight: 700;
+    }
+
+    h3 {
+        font-size: clamp(1rem, calc(1.25vw + 1rem), 1.75rem);
+        line-height: 1.15;
+        font-weight: 600;
+    }
+
+    h4 {
+        font-size: clamp(0.50rem, calc(0.75vw + 1rem), 1.5rem);
+        line-height: 1.15;
+        font-weight: 600;
+    }
+
+    h5 {
+        font-size: clamp(0.40rem, calc(0.60vw + 1rem), 1.25rem);
+        line-height: 1.15;
+        font-weight: 700;
+    }
+
+    h6 {
+        font-size: clamp(0.20rem, calc(0.30vw + 1rem), 1.05rem);
+        line-height: 1.15;
+        font-weight: 600;
+    }
+
+    P {
+        font-size: clamp(0.75rem, 1.10rem, 1.50rem);
+        line-height: 1.5;
+        font-weight: 400;
+
+        &.texto-lg {
+            font-size: clamp(1rem, 1.25rem, 1.8rem);
+            line-height: 1.5;
+        }
+    }
+
+    a {
+        font-size: clamp(0.3rem, 1rem, 1.25rem);
+        text-decoration: none;
+    }
+
+
+    span,
+    strong {
+        font-size: clamp(0.35rem, 1rem, 1.10rem);
+    }
+
+    i {
+        padding-bottom: 0;
+        margin-bottom: 0;
+        vertical-align: middle;
+        @include flex();
+        justify-content: center;
+        padding: 0;
+    }
+
+    ul {
+        list-style: none;
+
+        li {
+            list-style: none;
+        }
+    }
+
+    i {
+        color: currentColor;
+    }
+
+    button {
+        font-family: $mainFont;
+        padding: 20px;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        font-weight: 600;
+    }
+
+}
+
+body {
+    background-color: $colorPrimario;
+
+    &:has(.adminPanel) {
+            background-color: $colorSecundario;
+        }
+}
+
+input,
+textarea,
+select {
+    height: 55px;
+    border-radius: 8px;
+    box-shadow: none;
+    border: none;
+    font-family: $mainFont;
+    font-size: 16px;
+    font-weight: 500;
+    padding-inline: 15px;
+    border: 1px solid $colorBorde;
+    background-color: $colorPrimario;
+    color: #fff;
+    width: 100%;
+}
+
+select[multiple] {
+    height: 120px;
+    padding-block: 10px;
+    overflow-y: scroll;
+}
+
+input[type=text],
+input[type=search],
+textarea,
+select {
+    &:focus {
+        outline: 0;
+        border: 1px solid $colorPrimario;
+        box-shadow: $colorPrimario 0 0 0 1px inset, $colorPrimarioClaro 0 0 0 5px;
+        background-color: $colorPrimarioClaro;
+    }
+
+    &::placeholder {
+        color: #ffffff77;
+        font-weight: 400;
+        font-size: 14px;
+    }
+}
+
+textarea {
+    padding: 15px;
+}

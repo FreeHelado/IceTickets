@@ -1,0 +1,171 @@
+.admin-eventos {
+    @include cuerpo(900px);
+    @include flexColumn();
+    align-items: center;
+    padding-bottom: 50px;
+    h2 { 
+        text-align: center;
+    }
+    form {
+        @include flexColumn(20px);
+        @extend .caja;
+        background-color: oscuro($colorSecundario, 3.5);
+        border-color: claro($colorSecundario, 6);
+        width: 100%;
+        padding: 35px;
+
+        .campoForm {
+            @include flexColumn(6px);
+            width: 100%;
+            position: relative;
+            label {
+                color: #ffffffbc;
+                font-size: 14px;
+                font-weight: 500;
+            }
+
+            .autocomplete-list {
+                background-color: $colorSecundario;
+                position: absolute;
+                top: 100%;
+                width: 100%;
+                transform: translateY(2px);
+                border-radius: 0px 0px 20px 10px;
+                padding: 10px;
+                max-height: 300px !important;
+                border-color: $colorBorde;
+                list-style: none;
+                margin: 0;
+                border: 1px solid #cccccc95;
+                border-top: none;
+                overflow-y: auto;
+                z-index: 10;
+                
+            }
+            
+            .autocomplete-list li {
+                padding: 8px;
+                cursor: pointer;
+            }
+
+            .autocomplete-list li:hover {
+                background: $colorTag;
+            }
+
+            &__mix {
+                @include grid(2);
+                input {
+                    width: 100%;
+                }
+            }
+
+            input, select {
+                background-color: claro($colorSecundario, 5);
+                border-color: claro($colorSecundario, 13);
+                width: 100%;
+            }
+
+            &.addImagen {
+                input[type=file] {
+                    @include flex();
+                    justify-content: center;
+                    padding-top: 13px
+                }
+            }
+        }
+
+        .imgPrev {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .grupoCampos {
+            @include grid(2);
+            width: 100%;
+        }
+
+        .camposTickets {
+            @include grid(3);
+            background-color: $colorSecundario;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid;
+            border-color: claro($colorSecundario, 13);
+            position: relative;
+
+            button {
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                background-color: $rojo;
+                width: 25px;
+                height: 25px;
+                @include flex();
+                justify-content: center;
+                border-radius: 50%;
+                color: #fff;
+                cursor: pointer;
+                @include hover();
+                &:hover {
+                    background-color: oscuro($rojo, 20);
+                }
+                i {
+                    font-size: 18px;
+                }
+            }
+                
+        }
+
+        .addTicket {
+            @include flex();
+            justify-content: center;
+            width: 100%;
+                button {
+                    background-color: transparent;
+                    @include flex();
+                    justify-content: center;
+                    font-size: 18px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    height: 0;
+                    &:hover {
+                        color: $colorTag;
+                    }
+                    strong {
+                        font-size: 40px;
+                        font-weight: 100;
+                    }
+                }
+        }
+
+        
+        hr {
+            border: none;
+            height: 1px;
+            background-color: claro($colorSecundario, 10);
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        textarea {
+            height: 250px;
+        }
+
+        button{
+        &.enviarEvento {
+                width: 100%;
+                background-color: $colorTagDestacado;
+                font-size: 22px;
+                border-radius: 10px;
+                cursor: pointer;
+                @include hover();
+        
+                &:hover {
+                    background-color: $colorTag;
+                    box-shadow: 0 0 50px 0 color-opacity($colorTagDestacado, .5);
+                }
+            }
+        } 
+    }
+}
+

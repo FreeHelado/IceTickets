@@ -1,0 +1,35 @@
+//////////////////////////
+//        ()            //
+//       (__)           //
+//      (____)          //
+//     (______)         //
+//    (________)        //
+//   (__________)       //
+//    \/\/\/\/\/        //
+//     \/\/\/\/         //
+//      \/\/\/          //
+//       \/\/           //
+//        \/            //
+//////////////////////////
+//////////ESTILOS///////////
+//////////////////////////////
+
+
+@import "variables";
+@import "mixins";
+@import "extends";
+@import "global";
+
+@import "./componentes/general";
+@import "./componentes/header";
+@import "./componentes/admin";
+@import "./componentes/listados";
+@import "./componentes/carrito";
+
+@import "./paginas/formularioevento";
+@import "./paginas/evento";
+@import "./paginas/compra";
+@import "./paginas/login";
+
+
+@import "./componentes/utiles";

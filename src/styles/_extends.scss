@@ -1,0 +1,29 @@
+.caja {
+    border-radius: 18px;
+    border: $borde;
+    background-color: $colorBg;
+    padding: 20px 25px;
+    @include hover();
+}
+
+/// bordes //
+.borderRight {
+    border-right: $borde;
+}
+
+
+.borderBottom {
+    border-bottom: $borde;
+}
+
+.notUltimo {
+    &:last-child {
+        border: none
+    }
+}
+
+.notPrimero {
+    &:first-child {
+        border: none
+    }
+}
