@@ -6,15 +6,13 @@ import Evento from "../models/Evento.js"; // ? Importamos el modelo del evento
 const router = express.Router();
 
 /* =====================================
-// ? Guardar Orden en MongoDB
+// 🛒 Guardar Orden en MongoDB
 ===================================== */
 router.post("/", verificarToken, async (req, res) => {
     try {
         const { comprador, evento, tickets, total, metodoPago } = req.body;
 
         // 🔹 Verificar si el evento tiene un ID válido
-        console.log("🟢 Recibiendo evento con ID:", evento.id); // <-- 🛠️ Aquí va el console.log
-
         if (!evento.id || !evento.id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ message: "ID del evento inválido" });
         }
@@ -24,6 +22,25 @@ router.post("/", verificarToken, async (req, res) => {
         if (!eventoDB) {
             return res.status(404).json({ message: "Evento no encontrado" });
         }
+
+        // 🔥 Validar y descontar stock
+       
+        tickets.forEach(ticket => {
+            const precio = eventoDB.precios.id(ticket.idPrecio); // Busca el precio por ID
+
+            if (!precio) {
+                throw new Error(`No se encontró el precio con ID: ${ticket.idPrecio}`);
+            }
+
+            if (precio.disponibles < 1) {
+                throw new Error(`Stock agotado para ${ticket.tipoEntrada}`);
+            }
+
+            precio.disponibles -= 1; // 🚀 Descontamos 1 del stock
+        });
+
+        // ✅ Guardamos los cambios en la base de datos
+        await eventoDB.save();
 
         // Crear la orden
         const nuevaOrden = new Orden({
@@ -39,7 +56,7 @@ router.post("/", verificarToken, async (req, res) => {
         // Guardar en la base de datos
         await nuevaOrden.save();
 
-        console.log("✅ Orden guardada correctamente:", nuevaOrden);
+        
         res.status(201).json({ message: "Orden guardada exitosamente", orden: nuevaOrden });
 
     } catch (error) {

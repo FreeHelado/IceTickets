@@ -44,6 +44,7 @@ function Checkout({ usuario }) {
                 telefono: "",
                 documento: "",
                 tipoEntrada: item.nombre,
+                idPrecio: item.idPrecio, // ❌ Si no está en el carrito, llega undefined
                 monto: item.monto
             }))
         )
@@ -102,6 +103,7 @@ function Checkout({ usuario }) {
                     telefono: ticket.telefono,
                     documento: ticket.documento,
                     tipoEntrada: ticket.tipoEntrada,
+                    idPrecio: ticket.idPrecio, // 🔥 Ahora enviamos el _id del precio también
                     monto: ticket.monto,
                     idVerificador: Math.random().toString(36).substr(2, 9) // 🔥 Código único
                 })),

@@ -51,10 +51,13 @@ router.get("/:id", async (req, res) => {
       estado: evento.estado,
       imagen: evento.imagen,
       precios: evento.precios.map(precio => ({
+        _id: precio._id, // 🔥 Ahora enviamos el ID de cada precio
         nombre: precio.nombre,
         monto: precio.monto,
         disponibles: precio.disponibles,
       })),
+
+
       categoria: evento.categoria,
       lugar: evento.lugar,
       vendedor: evento.vendedor,
