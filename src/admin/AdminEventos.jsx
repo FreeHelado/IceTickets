@@ -33,7 +33,8 @@ function AdminEventos({ setToken }) {
   const [imagenPreview, setImagenPreview] = useState(null);
   const [cargandoImagen, setCargandoImagen] = useState(false);
   const [sociosEmails, setSociosEmails] = useState([]);
-  const [nuevoEmail, setNuevoEmail] = useState("");   
+  const [nuevoEmail, setNuevoEmail] = useState(""); // ✅ Aseguramos que esté definido
+
 
   const navigate = useNavigate();
 
@@ -111,6 +112,47 @@ function AdminEventos({ setToken }) {
       .then(setLugares)
       .catch((error) => console.error("❌ Error al obtener lugares:", error));
   }, []);
+
+  // ✅ Cargar sociosProductores al editar un evento
+  useEffect(() => {
+    const fetchEvento = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
+        const data = await response.json();
+        if (!data) return;
+
+        // ✅ Cargar emails de sociosProductores en la lista
+        setSociosEmails(data.sociosProductores.map(sp => sp.email));
+
+        setEvento({
+          nombre: data.nombre || "",
+          fecha: data.fecha ? parseISO(data.fecha) : null,
+          hora: data.hora || "",
+          descripcion: data.descripcion || "",
+          stock: {
+            aforo: data.stock?.aforo || "",
+            vendidas: data.stock?.vendidas || 0
+          },
+          estado: data.estado || "proximo",
+          imagen: data.imagen || "",
+          precios: data.precios?.length > 0 
+            ? data.precios.map(precio => ({
+                nombre: precio.nombre || "",
+                monto: precio.monto || "",
+                disponibles: precio.disponibles || ""
+              }))
+            : [{ nombre: "", monto: "", disponibles: "" }],
+          categoria: data.categoria || "",
+          lugar: data.lugar || "",
+          vendedor: data.vendedor || "",
+        });
+      } catch (error) {
+        console.error("❌ Error al cargar el evento:", error);
+      }
+    };
+
+    if (id) fetchEvento();
+  }, [id]);
 
   const handleFileChange = (e) => {
   const file = e.target.files[0];
@@ -217,6 +259,7 @@ function AdminEventos({ setToken }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    
     if (!imagenSeleccionada && !evento.imagen) {
       Swal.fire({
         icon: "warning",
@@ -529,16 +572,16 @@ function AdminEventos({ setToken }) {
 
         <hr />
         
-        <label>Socios Productores</label>
+        <h3>Socios Productores</h3>
         <div className="campoForm">
           <label>Busca por email</label>
           <input type="email" value={nuevoEmail} onChange={(e) => setNuevoEmail(e.target.value)} />
-          <button type="button" onClick={agregarEmail}>Agregar</button>
-          <ul>
-            {sociosEmails.map(email => (
-              <li key={email}>{email} <button onClick={() => eliminarEmail(email)}>X</button></li>
-            ))}
-          </ul>
+            <button type="button" onClick={agregarEmail}>Agregar</button>
+            <ul>
+              {sociosEmails.map(email => (
+                <li key={email}>{email} <button onClick={() => eliminarEmail(email)}>X</button></li>
+              ))}
+            </ul>
         </div>
         
 

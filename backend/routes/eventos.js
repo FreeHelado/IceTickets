@@ -26,53 +26,39 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-
-    //  Validamos si el ID es un ObjectId válido
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "ID de evento invÃ¡lido" });
+      return res.status(400).json({ message: "ID de evento inválido" });
     }
 
-    const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor");
-
+    // 🔍 Buscar el evento sin populate
+    const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor sociosProductores");
 
     if (!evento) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
-    //  Adaptamos la estructura incluyendo el _id
+    // 🔍 Buscar los emails de los sociosProductores manualmente
+    const sociosInfo = await User.find({ _id: { $in: evento.sociosProductores } }, "email _id");
+
+    // 📌 Convertimos los sociosProductores en { _id, email }
+    const sociosProductores = sociosInfo.map(user => ({
+      _id: user._id,
+      email: user.email
+    }));
+
     res.json({
-      _id: evento._id, // Asegura que el _id se enví­e en la respuesta
-      nombre: evento.nombre,
-      fecha: evento.fecha,
-      hora: evento.hora,
-      descripcion: evento.descripcion,
-      stock: {
-        aforo: evento.stock?.aforo || null,
-        vendidas: evento.stock?.vendidas || 0,
-      },
-      estado: evento.estado,
-      imagen: evento.imagen,
-      precios: evento.precios.map(precio => ({
-        _id: precio._id, // 🔥 Ahora enviamos el ID de cada precio
-        nombre: precio.nombre,
-        monto: precio.monto,
-        disponibles: precio.disponibles,
-      })),
-
-
-      categoria: evento.categoria,
-      lugar: evento.lugar,
-      vendedor: evento.vendedor,
+      ...evento.toObject(), // Convertimos el evento en un objeto plano
+      sociosProductores // ✅ Ahora tiene los emails
     });
 
   } catch (error) {
-    console.error("X Error al obtener el evento:", error);
+    console.error("❌ Error al obtener el evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
 
 
-/* =====================================
+/* ====================================
 ✨ Crear un evento (protegido con autenticación)
 ===================================== */
 router.post("/", verificarToken, async (req, res) => {
@@ -128,6 +114,51 @@ router.post("/", verificarToken, async (req, res) => {
     res.status(201).json({ message: "Evento creado exitosamente", evento: nuevoEvento });
   } catch (error) {
     console.error("❌ Error al crear evento:", error);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
+});
+
+/* =====================================
+// ✨ Actualizar un evento (requiere autenticación)
+===================================== */
+router.put("/:id", verificarToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID de evento inválido" });
+    }
+
+    // 🔍 Buscar IDs de sociosProductores a partir de los emails
+    let sociosProductores = [];
+    if (sociosProductoresEmails && sociosProductoresEmails.length > 0) {
+      const usuariosEncontrados = await User.find({ email: { $in: sociosProductoresEmails } }, "_id");
+      sociosProductores = usuariosEncontrados.map(user => user._id);
+    }
+
+    // 📌 Actualizar el evento con los nuevos datos
+    const eventoActualizado = await Evento.findByIdAndUpdate(id, {
+      nombre,
+      fecha,
+      hora,
+      descripcion,
+      stock,
+      estado,
+      imagen,
+      precios,
+      categoria,
+      lugar,
+      sociosProductores // ✅ Se actualiza la lista de IDs de sociosProductores
+    }, { new: true });
+
+    if (!eventoActualizado) {
+      return res.status(404).json({ message: "Evento no encontrado" });
+    }
+
+    res.json({ message: "Evento actualizado correctamente", evento: eventoActualizado });
+  } catch (error) {
+    console.error("❌ Error al actualizar el evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
