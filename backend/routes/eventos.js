@@ -46,15 +46,18 @@ router.get("/:id", async (req, res) => {
       descripcion: evento.descripcion,
       stock: {
         aforo: evento.stock?.aforo || null,
-        disponibles: evento.stock?.disponibles || 0,
+        vendidas: evento.stock?.vendidas || 0,
       },
       estado: evento.estado,
       imagen: evento.imagen,
       precios: evento.precios.map(precio => ({
+        _id: precio._id, // 🔥 Ahora enviamos el ID de cada precio
         nombre: precio.nombre,
         monto: precio.monto,
         disponibles: precio.disponibles,
       })),
+
+
       categoria: evento.categoria,
       lugar: evento.lugar,
       vendedor: evento.vendedor,
@@ -118,7 +121,6 @@ router.post("/", verificarToken, async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
-
 
 
 /* =====================================

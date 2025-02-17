@@ -138,6 +138,7 @@ function CompraEntradas({ precios, aforo, evento }) {
         const nuevasEntradas = precios
             .filter(precio => cantidades[precio.nombre] > 0)
             .map(precio => ({
+                idPrecio: precio._id, // 🔥 Agregamos el ID del precio
                 nombre: precio.nombre,
                 cantidad: cantidades[precio.nombre],
                 monto: precio.monto,
@@ -180,6 +181,8 @@ function CompraEntradas({ precios, aforo, evento }) {
         // 🎯 Ejecutar la animación después de actualizar el carrito
     mostrarCarrito();
     };
+    JSON.parse(localStorage.getItem("carrito"))
+
 
     // 🛒🎫 Calcular total en el carrito
     const totalEntradasCarrito = carrito.reduce((acc, item) => acc + item.cantidad, 0);

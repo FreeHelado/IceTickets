@@ -18,11 +18,11 @@ function AdminEventos({ setToken }) {
     fecha: "",
     hora: "",
     descripcion: "",
-    stock: { aforo: "", vendidas: 0 }, // ✅ Nueva estructura con `stock`
+    stock: { aforo: "", vendidas: 0 }, 
     disponibles: "",
     estado: "proximo",
     imagen: "",
-     precios: [{ nombre: "", monto: "", disponibles: "" }], // ✅ Cada precio maneja su stock
+     precios: [{ nombre: "", monto: "", disponibles: "" }],
     categoria: "",
     lugar: "",
   });
@@ -43,6 +43,8 @@ function AdminEventos({ setToken }) {
       const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
       const data = await response.json();
 
+      console.log("📊 Evento recibido del backend:", data); // 🔥 Verificar si vendidas está llegando
+
       if (!data) return;
 
       // ✅ Cargar evento en el estado
@@ -55,7 +57,7 @@ function AdminEventos({ setToken }) {
           aforo: data.stock?.aforo || "", 
           vendidas: data.stock?.vendidas || 0  // ✅ Nuevo campo `vendidas`
         },
-        disponibles: data.stock?.disponibles || "", // ✅ Cargar disponibles
+       
         estado: data.estado || "proximo",
         imagen: data.imagen || "",
         precios: data.precios?.length > 0 
@@ -475,8 +477,9 @@ function AdminEventos({ setToken }) {
 
         <hr />
         
-        <h3>Stock</h3>
+        <h3>Stock del Evento</h3>
         <div className="campoForm">  
+          <label>Aforo Total</label>
           <input 
             type="number" 
             name="aforo" 
@@ -484,7 +487,10 @@ function AdminEventos({ setToken }) {
             disabled // ❌ No editable
             placeholder="Aforo total" 
           />
+        </div>
 
+        <div className="campoForm"> 
+          <label>Vendidas</label>
           <input 
             type="number" 
             name="vendidas" 
@@ -493,6 +499,7 @@ function AdminEventos({ setToken }) {
             placeholder="Entradas vendidas (Solo informativo)" 
             disabled 
           />
+
         </div>
 
         <hr/>
