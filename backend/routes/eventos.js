@@ -1,9 +1,11 @@
 import express from "express";
 import Evento from "../models/Evento.js";
+import User from "../models/User.js"; // ✅ Importamos User para buscar IDs
 import verificarToken from "../middleware/auth.js"; // Importamos la autenticaciï¿½n
 import mongoose from "mongoose";
-const router = express.Router();
 import { format } from "date-fns"; // Aseguramos que format esté disponible
+
+const router = express.Router();
 
 /* =====================================
 🔍 Obtener todos los eventos (sin autenticación)
@@ -75,7 +77,7 @@ router.get("/:id", async (req, res) => {
 ===================================== */
 router.post("/", verificarToken, async (req, res) => {
   try {
-    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar } = req.body;
+    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails } = req.body;
 
 
     // ✅ Asegurar que `fecha` se convierte a "YYYY-MM-DD"
@@ -97,6 +99,13 @@ router.post("/", verificarToken, async (req, res) => {
     // ✅ Asignar automáticamente el usuario autenticado como vendedor
     const vendedor = req.user.userId;
 
+    // 🔍 Buscar IDs de sociosProductores a partir de emails
+    let sociosProductores = [];
+    if (sociosProductoresEmails && sociosProductoresEmails.length > 0) {
+        const usuariosEncontrados = await User.find({ email: { $in: sociosProductoresEmails } }, "_id");
+        sociosProductores = usuariosEncontrados.map(user => user._id);
+    }
+
     const nuevoEvento = new Evento({
       nombre,
       fecha,
@@ -111,13 +120,14 @@ router.post("/", verificarToken, async (req, res) => {
       precios: preciosProcesados, // $ Guardamos precios convertidos
       categoria,
       lugar,
-      vendedor
+      vendedor,
+      sociosProductores // ✅ Guardamos los IDs encontrados
     });
 
     await nuevoEvento.save();
     res.status(201).json({ message: "Evento creado exitosamente", evento: nuevoEvento });
   } catch (error) {
-    console.error("â Error al crear evento:", error);
+    console.error("❌ Error al crear evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });

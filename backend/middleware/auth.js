@@ -10,7 +10,7 @@ const verificarToken = (req, res, next) => {
   try {
     const verificado = jwt.verify(token, "secreto_super_seguro"); // Verifica el token
     req.user = verificado; // Agrega los datos del usuario al request
-    next(); // Contin�a con la siguiente funci�n
+    next(); // Continúa con la siguiente función
   } catch (error) {
     res.status(400).json({ message: "Token no válido" });
   }

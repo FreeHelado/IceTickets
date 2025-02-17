@@ -9,8 +9,6 @@ import { Editor } from "@tinymce/tinymce-react";
 import { FaRegTrashCan } from "react-icons/fa6";
 
 
-
-
 function AdminEventos({ setToken }) {
   const { id } = useParams(); // ✅ Capturar ID si estamos en edición
   const [evento, setEvento] = useState({
@@ -22,7 +20,7 @@ function AdminEventos({ setToken }) {
     disponibles: "",
     estado: "proximo",
     imagen: "",
-     precios: [{ nombre: "", monto: "", disponibles: "" }],
+    precios: [{ nombre: "", monto: "", disponibles: "" }],
     categoria: "",
     lugar: "",
   });
@@ -34,6 +32,9 @@ function AdminEventos({ setToken }) {
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   const [imagenPreview, setImagenPreview] = useState(null);
   const [cargandoImagen, setCargandoImagen] = useState(false);
+  const [sociosEmails, setSociosEmails] = useState([]);
+  const [nuevoEmail, setNuevoEmail] = useState("");   
+
   const navigate = useNavigate();
 
   // ✅ Si hay un ID, traer datos del evento para editar
@@ -43,7 +44,7 @@ function AdminEventos({ setToken }) {
       const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
       const data = await response.json();
 
-      console.log("📊 Evento recibido del backend:", data); // 🔥 Verificar si vendidas está llegando
+      
 
       if (!data) return;
 
@@ -93,8 +94,7 @@ function AdminEventos({ setToken }) {
   };
 
   if (id) fetchEvento();
-}, [id]);
-
+  }, [id]);
 
   // ✅ Cargar categorías
   useEffect(() => {
@@ -114,9 +114,7 @@ function AdminEventos({ setToken }) {
 
   const handleFileChange = (e) => {
   const file = e.target.files[0];
-  setImagenSeleccionada(file);
-
-  
+  setImagenSeleccionada(file);    
     
   if (file) {
     setCargandoImagen(true); // ✅ Mostramos el spinner
@@ -128,7 +126,7 @@ function AdminEventos({ setToken }) {
     };
     reader.readAsDataURL(file);
   }
-};
+  };
 
   // 💰 PRECIOS
   const handlePrecioChange = (index, e) => {
@@ -139,7 +137,6 @@ function AdminEventos({ setToken }) {
     const nuevoAforo = nuevosPrecios.reduce((total, p) => total + Number(p.disponibles || 0), 0);
     setEvento({ ...evento, precios: nuevosPrecios, stock: { ...evento.stock, aforo: nuevoAforo } });
   };
-
 
   const agregarPrecio = () => {
     setEvento({ 
@@ -156,6 +153,19 @@ function AdminEventos({ setToken }) {
     });
   };
   // 💰 PRECIOS
+
+
+  // Socios //
+  const agregarEmail = () => {
+    if (nuevoEmail && !sociosEmails.includes(nuevoEmail)) {
+      setSociosEmails([...sociosEmails, nuevoEmail]);
+      setNuevoEmail("");
+    }
+  };
+
+  const eliminarEmail = (email) => {
+    setSociosEmails(sociosEmails.filter(e => e !== email));
+  };
 
 
   const handleChange = (e) => {
@@ -207,7 +217,6 @@ function AdminEventos({ setToken }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
     if (!imagenSeleccionada && !evento.imagen) {
       Swal.fire({
         icon: "warning",
@@ -255,6 +264,7 @@ function AdminEventos({ setToken }) {
       })),
       categoria: evento.categoria,
       lugar: evento.lugar,
+      sociosProductoresEmails: sociosEmails,
     };
 
     try {
@@ -515,6 +525,20 @@ function AdminEventos({ setToken }) {
               </option>
             ))}
           </select>
+        </div>
+
+        <hr />
+        
+        <label>Socios Productores</label>
+        <div className="campoForm">
+          <label>Busca por email</label>
+          <input type="email" value={nuevoEmail} onChange={(e) => setNuevoEmail(e.target.value)} />
+          <button type="button" onClick={agregarEmail}>Agregar</button>
+          <ul>
+            {sociosEmails.map(email => (
+              <li key={email}>{email} <button onClick={() => eliminarEmail(email)}>X</button></li>
+            ))}
+          </ul>
         </div>
         
 

@@ -29,8 +29,10 @@ const eventoSchema = new mongoose.Schema({
   ],
   categoria: { type: mongoose.Schema.Types.ObjectId, ref: "Categoria" }, 
   lugar: { type: mongoose.Schema.Types.ObjectId, ref: "Lugar" },
-  vendedor: { type: mongoose.Schema.Types.ObjectId, ref: "Vendedor" }
-}, { toJSON: { virtuals: true } }); // ?? Permitir que Mongoose agregue virtuals al JSON
+  vendedor: { type: mongoose.Schema.Types.ObjectId, ref: "Vendedor" },
+  sociosProductores: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+
+}, { toJSON: { virtuals: true } }); // Permitir que Mongoose agregue virtuals al JSON
 
 // Virtual para obtener el precio más bajo
 eventoSchema.virtual("precioMenor").get(function () {
