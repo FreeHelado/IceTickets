@@ -31,6 +31,7 @@ function Login({ setToken }) {
       const data = await response.json();
 
       if (response.ok) {
+        console.log("🔥 Respuesta del backend:", data);
         if (!data.verificado) { // 🔥 Verificamos si el usuario está verificado
           Swal.fire({
             title: "Cuenta no verificada",
@@ -45,6 +46,7 @@ function Login({ setToken }) {
         }
         localStorage.setItem("token", data.token);
         localStorage.setItem("isAdmin", data.isAdmin); // 🔥 Guardamos isAdmin
+        localStorage.setItem("userId", data.userId); // 🔥 Guardamos el userId aquí
         setToken(data.token);
 
         const prevPage = localStorage.getItem("prevPage") || "/";

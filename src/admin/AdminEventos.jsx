@@ -25,7 +25,6 @@ function AdminEventos({ setToken }) {
      precios: [{ nombre: "", monto: "", disponibles: "" }], // ✅ Cada precio maneja su stock
     categoria: "",
     lugar: "",
-    vendedor: "",
   });
 
   const [lugares, setLugares] = useState([]);
@@ -254,7 +253,6 @@ function AdminEventos({ setToken }) {
       })),
       categoria: evento.categoria,
       lugar: evento.lugar,
-      vendedor: evento.vendedor,
     };
 
     try {
@@ -511,10 +509,7 @@ function AdminEventos({ setToken }) {
             ))}
           </select>
         </div>
-        <div className="campoForm">
-          <label htmlFor="vendedor">Vendedor</label>
-        <input type="text" name="vendedor" placeholder="ID Vendedor" value={evento.vendedor} onChange={handleChange} required />
-         </div>
+        
 
         <button type="submit" className="enviarEvento">{id ? "Actualizar Evento" : "Guardar Evento"}</button>
         </form>

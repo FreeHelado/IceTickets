@@ -72,7 +72,7 @@ router.get("/:id", async (req, res) => {
 ===================================== */
 router.post("/", verificarToken, async (req, res) => {
   try {
-    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, vendedor } = req.body;
+    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar } = req.body;
 
 
     // ✅ Asegurar que `fecha` se convierte a "YYYY-MM-DD"
@@ -81,7 +81,7 @@ router.post("/", verificarToken, async (req, res) => {
       return res.status(400).json({ message: "Fecha inválida" });
     }
 
-    // $ Convertir `monto` a número antes de guardarlo
+    // 💰 Convertir `monto` a número antes de guardarlo
     const preciosProcesados = precios.map(precio => ({
       nombre: precio.nombre,
       monto: Number(precio.monto), // Covertir Convertimos `monto` a número
@@ -90,6 +90,9 @@ router.post("/", verificarToken, async (req, res) => {
 
     // 🔥 Calculamos `aforo` sumando todas las entradas disponibles
     const aforoCalculado = preciosProcesados.reduce((total, precio) => total + precio.disponibles, 0);
+
+    // ✅ Asignar automáticamente el usuario autenticado como vendedor
+    const vendedor = req.user.userId;
 
     const nuevoEvento = new Evento({
       nombre,

@@ -6,8 +6,8 @@ import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenTo
 function AdminIndex({ setToken }) {
   const [eventos, setEventos] = useState([]);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
   const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertir a booleano
-
 
 
   useEffect(() => {
@@ -17,7 +17,10 @@ function AdminIndex({ setToken }) {
   const cargarEventos = () => {
     fetch("http://localhost:5000/api/eventos")
       .then((response) => response.json())
-      .then((data) => setEventos(data))
+      .then((data) => {
+        const eventosFiltrados = isAdmin ? data : data.filter(evento => evento.vendedor === userId); // 🔥 Filtrar solo si no es admin
+        setEventos(eventosFiltrados);
+      })
       .catch((error) => console.error("❌ Error cargando eventos:", error));
   };
 

@@ -169,7 +169,8 @@ router.post("/login", async (req, res) => {
     );
 
     // 🔥 Enviar isAdmin y verificado en la respuesta
-    res.json({ token, isAdmin: user.isAdmin, verificado: user.verificado });
+    res.json({ token, isAdmin: user.isAdmin, verificado: user.verificado, userId: user._id });
+
 
   } catch (error) {
     console.error("Error en login:", error);
