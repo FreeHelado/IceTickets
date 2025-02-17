@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare  } from "react-icons/fa6";
+import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare } from "react-icons/fa6";
+import { format, parseISO } from "date-fns";
+import esLocale from "date-fns/locale/es"; // Para formato en español
 
 function AdminIndex({ setToken }) {
   const [eventos, setEventos] = useState([]);
@@ -77,7 +79,7 @@ function AdminIndex({ setToken }) {
                 <div className="adminPanel__cont--zona2--card--data">
                   <div className="adminPanel__cont--zona2--card--data--titulo">
                     <h4>{evento.nombre}</h4>
-                    <span>{evento.fecha} - {evento.hora}</span>
+                    <span> {evento.fecha ? format(parseISO(evento.fecha), "dd 'de' MMMM yyyy", { locale: esLocale }) : "Fecha no disponible"} - {evento.hora}</span>
                   </div>
 
                   <div className="adminPanel__cont--zona2--card--data--tools">

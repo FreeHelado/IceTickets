@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare, FaRegTrashCan, FaChartLine } from "react-icons/fa6";
 import Swal from "sweetalert2";
+import { format, parseISO } from "date-fns";
+import esLocale from "date-fns/locale/es"; // Para formato en español
 
 function AdminEventosList() {
   const [eventos, setEventos] = useState([]);
@@ -83,11 +85,9 @@ function AdminEventosList() {
                 <div className="adminPanel__cont--zonaListardo--card--data">
                   <div className="adminPanel__cont--zonaListardo--card--data--titulo">
                     <h4>{evento.nombre}</h4>
-                    <span>{evento.fecha} - {evento.hora}</span>
+                    <span> {evento.fecha ? format(parseISO(evento.fecha), "dd 'de' MMMM yyyy", { locale: esLocale }) : "Fecha no disponible"} - {evento.hora}</span>
                   </div>
 
-
-                  
                   <div className="adminPanel__cont--zonaListardo--card--data--tools">
                     
                     <Link to={`/evento/${evento._id}`} target="_blank" rel="noopener noreferrer">

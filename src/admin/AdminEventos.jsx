@@ -55,7 +55,7 @@ function AdminEventos({ setToken }) {
       // ✅ Cargar evento en el estado
       setEvento({
         nombre: data.nombre || "",
-        fecha: data.fecha ? parseISO(data.fecha) : null,
+        fecha: data.fecha ? new Date(data.fecha) : null, // 🔥 Convertimos de ISO a Date
         hora: data.hora || "",
         descripcion: data.descripcion || "",
         stock: { 
@@ -125,7 +125,8 @@ function AdminEventos({ setToken }) {
         if (!data) return;
 
         // ✅ Cargar emails de sociosProductores en la lista
-        setSociosEmails(data.sociosProductores.map(sp => sp.email));
+        setSociosEmails(data.sociosProductores ? data.sociosProductores.map(sp => sp.email) : []);
+
 
         setEvento({
           nombre: data.nombre || "",
@@ -235,7 +236,7 @@ function AdminEventos({ setToken }) {
 
   const handleFechaChange = (date) => {
     if (!date) return;
-    const fechaFormateada = format(date, "yyyy-MM-dd", { locale: esLocale });
+    setEvento({ ...evento, fecha: date }); // ✅ Guardamos la fecha como `Date`
     setEvento({ ...evento, fecha: fechaFormateada });
   };
 
@@ -294,7 +295,7 @@ function AdminEventos({ setToken }) {
     // ✅ Construir el objeto `evento` con la nueva estructura
     const eventoData = {
       nombre: evento.nombre,
-      fecha: evento.fecha,
+      fecha: evento.fecha.toISOString(), // ✅ Convertimos Date a ISO antes de enviar
       hora: evento.hora,
       descripcion: evento.descripcion,
       stock: { 
@@ -436,7 +437,7 @@ function AdminEventos({ setToken }) {
         <div className="campoForm">
           <label htmlFor="fecha">Fecha del Evento</label>
           <ReactDatePicker
-            selected={evento.fecha ? new Date(evento.fecha) : null}
+            selected={evento.fecha} // ✅ Ahora es un objeto Date
             onChange={handleFechaChange}
             dateFormat="EEEE d 'de' MMMM yyyy"
             locale={esLocale}  

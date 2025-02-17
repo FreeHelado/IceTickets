@@ -26,37 +26,33 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validar que el ID sea de MongoDB
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "ID de evento inválido" });
     }
 
-    // 🔍 Buscar el evento sin populate
+    // Buscar el evento sin populate
     const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor sociosProductores");
 
     if (!evento) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
-    // 🔍 Buscar los emails de los sociosProductores manualmente
-    const sociosInfo = await User.find({ _id: { $in: evento.sociosProductores } }, "email _id");
+    console.log("Evento encontrado:", evento);
 
-    // 📌 Convertimos los sociosProductores en { _id, email }
+    // Buscar los emails de los sociosProductores manualmente
+    const sociosInfo = await User.find({ _id: { $in: evento.sociosProductores || [] } }, "email _id");
+
+    // Convertimos los sociosProductores en { _id, email }
     const sociosProductores = sociosInfo.map(user => ({
       _id: user._id,
       email: user.email
     }));
 
-    // 🔍 Buscar el email del vendedor
-    let vendedorEmail = null;
-    if (evento.vendedor) {
-      const vendedorInfo = await User.findById(evento.vendedor).select("email");
-      vendedorEmail = vendedorInfo ? vendedorInfo.email : "No disponible";
-    }
-
     res.json({
-      ...evento.toObject(), // Convertimos el evento en un objeto plano
-      sociosProductores, // ✅ Ahora tiene los emails
-      vendedorEmail // ✅ Agregamos el email del vendedor
+      ...evento.toObject(),
+      sociosProductores // ✅ Ahora tiene los emails
     });
 
   } catch (error) {
@@ -64,6 +60,7 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
+
 
 
 /* ====================================
@@ -74,11 +71,8 @@ router.post("/", verificarToken, async (req, res) => {
     const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails } = req.body;
 
 
-    // ✅ Asegurar que `fecha` se convierte a "YYYY-MM-DD"
-    const fechaConvertida = fecha ? format(new Date(fecha), "yyyy-MM-dd") : null;
-    if (!fechaConvertida) {
-      return res.status(400).json({ message: "Fecha inválida" });
-    }
+    // ✅ Convertir fecha a Date antes de guardarla
+    const fechaConvertida = new Date(fecha);
 
     // 💰 Convertir `monto` a número antes de guardarlo
     const preciosProcesados = precios.map(precio => ({
@@ -102,7 +96,7 @@ router.post("/", verificarToken, async (req, res) => {
 
     const nuevoEvento = new Evento({
       nombre,
-      fecha,
+      fecha: fechaConvertida, // ✅ Guardamos el Date correctamente
       hora,
       descripcion,
       stock: { 

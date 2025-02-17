@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const eventoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  fecha: { type: String, required: true },
+  fecha: { type: Date, required: true }, // ✅ Guardamos como Date en UTC
   hora: { type: String, required: true },
   descripcion: { type: String },
   stock: { 
