@@ -18,11 +18,16 @@ function AdminEventosList() {
     fetch("http://localhost:5000/api/eventos")
       .then((response) => response.json())
       .then((data) => {
-        const eventosFiltrados = isAdmin ? data : data.filter(evento => evento.vendedor === userId); // 🔥 Filtrar solo si no es admin
+        const eventosFiltrados = isAdmin 
+          ? data 
+          : data.filter(evento => 
+              evento.vendedor === userId || evento.sociosProductores.includes(userId)
+            );
         setEventos(eventosFiltrados);
       })
       .catch((error) => console.error("❌ Error cargando eventos:", error));
   };
+
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
