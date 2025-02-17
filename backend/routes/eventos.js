@@ -120,7 +120,6 @@ router.post("/", verificarToken, async (req, res) => {
 });
 
 
-
 /* =====================================
 // 🗑 Eliminar un evento por ID (requiere autenticaciÃ³n)
 ===================================== */

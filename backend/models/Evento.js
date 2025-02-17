@@ -15,18 +15,18 @@ const eventoSchema = new mongoose.Schema({
     default: "proximo"
   },
   imagen: { type: String, required: true },
-  precios: [
+    precios: [
     {
-      nombre: { type: String, required: true }, // Tipo de entrada (General, VIP, etc.)
+      _id: { type: mongoose.Schema.Types.ObjectId, auto: true }, // Genera un ID único
+      nombre: { type: String, required: true },
       monto: { 
         type: Number, 
         required: true, 
-        min: [1, "El monto debe ser mayor a 0"] // Validación directa en el esquema
+        min: [1, "El monto debe ser mayor a 0"] 
       }, 
-      disponibles: { type: Number, required: true } // entradas disponibles de un tipo, más adelante este stock bajará con las ventas
+      disponibles: { type: Number, required: true } 
     }
   ],
-
   categoria: { type: mongoose.Schema.Types.ObjectId, ref: "Categoria" }, 
   lugar: { type: mongoose.Schema.Types.ObjectId, ref: "Lugar" },
   vendedor: { type: mongoose.Schema.Types.ObjectId, ref: "Vendedor" }
