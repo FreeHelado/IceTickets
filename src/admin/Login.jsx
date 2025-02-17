@@ -129,6 +129,7 @@ function Login({ setToken }) {
 
           <button type="submit">Ingresar</button>
         </form>
+        <span>Olvidé mi contraseña</span>
       </div>
       <div className="login__crear">
          <span>
