@@ -34,6 +34,7 @@ function AdminEventos({ setToken }) {
   const [cargandoImagen, setCargandoImagen] = useState(false);
   const [sociosEmails, setSociosEmails] = useState([]);
   const [nuevoEmail, setNuevoEmail] = useState(""); // ✅ Aseguramos que esté definido
+  const [vendedorEmail, setVendedorEmail] = useState(""); // ✅ Guardamos el email del vendedor
   const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
   const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertimos el string a booleano
 
@@ -47,8 +48,9 @@ function AdminEventos({ setToken }) {
       const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
       const data = await response.json();
 
-      
       if (!data) return;
+
+      setVendedorEmail(data.vendedorEmail || "No disponible"); // ✅ Guardamos el email del vendedor
 
       // ✅ Cargar evento en el estado
       setEvento({
@@ -575,26 +577,41 @@ function AdminEventos({ setToken }) {
         
         <h3>Socios Productores</h3>
         <div className="campoForm">
+          <div className="alert">
+            Vendedor de este evento: {vendedorEmail}
+          </div>
+        </div>
+
+
+        <div className="sociosCont">
+          
           {isAdmin || userId === evento.vendedor ? (
             <>
-              <label>Busca por email</label>
-              <input type="email" value={nuevoEmail} onChange={(e) => setNuevoEmail(e.target.value)} />
-              <button type="button" onClick={agregarEmail}>Agregar</button>
+              <div className="alert alert-warning">
+                Ingresa aquí los emails de los demás productores, si tienen un usuario en IceTicket, podrán ver y administrar el evento. Ten en cuenta que todos los productores tienen los mismos privilegios en los eventos, podrán eliminarlo y modificar cualquiera de sus datos. Lo único que solo puedes hacer tu, es editar los socios promotores.
+               </div>
+              
+              <div className="campoForm campoSocio">
+                <label>Ingresá el Email</label>
+                <input type="email" value={nuevoEmail} onChange={(e) => setNuevoEmail(e.target.value)} />
+                <button type="button" onClick={agregarEmail}>Agregar</button>
+              </div>
             </>
           ) : (
-            <p>No puedes modificar los socios productores.</p>
+            <div className="alert alert-warning">Solo el vendedor {vendedorEmail} puede modificar los socios productores</div>
           )}
 
-          <ul>
-            {sociosEmails.map(email => (
-              <li key={email}>
-                {email}{" "}
-                {isAdmin || userId === evento.vendedor ? (
-                  <button onClick={() => eliminarEmail(email)}>X</button>
-                ) : null}
-              </li>
-            ))}
-          </ul>
+            <div className="listadoSocios">
+              <h5>Socios:</h5>
+              {sociosEmails.map(email => (
+                <span key={email}>
+                  {email}{" "}
+                  {isAdmin || userId === evento.vendedor ? (
+                    <button onClick={() => eliminarEmail(email)}>X</button>
+                  ) : null}
+                </span>
+              ))}
+            </div>
         </div>
 
         

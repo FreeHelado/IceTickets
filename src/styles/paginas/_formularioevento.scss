@@ -74,6 +74,9 @@
             }
         }
 
+        
+        
+
         .imgPrev {
             border-radius: 10px;
             overflow: hidden;
@@ -169,3 +172,57 @@
     }
 }
 
+.listadoSocios {
+    background-color: #ffffff0f;
+    @include flexColumn(0px);
+    width: 100%;
+    padding: 20px 25px;
+    border-radius: 15px;
+    h5 {
+        font-weight: 600;
+    }
+
+    span {
+        @extend .borderBottom, .notUltimo;
+        border-color: #ffffff2d;
+        @include flex(20px);
+        width: 100%;
+        padding-block: 10px;
+        button {
+            background-color: $rojo;
+            height: 24px;
+            @include flex();
+            justify-content: center;
+            border-radius: 60px;
+            font-size: 14px;
+            padding: 8px;
+            cursor: pointer;
+            &:hover {
+                background-color: color-opacity($rojo, .4);
+            }
+        }
+    }
+}
+
+.sociosCont {
+    @include flexColumn(30px);
+
+    .campoSocio {
+        position: relative;
+
+        button {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            height: 24px;
+            padding: 18px;
+            @include flex();
+            justify-content: center;
+            cursor: pointer;
+            background-color: $colorTag;
+            &:hover {
+                background-color: $colorTagDestacado;
+            }
+        }
+    }
+}

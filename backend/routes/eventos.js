@@ -46,9 +46,17 @@ router.get("/:id", async (req, res) => {
       email: user.email
     }));
 
+    // 🔍 Buscar el email del vendedor
+    let vendedorEmail = null;
+    if (evento.vendedor) {
+      const vendedorInfo = await User.findById(evento.vendedor).select("email");
+      vendedorEmail = vendedorInfo ? vendedorInfo.email : "No disponible";
+    }
+
     res.json({
       ...evento.toObject(), // Convertimos el evento en un objeto plano
-      sociosProductores // ✅ Ahora tiene los emails
+      sociosProductores, // ✅ Ahora tiene los emails
+      vendedorEmail // ✅ Agregamos el email del vendedor
     });
 
   } catch (error) {
