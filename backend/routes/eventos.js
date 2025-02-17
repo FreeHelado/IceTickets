@@ -130,6 +130,12 @@ router.put("/:id", verificarToken, async (req, res) => {
       return res.status(400).json({ message: "ID de evento inválido" });
     }
 
+    // 🔍 Buscar el evento antes de actualizar
+    const eventoExistente = await Evento.findById(id);
+    if (!eventoExistente) {
+      return res.status(404).json({ message: "Evento no encontrado" });
+    }
+
     // 🔍 Buscar IDs de sociosProductores a partir de los emails
     let sociosProductores = [];
     if (sociosProductoresEmails && sociosProductoresEmails.length > 0) {
@@ -153,15 +159,17 @@ router.put("/:id", verificarToken, async (req, res) => {
     }, { new: true });
 
     if (!eventoActualizado) {
-      return res.status(404).json({ message: "Evento no encontrado" });
+      return res.status(404).json({ message: "Evento no encontrado tras la actualización" });
     }
 
     res.json({ message: "Evento actualizado correctamente", evento: eventoActualizado });
+
   } catch (error) {
     console.error("❌ Error al actualizar el evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
+
 
 
 /* =====================================

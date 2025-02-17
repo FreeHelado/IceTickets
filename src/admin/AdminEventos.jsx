@@ -34,6 +34,8 @@ function AdminEventos({ setToken }) {
   const [cargandoImagen, setCargandoImagen] = useState(false);
   const [sociosEmails, setSociosEmails] = useState([]);
   const [nuevoEmail, setNuevoEmail] = useState(""); // ✅ Aseguramos que esté definido
+  const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
+  const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertimos el string a booleano
 
 
   const navigate = useNavigate();
@@ -46,7 +48,6 @@ function AdminEventos({ setToken }) {
       const data = await response.json();
 
       
-
       if (!data) return;
 
       // ✅ Cargar evento en el estado
@@ -574,15 +575,28 @@ function AdminEventos({ setToken }) {
         
         <h3>Socios Productores</h3>
         <div className="campoForm">
-          <label>Busca por email</label>
-          <input type="email" value={nuevoEmail} onChange={(e) => setNuevoEmail(e.target.value)} />
-            <button type="button" onClick={agregarEmail}>Agregar</button>
-            <ul>
-              {sociosEmails.map(email => (
-                <li key={email}>{email} <button onClick={() => eliminarEmail(email)}>X</button></li>
-              ))}
-            </ul>
+          {isAdmin || userId === evento.vendedor ? (
+            <>
+              <label>Busca por email</label>
+              <input type="email" value={nuevoEmail} onChange={(e) => setNuevoEmail(e.target.value)} />
+              <button type="button" onClick={agregarEmail}>Agregar</button>
+            </>
+          ) : (
+            <p>No puedes modificar los socios productores.</p>
+          )}
+
+          <ul>
+            {sociosEmails.map(email => (
+              <li key={email}>
+                {email}{" "}
+                {isAdmin || userId === evento.vendedor ? (
+                  <button onClick={() => eliminarEmail(email)}>X</button>
+                ) : null}
+              </li>
+            ))}
+          </ul>
         </div>
+
         
 
         <button type="submit" className="enviarEvento">{id ? "Actualizar Evento" : "Guardar Evento"}</button>
