@@ -127,6 +127,8 @@ router.put("/:id", verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails } = req.body;
+    const userId = req.user.userId; // 🔥 Usuario autenticado
+    const isAdmin = req.user.isAdmin; // 🔥 Si es admin
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "ID de evento inválido" });
@@ -138,6 +140,14 @@ router.put("/:id", verificarToken, async (req, res) => {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
+    // 🔒 Verificar permisos: Solo el admin, el vendedor o un socio asignado pueden editar
+    const esVendedor = eventoExistente.vendedor.toString() === userId;
+    const esSocio = eventoExistente.sociosProductores.some(socio => socio.toString() === userId);
+
+    if (!isAdmin && !esVendedor && !esSocio) {
+      return res.status(403).json({ message: "No tienes permisos para editar este evento" });
+    }
+
     // 🔍 Buscar IDs de sociosProductores a partir de los emails
     let sociosProductores = [];
     if (sociosProductoresEmails && sociosProductoresEmails.length > 0) {
@@ -146,19 +156,23 @@ router.put("/:id", verificarToken, async (req, res) => {
     }
 
     // 📌 Actualizar el evento con los nuevos datos
-    const eventoActualizado = await Evento.findByIdAndUpdate(id, {
-      nombre,
-      fecha,
-      hora,
-      descripcion,
-      stock,
-      estado,
-      imagen,
-      precios,
-      categoria,
-      lugar,
-      sociosProductores // ✅ Se actualiza la lista de IDs de sociosProductores
-    }, { new: true });
+    const eventoActualizado = await Evento.findByIdAndUpdate(
+      id,
+      {
+        nombre,
+        fecha,
+        hora,
+        descripcion,
+        stock,
+        estado,
+        imagen,
+        precios,
+        categoria,
+        lugar,
+        sociosProductores, // ✅ Se actualiza la lista de IDs de sociosProductores
+      },
+      { new: true }
+    );
 
     if (!eventoActualizado) {
       return res.status(404).json({ message: "Evento no encontrado tras la actualización" });

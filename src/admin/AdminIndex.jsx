@@ -3,19 +3,19 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare } from "react-icons/fa6";
 import { format, parseISO } from "date-fns";
-import esLocale from "date-fns/locale/es"; // Para formato en espa�ol
+import esLocale from "date-fns/locale/es";
 
 function AdminIndex({ setToken }) {
   const [eventos, setEventos] = useState([]);
-  const [usuario, setUsuario] = useState(null); // 🔥 Nuevo estado para guardar el usuario
+  const [usuario, setUsuario] = useState(null);
   const navigate = useNavigate();
-  const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
-  const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertir a booleano
+  const userId = localStorage.getItem("userId");
+  const isAdmin = localStorage.getItem("isAdmin") === "true"; 
 
 
   useEffect(() => {
     cargarEventos();
-    cargarUsuario(); // ✅ Llamamos la función para obtener los datos del usuario
+    cargarUsuario(); 
   }, []);
 
   const cargarEventos = () => {
@@ -41,7 +41,7 @@ function AdminIndex({ setToken }) {
         .then((res) => res.json())
         .then((data) => {
           if (data.nombre || data.email) {
-            setUsuario(data); // ✅ Guardamos el usuario en el estado
+            setUsuario(data);
           }
         })
         .catch((error) => console.error("❌ Error obteniendo perfil:", error));

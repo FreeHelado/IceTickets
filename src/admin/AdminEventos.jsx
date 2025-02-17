@@ -42,34 +42,65 @@ function AdminEventos({ setToken }) {
   const navigate = useNavigate();
 
   // ✅ Si hay un ID, traer datos del evento para editar
-  useEffect(() => {
+    useEffect(() => {
   const fetchEvento = async () => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
-      const data = await response.json();
+    const token = localStorage.getItem("token");
+    
+    // 🔒 Si no hay token, redirigir al login
+    if (!token) {
+      Swal.fire({
+        icon: "warning",
+        title: "Acceso restringido",
+        text: "Debes iniciar sesión para acceder a esta sección",
+        confirmButtonText: "Ir al Login",
+      }).then(() => navigate("/login"));
+      return;
+    }
 
+    try {
+      const response = await fetch(`http://localhost:5000/api/eventos/${id}`, {
+        headers: { Authorization: token }
+      });
+
+      if (!response.ok) {
+        throw new Error("No autorizado");
+      }
+
+      const data = await response.json();
       if (!data) return;
 
-      setVendedorEmail(data.vendedorEmail || "No disponible"); // ✅ Guardamos el email del vendedor
+      // 🔐 Verificar si el usuario puede editar
+      const puedeEditar =
+        isAdmin || 
+        userId === data.vendedor || 
+        data.sociosProductores.some(socio => socio._id === userId);
 
-      // ✅ Cargar evento en el estado
+      if (!puedeEditar) {
+        Swal.fire({
+          icon: "error",
+          title: "Acceso denegado",
+          text: "No tienes permisos para editar este evento",
+          confirmButtonText: "Volver al panel",
+        }).then(() => navigate("/eventosadmin"));
+        return;
+      }
+
       setEvento({
         nombre: data.nombre || "",
-        fecha: data.fecha ? new Date(data.fecha) : null, // 🔥 Convertimos de ISO a Date
+        fecha: data.fecha ? parseISO(data.fecha) : null,
         hora: data.hora || "",
         descripcion: data.descripcion || "",
         stock: { 
           aforo: data.stock?.aforo || "", 
-          vendidas: data.stock?.vendidas || 0  // ✅ Nuevo campo `vendidas`
+          vendidas: data.stock?.vendidas || 0  
         },
-       
         estado: data.estado || "proximo",
         imagen: data.imagen || "",
         precios: data.precios?.length > 0 
           ? data.precios.map(precio => ({
               nombre: precio.nombre || "",
               monto: precio.monto || "",
-              disponibles: precio.disponibles || "" // ✅ Nuevo campo `disponibles` por tipo de entrada
+              disponibles: precio.disponibles || ""
             }))
           : [{ nombre: "", monto: "", disponibles: "" }],
         categoria: data.categoria || "",
@@ -77,28 +108,21 @@ function AdminEventos({ setToken }) {
         vendedor: data.vendedor || "",
       });
 
-      // ✅ Si hay imagen, mostrarla en la preview
-      if (data.imagen) {
-        setImagenPreview(`http://localhost:5000/img/eventos/${data.imagen}`);
-      }
-
-      // ✅ Si el evento tiene un lugar, obtener el nombre
-      if (data.lugar) {
-        const lugarResponse = await fetch(`http://localhost:5000/api/lugares/${data.lugar}`);
-        if (lugarResponse.ok) {
-          const lugarData = await lugarResponse.json();
-          setBusquedaLugar(lugarData.nombre);
-        } else {
-          console.error("❌ Error: Lugar no encontrado");
-        }
-      }
     } catch (error) {
       console.error("❌ Error al cargar el evento:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo cargar el evento.",
+        confirmButtonText: "Volver",
+      }).then(() => navigate("/eventosadmin"));
     }
   };
 
   if (id) fetchEvento();
-  }, [id]);
+}, [id, isAdmin, userId, navigate]);
+
+
 
   // ✅ Cargar categorías
   useEffect(() => {
