@@ -120,3 +120,29 @@
         cursor: pointer;
     }
 }
+
+//////// /////////
+/// Sweet Alert////
+.swal2-popup {
+    border-radius: 20px;
+    color: #fff;
+    background-color:$colorPrimario;
+    background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
+    border: 2px solid $colorPrimarioClaro;
+}
+
+.swal2-backdrop-show {
+    background-color: #000000d6;
+    backdrop-filter: blur(4px);
+}
+
+.swal2-confirm {
+    background-color: $colorTagDestacado;
+    border-radius: 10px;
+}
+
+.swal2-toast {
+    background-color: $amarelo !important;
+    background: $amarelo !important;
+    color: $colorPrimario !important;
+}

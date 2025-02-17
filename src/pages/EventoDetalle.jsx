@@ -83,7 +83,7 @@ function EventoDetalle() {
           <div dangerouslySetInnerHTML={{ __html: evento.descripcion }} />
 
           
-          <span>Vendedor: {evento.vendedor}</span>
+          
           
           {/* ✅ Renderizar LugarCard con los datos del lugar */}
           

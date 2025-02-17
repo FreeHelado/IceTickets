@@ -42,16 +42,13 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       nombre,
       telefono,
-      isAdmin: false, // Siempre inicia como usuario normal
-      verificado: false, // 🔥 Nuevo campo: el usuario no está verificado
+      isAdmin: false, 
+      verificado: false,
       codigoVerificacion,
       expiracionCodigo
     });
 
     await newUser.save();
-
-    console.log(`Código de verificación para ${email}: ${codigoVerificacion}`);
-
     res.status(201).json({ message: "Usuario registrado. Verifica tu correo.", email });
 
   } catch (error) {
@@ -132,7 +129,6 @@ router.post("/resend-code", async (req, res) => {
     user.expiracionCodigo = nuevaExpiracion;
     await user.save();
 
-    console.log(`Nuevo código de verificación para ${email}: ${nuevoCodigo}`);
 
     res.json({ message: "Se ha enviado un nuevo código de verificación." });
 
@@ -158,7 +154,7 @@ router.post("/login", async (req, res) => {
     // Comparar la contraseña ingresada con la hasheada en MongoDB
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "ContraseÃ±a incorrecta" });
+      return res.status(400).json({ message: "Contraseña incorrecta" });
     }
 
     // 🔥 Generar un token JWT incluyendo isAdmin y verificado

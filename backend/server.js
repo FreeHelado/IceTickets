@@ -37,8 +37,8 @@ app.use("/api/ordenes", ordenesRoutes);
 // DDBB Conectar a MongoDB
 mongoose.set("strictQuery", false); // Desactivar restricciones en consultas
 mongoose.connect(MONGO_URI)
-   .then(() => console.log(`ð Conectado a MongoDB: ${MONGO_URI}`))
-  .catch(err => console.error("âError de conexiÃ³n con MongoDB:", err));
+   .then(() => console.log(`🚀 Conectado a MongoDB: ${MONGO_URI}`))
+  .catch(err => console.error("❌ Error de conexión con MongoDB:", err));
 
 
 /* =====================================
@@ -61,12 +61,12 @@ app.get("/api/eventos/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // ð Validar si el ID es un ObjectId vÃ¡lido
+    //  Validar si el ID es un ObjectId válido
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "ID de evento invÃ¡lido" });
+      return res.status(400).json({ message: "ID de evento inválido" });
     }
 
-    // ð Buscar el evento y seleccionar solo los campos necesarios
+    // 🔍 Buscar el evento y seleccionar solo los campos necesarios
     const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor");
 
     if (!evento) {
@@ -80,7 +80,7 @@ app.get("/api/eventos/:id", async (req, res) => {
       hora: evento.hora,
       descripcion: evento.descripcion,
       stock: {
-        aforo: evento.stock?.aforo || null, // `aforo` puede ser null si no estÃ¡ definido
+        aforo: evento.stock?.aforo || null, // `aforo` puede ser null si no está definido
         disponibles: evento.stock?.disponibles || 0, // `disponibles` se calcula en el POST
       },
       estado: evento.estado,
@@ -90,13 +90,13 @@ app.get("/api/eventos/:id", async (req, res) => {
         monto: precio.monto,
         disponibles: precio.disponibles, // Stock por tipo de entrada
       })),
-      categoria: evento.categoria, // Se devuelve el ID, sin `populate()`
-      lugar: evento.lugar, // Se devuelve el ID, sin `populate()`
-      vendedor: evento.vendedor, // Se devuelve el ID, sin `populate()`
+      categoria: evento.categoria, 
+      lugar: evento.lugar, 
+      vendedor: evento.vendedor, 
     });
 
   } catch (error) {
-    console.error("â Error al obtener el evento:", error);
+    console.error("❌ Error al obtener el evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
@@ -110,8 +110,8 @@ app.get("/api/categorias", async (req, res) => {
     const categorias = await Categoria.find();
     res.json(categorias);
   } catch (error) {
-    console.error("â Error al obtener categorÃ­Â­as:", error);
-    res.status(500).json({ message: "Error al obtener categorÃÂ­as" });
+    console.error("❌ Error al obtener categorí­as:", error);
+    res.status(500).json({ message: "Error al obtener categorí­as" });
   }
 });
 
@@ -122,11 +122,11 @@ app.get("/api/categorias/:id", async (req, res) => {
   try {
     const categoria = await Categoria.findById(req.params.id);
     if (!categoria) {
-      return res.status(404).json({ message: "CategorÃÂ­a no encontrada" });
+      return res.status(404).json({ message: "Categorí­a no encontrada" });
     }
     res.json(categoria);
   } catch (error) {
-    console.error("â Error al obtener la categorÃÂ­a:", error);
+    console.error("❌ Error al obtener la categorÃÂ­a:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
@@ -295,6 +295,6 @@ app.use("/img/lugares", express.static("public/img/lugares"));
 ===================================== */
 
 /* =====================================
-// ðð Iniciar el servidor en el puerto 5000
+Iniciar el servidor en el puerto 5000
 ===================================== */
 app.listen(5000, () => console.log("Servidor corriendo en ${BACKEND_URL}"));
