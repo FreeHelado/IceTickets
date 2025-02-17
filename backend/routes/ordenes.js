@@ -39,6 +39,10 @@ router.post("/", verificarToken, async (req, res) => {
             precio.disponibles -= 1; // 🚀 Descontamos 1 del stock
         });
 
+        // 🔥 Sumar la cantidad de entradas vendidas al evento
+        const cantidadVendida = tickets.length; // 📌 Cantidad de tickets en la orden
+        eventoDB.stock.vendidas += cantidadVendida; // ✅ Sumamos al campo vendidas
+
         // ✅ Guardamos los cambios en la base de datos
         await eventoDB.save();
 
@@ -56,7 +60,7 @@ router.post("/", verificarToken, async (req, res) => {
         // Guardar en la base de datos
         await nuevaOrden.save();
 
-        
+        console.log(`✅ Orden guardada. Se sumaron ${cantidadVendida} tickets al evento.`);
         res.status(201).json({ message: "Orden guardada exitosamente", orden: nuevaOrden });
 
     } catch (error) {

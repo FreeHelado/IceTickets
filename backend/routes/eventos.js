@@ -46,7 +46,7 @@ router.get("/:id", async (req, res) => {
       descripcion: evento.descripcion,
       stock: {
         aforo: evento.stock?.aforo || null,
-        disponibles: evento.stock?.disponibles || 0,
+        vendidas: evento.stock?.vendidas || 0,
       },
       estado: evento.estado,
       imagen: evento.imagen,
