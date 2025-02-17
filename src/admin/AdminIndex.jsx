@@ -5,6 +5,7 @@ import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenTo
 
 function AdminIndex({ setToken }) {
   const [eventos, setEventos] = useState([]);
+  const [usuario, setUsuario] = useState(null); // 🔥 Nuevo estado para guardar el usuario
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
   const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertir a booleano
@@ -12,6 +13,7 @@ function AdminIndex({ setToken }) {
 
   useEffect(() => {
     cargarEventos();
+    cargarUsuario(); // ✅ Llamamos la función para obtener los datos del usuario
   }, []);
 
   const cargarEventos = () => {
@@ -28,6 +30,22 @@ function AdminIndex({ setToken }) {
       .catch((error) => console.error("? Error cargando eventos:", error));
   };
 
+  const cargarUsuario = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("http://localhost:5000/api/auth/perfil", {
+        headers: { Authorization: token }
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.nombre || data.email) {
+            setUsuario(data); // ✅ Guardamos el usuario en el estado
+          }
+        })
+        .catch((error) => console.error("❌ Error obteniendo perfil:", error));
+    }
+  };
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -40,7 +58,7 @@ function AdminIndex({ setToken }) {
 
       <div className="adminPanel__cont">
         <div className="adminPanel__cont--zona1">
-          <h1>Bienvenido a IceTicket bro</h1>
+          <h1>Bienvenido a IceTicket {usuario?.nombre || usuario?.email || "Usuario"} 👋</h1>
           <h2>Desde este panel vas a poder vender tus tickets y administrarlos</h2>
           <span>Ayuda</span>
 

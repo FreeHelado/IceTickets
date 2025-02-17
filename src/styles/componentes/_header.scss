@@ -19,11 +19,16 @@ header {
                 font-size: 28px;
             }
             span {
-                align-self: baseline;
+                
                 color: $colorTag;
                 font-size: 13px;
                 font-weight: 500;
             }
+        }
+        small {
+            color: $colorTag;
+            font-size: 13px;
+            font-weight: 500;
         }
     }
 
@@ -44,7 +49,7 @@ header {
     .header__tools {
        
             @include flex(25px);
-        a {
+        a, div {
             @include flex(5px);
             align-items: center;
             color: #fff;
