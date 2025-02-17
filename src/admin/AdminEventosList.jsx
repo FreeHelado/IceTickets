@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare, FaRegTrashCan, FaChartLine } from "react-icons/fa6";
 import Swal from "sweetalert2";
 
 function AdminEventosList() {
@@ -55,59 +56,81 @@ function AdminEventosList() {
   };
 
   return (
-    <div className="admin-eventos-list">
-      <button onClick={() => navigate("/crearevento")}>📅 Crear Evento</button>
-      <h2>📋 Listado de Eventos</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Evento</th>
-            <th>Nombre</th>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {eventos.length > 0 ? (
-            eventos.map((evento) => (
-              <tr key={evento._id}>
-                <td>
-                  <img 
-                    src={`http://localhost:5000/img/eventos/${evento.imagen}`} 
-                    alt={`Imagen de ${evento.nombre}`} 
-                    style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "5px" }}
-                  />
-                </td>
-                <td>{evento.nombre}</td>
-                <td>{evento.fecha}</td>
-                <td>{evento.hora}</td>
-                <td>
-                  <Link to={`/evento/${evento._id}`} target="_blank" rel="noopener noreferrer">
-  <button style={{ marginRight: "10px", background: "blue", color: "white" }}>
-    👁️ Vista previa
-  </button>
-</Link>
+    <div className="adminPanel">
+      <h2>Listado de Eventos</h2>
+      <div className="alert">
+        Aquí se presentan todos los eventos de los cuales formas parte como vendedor y administrador
+      </div>
+      <div className="adminPanel__cont">
 
-                  <Link to={`/admin/evento/editar/${evento._id}`}>
-                    <button style={{ marginRight: "10px" }}>✏️ Editar</button>
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(evento._id)}
-                    style={{ background: "red", color: "white" }}
-                  >
-                    ❌ Borrar
-                  </button>
-                </td>
-              </tr>
+        <div className="adminPanel__cont--zonaListardo">
+         {eventos.length > 0 ? (
+            eventos.map((evento) => (
+              <div key={evento._id} className="adminPanel__cont--zonaListardo--card">
+                
+                <img src={`http://localhost:5000/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
+                
+                <div className="adminPanel__cont--zonaListardo--card--data">
+                  <div className="adminPanel__cont--zonaListardo--card--data--titulo">
+                    <h4>{evento.nombre}</h4>
+                    <span>{evento.fecha} - {evento.hora}</span>
+                  </div>
+
+
+                  
+                  <div className="adminPanel__cont--zonaListardo--card--data--tools">
+                    
+                    <Link to={`/evento/${evento._id}`} target="_blank" rel="noopener noreferrer">
+                      <i><FaRegEye /></i>
+                      <span>Ir al Evento</span>
+                    </Link>
+                    <Link to={`/admin/evento/editar/${evento._id}`}>
+                      <i><FaRegPenToSquare /></i>
+                      <span>Editar Evento</span>
+                    </Link>
+                    <Link to={`/admin/evento/editar/${evento._id}`}>
+                        <FaChartLine />
+                        <span>Ventas</span>
+                    </Link>
+                    <div onClick={() => handleDelete(evento._id)} className="borrarEvento">
+                        <i><FaRegTrashCan /></i>
+                        <span>Eliminar</span>
+                    </div>
+               
+                  </div>
+                </div>
+              </div>
+                
             ))
           ) : (
-            <tr>
-              <td colSpan="5">Cargando eventos...</td>
-            </tr>
+            <div>
+              Cargando eventos...
+            </div>
           )}
-        </tbody>
-      </table>
+          
+        </div>
+
+        <div className="adminPanel__cont--zona3">
+            <nav>
+              <button onClick={() => navigate("/crearevento")}>
+                <i><FaRegCalendarPlus /></i>
+                <span>Nuevo Evento</span>
+              </button>
+
+              <button onClick={() => navigate("/eventosadmin")}>
+                <i><FaRegCalendarCheck /></i>
+                <span>Mis Eventos</span>
+              </button>
+              
+              <button onClick={() => navigate("/")}>
+                <i><FaIceCream /></i>
+                <span>Inicio</span>
+              </button>
+            </nav>
+
+        </div>
+      </div>
+
     </div>
   );
 }

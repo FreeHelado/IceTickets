@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { GoDash, GoPlus } from "react-icons/go";
-import { FaTicketSimple } from "react-icons/fa6";
+import { FaTicketSimple, FaRegTrashCan } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { MdOutlineShoppingBag } from "react-icons/md";
@@ -293,7 +293,8 @@ function CompraEntradas({ precios, aforo, evento }) {
         {/* 🛒 Mostrar carrito */}
         {carrito.length > 0 && (
             <div ref={modalRef} className="carrito">
-                <h3>Tickets en tu Carrito</h3>
+                  <h3>Tickets en tu Carrito</h3>
+                  
                   <button className="carrito__cerrar" onClick={cerrarCarrito}>X</button>
                   <div className="carrito__lista">  
                       <ul>
@@ -311,17 +312,23 @@ function CompraEntradas({ precios, aforo, evento }) {
                               <span>Total:</span>
                               <strong>${totalCarrito}</strong>
                           </li>
-                    </ul>
+                      </ul>
+                      
+                       {carrito.length > 0 && (
+                          <div className="vaciarCarrito" onClick={vaciarCarrito}>
+                                <i><FaRegTrashCan /></i>
+                                <span>Vaciar Carrito</span>
+                        </div>
+                        )}
+
                   </div>
-                    {/* 🛒 Botón para ir a la pantalla de Checkout */}
+                    
                     {carrito.length > 0 && (
                         <button className="finalizarBtn" onClick={irAConfirmacion}>
                             Finalizar Compra
                         </button>
                     )}
-                    {/* {carrito.length > 0 && (
-                        <button className="vaciarCarritoBtn" onClick={vaciarCarrito}>Vaciar Carrito</button>
-                    )} */}
+                    
             </div>
         )}
     </div>
