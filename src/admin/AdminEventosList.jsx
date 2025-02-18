@@ -18,7 +18,7 @@ function AdminEventosList() {
   }, []);
 
   const cargarEventos = () => {
-    fetch("${config.BACKEND_URL}/api/eventos")
+    fetch(`${config.BACKEND_URL}/api/eventos`)
       .then((response) => response.json())
       .then((data) => {
         const eventosFiltrados = isAdmin 

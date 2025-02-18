@@ -113,7 +113,7 @@ function Checkout({ usuario }) {
             };
 
 
-            const response = await fetch("${config.BACKEND_URL}/api/ordenes", {
+            const response = await fetch(`${config.BACKEND_URL}/api/ordenes`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

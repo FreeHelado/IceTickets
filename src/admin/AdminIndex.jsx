@@ -20,7 +20,7 @@ function AdminIndex({ setToken }) {
   }, []);
 
   const cargarEventos = () => {
-    fetch("${config.BACKEND_URL}/api/eventos")
+    fetch(`${config.BACKEND_URL}/api/eventos`)
       .then((response) => response.json())
       .then((data) => {
         const eventosFiltrados = isAdmin 
@@ -36,7 +36,7 @@ function AdminIndex({ setToken }) {
   const cargarUsuario = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch("${config.BACKEND_URL}/api/auth/perfil", {
+      fetch(`${config.BACKEND_URL}/api/auth/perfil`, {
         headers: { Authorization: token }
       })
         .then((res) => res.json())

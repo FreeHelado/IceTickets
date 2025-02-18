@@ -134,7 +134,7 @@ function AdminEventos({ setToken }) {
 
   // ✅ Cargar categorías
   useEffect(() => {
-    fetch("${config.BACKEND_URL}/api/categorias")
+    fetch(`${config.BACKEND_URL}/api/categorias`)
       .then((response) => response.json())
       .then(setCategorias)
       .catch((error) => console.error("❌ Error al obtener categorías:", error));
@@ -142,7 +142,7 @@ function AdminEventos({ setToken }) {
 
   // ✅ Cargar lugares
   useEffect(() => {
-    fetch("${config.BACKEND_URL}/api/lugares")
+    fetch(`${config.BACKEND_URL}/api/lugares`)
       .then((response) => response.json())
       .then((data) => {
         setLugares(data);
@@ -317,7 +317,7 @@ function AdminEventos({ setToken }) {
       const formData = new FormData();
       formData.append("imagen", imagenSeleccionada);
       try {
-        const response = await fetch("${config.BACKEND_URL}/api/eventos/upload", { method: "POST", body: formData });
+        const response = await fetch(`${config.BACKEND_URL}/api/eventos/upload`, { method: "POST", body: formData });
         const data = await response.json();
         imageName = data.fileName;
       } catch (error) {

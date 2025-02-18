@@ -12,7 +12,7 @@ function HeaderAdmin({ token }) {
 
   useEffect(() => {
     if (token) {
-      fetch("${config.BACKEND_URL}/api/auth/perfil", {
+      fetch(`${config.BACKEND_URL}/api/auth/perfil`, {
         headers: { Authorization: token }
       })
         .then((res) => res.json())
