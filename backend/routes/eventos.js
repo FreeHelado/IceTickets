@@ -32,8 +32,10 @@ router.get("/:id", async (req, res) => {
       return res.status(400).json({ message: "ID de evento inválido" });
     }
 
-    // Buscar el evento sin populate
-    const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor sociosProductores");
+    // Buscar el evento incluyendo "publico"
+    const evento = await Evento.findById(id).select(
+      "nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor sociosProductores publico"
+    );
 
     if (!evento) {
       return res.status(404).json({ message: "Evento no encontrado" });
@@ -42,7 +44,10 @@ router.get("/:id", async (req, res) => {
     console.log("Evento encontrado:", evento);
 
     // Buscar los emails de los sociosProductores manualmente
-    const sociosInfo = await User.find({ _id: { $in: evento.sociosProductores || [] } }, "email _id");
+    const sociosInfo = await User.find(
+      { _id: { $in: evento.sociosProductores || [] } },
+      "email _id"
+    );
 
     // Convertimos los sociosProductores en { _id, email }
     const sociosProductores = sociosInfo.map(user => ({
@@ -60,6 +65,7 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
+
 
 
 

@@ -41,8 +41,8 @@ function AdminEventos({ setToken }) {
 
   const navigate = useNavigate();
 
-  // ✅ Si hay un ID, traer datos del evento para editar
-    useEffect(() => {
+  // ✅ /// EDICION!!! Si hay un ID, traer datos del evento para editar
+  useEffect(() => {
   const fetchEvento = async () => {
     const token = localStorage.getItem("token");
     
@@ -85,6 +85,8 @@ function AdminEventos({ setToken }) {
         return;
       }
 
+     
+
       setEvento({
         nombre: data.nombre || "",
         fecha: data.fecha ? parseISO(data.fecha) : null,
@@ -106,6 +108,7 @@ function AdminEventos({ setToken }) {
         categoria: data.categoria || "",
         lugar: data.lugar || "",
         vendedor: data.vendedor || "",
+        publico: data.publico ?? false // ✅ Agrega esta línea
       });
 
     } catch (error) {
@@ -120,7 +123,7 @@ function AdminEventos({ setToken }) {
   };
 
   if (id) fetchEvento();
-}, [id, isAdmin, userId, navigate]);
+  }, [id, isAdmin, userId, navigate]);
 
 
 
@@ -173,6 +176,7 @@ function AdminEventos({ setToken }) {
           categoria: data.categoria || "",
           lugar: data.lugar || "",
           vendedor: data.vendedor || "",
+          publico: data.publico || false 
         });
       } catch (error) {
         console.error("❌ Error al cargar el evento:", error);
@@ -253,7 +257,6 @@ function AdminEventos({ setToken }) {
   const handleFechaChange = (date) => {
     if (!date) return;
     setEvento({ ...evento, fecha: date }); // ✅ Guardamos la fecha como `Date`
-    setEvento({ ...evento, fecha: fechaFormateada });
   };
 
   const handleCategoriaChange = (e) => {
@@ -328,6 +331,7 @@ function AdminEventos({ setToken }) {
       categoria: evento.categoria,
       lugar: evento.lugar,
       sociosProductoresEmails: sociosEmails,
+      publico: evento.publico // ✅ Se agrega para que se envíe al backend
     };
 
     try {
@@ -593,17 +597,18 @@ function AdminEventos({ setToken }) {
         
         <hr />
 
-        {/* ✅ Checkbox para "Público" */}
-        <div className="campoForm">
-          <label>
+        
+        <div className="campoCheck">
             <input
               type="checkbox"
               name="publico"
               checked={evento.publico}
               onChange={handleChange}
             />
-            Evento público
-          </label>
+          <label>Evento público</label>
+        </div>
+        <div className="alert">
+          Marca este check cuando el evento esté llisto para salir al público, mientras no lo esté el evento estará disponible solo con el link d ela vista previa, pero no se listará en la porta ni buscadores
         </div>
 
         <hr />
