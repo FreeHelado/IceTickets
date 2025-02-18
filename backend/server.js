@@ -297,4 +297,5 @@ app.use("/img/lugares", express.static("public/img/lugares"));
 /* =====================================
 Iniciar el servidor en el puerto 5000
 ===================================== */
-app.listen(5000, () => console.log("Servidor corriendo en ${BACKEND_URL}"));
+app.listen(PORT, () => console.log(`🚀 Servidor corriendo en ${BACKEND_URL || `http://localhost:${PORT}`}`));
+
