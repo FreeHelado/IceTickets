@@ -13,6 +13,7 @@ import VerificarCodigo from "./admin/VerificarCodigo";
 import AdminEventos from "./admin/AdminEventos";
 import AdminIndex from "./admin/AdminIndex";
 import AdminEventosList from "./admin/AdminEventosList";
+import AdminOrdenesEvento from "./admin/AdminOrdenesEvento";
 import Checkout from "./pages/Checkout"; // ✅ Importamos Checkout
 
 function App() {
@@ -65,6 +66,7 @@ function AppContent({ token, setToken, usuario }) {
         <Route path="/crearevento" element={token ? <AdminEventos setToken={setToken} /> : <Navigate to="/login" />} />
         <Route path="/eventosadmin" element={token ? <AdminEventosList /> : <Navigate to="/login" />} />
         <Route path="/admin/evento/editar/:id" element={token ? <AdminEventos setToken={setToken} /> : <Navigate to="/login" />} />
+        <Route path="/admin/evento/ordenes/:idEvento" element={<AdminOrdenesEvento />} /> 
         <Route path="/checkout" element={token ? <Checkout usuario={usuario} /> : <Navigate to="/login" />} />
 
         
