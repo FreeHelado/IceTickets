@@ -1,0 +1,113 @@
+.ventas {
+    @include grid(7);
+    gap: 50px;
+    
+    &__stats {
+        grid-column: 1 / 4;
+        @include flexColumn(50px);
+
+        &--aforo {
+            @include flexColumn(6px);
+            width: 100%;
+            
+            &--total {
+                @include flex();
+                justify-content: space-between;
+                background-color: $colorTagDestacado;
+                width: 100%;
+                padding: 2px 25px;
+                border-radius: 5px;
+                position: relative;
+                span {
+                    font-size: 18px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
+                strong {
+                    font-size: 30px;
+                } 
+            }
+            
+            &--vendidas {
+                @include flex();
+                justify-content: space-between;
+                background-color: color-opacity($amarelo, .5);
+                color: $colorSecundario;
+                width: 100%;
+                padding: 10px 25px;
+                border-radius: 5px;
+                position: relative;
+                overflow: hidden;
+
+                .progress {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    height: 100%;
+                    width: 50%;
+                    background-color: $amarelo;
+                    z-index: 0;
+                }
+                span {
+                    font-size: 24px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    z-index: 1;
+                }
+                strong {
+                    font-size: 36px;
+                    z-index: 1;
+                } 
+            }
+        }
+
+        &--tickets {
+            @include flexColumn();
+            width: 100%;
+
+            ul {
+                @include flex(25px);
+                width: 100%;
+                li {
+                    @include flexColumn();
+                    width: 100%;
+                    max-width: 120px;
+                    
+                    .progress {
+                        height: 280px;
+                        background-color: color-opacity($verde, .2);
+                        border-radius: 6px;
+                        width: 100%;
+                        position: relative;
+                        overflow: hidden;
+                        
+                        .progressVendidas {
+                            position: absolute;
+                            bottom: 0;
+                            left: 0;
+                            height: 0px;
+                            width: 100%;
+                            background-color: $verde;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    &__lista {
+        grid-column: 4 / 8;
+        border: 2px solid claro($colorSecundario, 20);
+        border-radius: 20px;
+        padding: 20px 25px;
+    }
+}
+
+.ventasNav {
+    @include flex(15px);
+    padding-block: 15px;
+    a {
+        @include flex(5px);
+    }
+}
