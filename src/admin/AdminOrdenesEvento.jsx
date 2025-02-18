@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare, FaRegTrashCan, FaChartLine } from "react-icons/fa6";
+import AdminTicketsEvento from "./AdminTicketsEvento";
 import Swal from "sweetalert2";
 
 function AdminOrdenesEvento() {
@@ -167,6 +168,12 @@ function AdminOrdenesEvento() {
                     ) : (
                         <p>No hay órdenes registradas aún.</p>
                     )}
+
+                    <Link to={`/admin/evento/${idEvento}/tickets`}>
+                        <i><FaRegEye /></i>
+                        <span>Ver Tickets</span>
+                    </Link>
+
                 </div>
 
 
