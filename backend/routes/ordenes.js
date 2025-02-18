@@ -137,17 +137,20 @@ router.get("/evento/:idEvento", verificarToken, async (req, res) => {
 ===================================== */
 router.get("/mis-tickets", verificarToken, async (req, res) => {
     try {
-        const userId = req.user.userId; // 🔥 ID del usuario autenticado
-        const userEmail = req.user.email; // ✅ Su email para filtrar las órdenes
+        const userEmail = req.user.email; // ✅ Email del usuario autenticado
 
-        // 🔍 Buscar órdenes donde el comprador tiene el email del usuario autenticado
+        // 🔍 Buscar órdenes donde el comprador tiene el mismo email
         const ordenes = await Orden.find({ "comprador.email": userEmail });
+
+        if (!ordenes.length) {
+            return res.json([]); // ✅ Si no hay órdenes, devolvemos un array vacío
+        }
 
         // 📌 Extraer todos los tickets de las órdenes
         const misTickets = ordenes.flatMap(orden =>
             orden.tickets.map(ticket => ({
-                ...ticket,
-                evento: orden.evento, // ✅ Agregar los datos del evento
+                ...ticket.toObject(), // ✅ Convertir ticket a objeto plano
+                evento: orden.evento // ✅ Agregar datos del evento
             }))
         );
 
@@ -157,6 +160,8 @@ router.get("/mis-tickets", verificarToken, async (req, res) => {
         res.status(500).json({ message: "Error en el servidor" });
     }
 });
+
+
 
 
 

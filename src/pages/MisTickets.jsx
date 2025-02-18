@@ -51,7 +51,6 @@ function MisTickets() {
                         <p><strong>Email:</strong> {ticket.email}</p>
                         <p><strong>Documento:</strong> {ticket.documento}</p>
                         <p><strong>ID Verificador:</strong> {ticket.idVerificador}</p>
-                        {/* 🔥 FUTURO: Botón para descargar QR */}
                     </div>
                 ))}
             </div>
