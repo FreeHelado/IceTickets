@@ -22,12 +22,14 @@ function Eventos() {
     </div>
     <div className="eventos">
       {eventos.length > 0 ? (
-        eventos.map((evento) => <EventoCard key={evento._id} {...evento} />)
+        eventos
+          .filter(evento => evento.publico) // 🔥 Filtrar solo eventos públicos
+          .map((evento) => <EventoCard key={evento._id} {...evento} />)
       ) : (
         <p>Cargando eventos...</p>
       )}
-      </div>
-     </>
+    </div>
+    </>
   );
 }
 
