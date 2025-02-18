@@ -132,25 +132,38 @@ router.get("/evento/:idEvento", verificarToken, async (req, res) => {
     }
 });
 
+
 /* =====================================
-// 📦 Obtener TICKETS de un Usuario
+// 📦 Obtener TICKETS de un Usuario (con info del lugar)
 ===================================== */
 router.get("/mis-tickets", verificarToken, async (req, res) => {
     try {
-        const userEmail = req.user.email; // ✅ Email del usuario autenticado
+        const userEmail = req.user.email;
 
-        // 🔍 Buscar órdenes donde el comprador tiene el mismo email
-        const ordenes = await Orden.find({ "comprador.email": userEmail });
+        // 🔍 Buscar órdenes del usuario con eventos y lugares asociados
+        const ordenes = await Orden.find({ "comprador.email": userEmail })
+            .populate({
+                path: "evento.id",
+                model: "Evento",
+                populate: { path: "lugar", model: "Lugar" }
+            });
 
-        if (!ordenes.length) {
-            return res.json([]); // ✅ Si no hay órdenes, devolvemos un array vacío
-        }
+        if (!ordenes.length) return res.json([]);
 
-        // 📌 Extraer todos los tickets de las órdenes
+        // 🔥 Transformamos los datos para enviar una respuesta limpia
         const misTickets = ordenes.flatMap(orden =>
             orden.tickets.map(ticket => ({
-                ...ticket.toObject(), // ✅ Convertir ticket a objeto plano
-                evento: orden.evento // ✅ Agregar datos del evento
+                ...ticket._doc, // 🔥 Extraer datos del ticket
+                evento: {
+                    nombre: orden.evento.id.nombre,
+                    fecha: orden.evento.id.fecha,
+                    hora: orden.evento.id.hora,
+                    lugar: orden.evento.id.lugar?.nombre || "Lugar no disponible",
+                    direccion: orden.evento.id.lugar?.direccion || "Dirección no disponible",
+                    localidad: orden.evento.id.lugar?.localidad || "Localidad no disponible",
+                    imagen: orden.evento.id.imagen,
+                    logo: orden.evento.id.lugar?.logo,
+                }
             }))
         );
 
@@ -160,8 +173,6 @@ router.get("/mis-tickets", verificarToken, async (req, res) => {
         res.status(500).json({ message: "Error en el servidor" });
     }
 });
-
-
 
 
 
