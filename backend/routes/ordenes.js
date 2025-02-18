@@ -132,6 +132,31 @@ router.get("/evento/:idEvento", verificarToken, async (req, res) => {
     }
 });
 
+/* =====================================
+// 📦 Obtener TICKETS de un Usuario
+===================================== */
+router.get("/mis-tickets", verificarToken, async (req, res) => {
+    try {
+        const userId = req.user.userId; // 🔥 ID del usuario autenticado
+        const userEmail = req.user.email; // ✅ Su email para filtrar las órdenes
+
+        // 🔍 Buscar órdenes donde el comprador tiene el email del usuario autenticado
+        const ordenes = await Orden.find({ "comprador.email": userEmail });
+
+        // 📌 Extraer todos los tickets de las órdenes
+        const misTickets = ordenes.flatMap(orden =>
+            orden.tickets.map(ticket => ({
+                ...ticket,
+                evento: orden.evento, // ✅ Agregar los datos del evento
+            }))
+        );
+
+        res.json(misTickets);
+    } catch (error) {
+        console.error("❌ Error al obtener tickets del usuario:", error);
+        res.status(500).json({ message: "Error en el servidor" });
+    }
+});
 
 
 

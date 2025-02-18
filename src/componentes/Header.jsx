@@ -31,10 +31,10 @@ function Header({ token }) {
 
         
         {token && (
-        <a href="" >
-          <i><FaTicketSimple /></i>
-          <span>Mis Tickets</span>
-          </a>
+          <Link to="/mis-tickets">
+            <i><FaTicketSimple /></i>
+            <span>Mis Tickets</span>
+          </Link>
         )}
 
         {token && (
