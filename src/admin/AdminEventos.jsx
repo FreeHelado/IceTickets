@@ -22,7 +22,7 @@ function AdminEventos({ setToken }) {
     imagen: "",
     precios: [{ nombre: "", monto: "", disponibles: "" }],
     categoria: "",
-    lugar: "",
+    publico: false // ✅ Por defecto en false
   });
 
   const [lugares, setLugares] = useState([]);
@@ -239,22 +239,14 @@ function AdminEventos({ setToken }) {
 
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "aforo" || name === "vendidas") {
-      setEvento((prev) => ({
-        ...prev,
-        stock: {
-          ...prev.stock,
-          [name]: value, // ✅ Asegura que `aforo` y `vendidas` se guarden dentro de `stock`
-        },
-      }));
-    } else {
-      setEvento((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    const { name, value, type, checked } = e.target;
+    setEvento((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked :
+        (name === "aforo" || name === "vendidas")
+        ? { ...prev.stock, [name]: value }
+        : value
+    }));
   };
 
 
@@ -596,6 +588,22 @@ function AdminEventos({ setToken }) {
               </option>
             ))}
           </select>
+        </div>
+
+        
+        <hr />
+
+        {/* ✅ Checkbox para "Público" */}
+        <div className="campoForm">
+          <label>
+            <input
+              type="checkbox"
+              name="publico"
+              checked={evento.publico}
+              onChange={handleChange}
+            />
+            Evento público
+          </label>
         </div>
 
         <hr />

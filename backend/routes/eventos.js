@@ -1,9 +1,9 @@
 import express from "express";
 import Evento from "../models/Evento.js";
-import User from "../models/User.js"; // ✅ Importamos User para buscar IDs
-import verificarToken from "../middleware/auth.js"; // Importamos la autenticaciï¿½n
+import User from "../models/User.js";
+import verificarToken from "../middleware/auth.js";
 import mongoose from "mongoose";
-import { format } from "date-fns"; // Aseguramos que format esté disponible
+import { format } from "date-fns";
 
 const router = express.Router();
 
@@ -68,7 +68,7 @@ router.get("/:id", async (req, res) => {
 ===================================== */
 router.post("/", verificarToken, async (req, res) => {
   try {
-    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails } = req.body;
+    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails, publico } = req.body;
 
 
     // ✅ Convertir fecha a Date antes de guardarla
@@ -109,7 +109,8 @@ router.post("/", verificarToken, async (req, res) => {
       categoria,
       lugar,
       vendedor,
-      sociosProductores // ✅ Guardamos los IDs encontrados
+      sociosProductores,
+      publico
     });
 
     await nuevoEvento.save();
@@ -126,7 +127,7 @@ router.post("/", verificarToken, async (req, res) => {
 router.put("/:id", verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails } = req.body;
+    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails, publico } = req.body;
     const userId = req.user.userId; // 🔥 Usuario autenticado
     const isAdmin = req.user.isAdmin; // 🔥 Si es admin
 
@@ -155,24 +156,28 @@ router.put("/:id", verificarToken, async (req, res) => {
       sociosProductores = usuariosEncontrados.map(user => user._id);
     }
 
+    // 📌 Construir objeto con datos actualizados
+    const updateData = {
+      nombre,
+      fecha,
+      hora,
+      descripcion,
+      stock,
+      estado,
+      imagen,
+      precios,
+      categoria,
+      lugar,
+      sociosProductores,
+    };
+
+    // ✅ Agregar `publico` solo si está definido en la petición
+    if (publico !== undefined) {
+      updateData.publico = publico;
+    }
+
     // 📌 Actualizar el evento con los nuevos datos
-    const eventoActualizado = await Evento.findByIdAndUpdate(
-      id,
-      {
-        nombre,
-        fecha,
-        hora,
-        descripcion,
-        stock,
-        estado,
-        imagen,
-        precios,
-        categoria,
-        lugar,
-        sociosProductores, // ✅ Se actualiza la lista de IDs de sociosProductores
-      },
-      { new: true }
-    );
+    const eventoActualizado = await Evento.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!eventoActualizado) {
       return res.status(404).json({ message: "Evento no encontrado tras la actualización" });

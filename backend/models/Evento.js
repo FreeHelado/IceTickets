@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const eventoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  fecha: { type: Date, required: true }, // ✅ Guardamos como Date en UTC
+  fecha: { type: Date, required: true }, 
   hora: { type: String, required: true },
   descripcion: { type: String },
   stock: { 
-    aforo: { type: Number }, // lo vamos a usar a modo informativo del lugar. 
-    vendidas: { type: Number } // mas adelante lo utilizaremos para sumar la cantidad de entradas vendidas
+    aforo: { type: Number },
+    vendidas: { type: Number } 
   },
   estado: {
     type: String,
@@ -17,7 +17,7 @@ const eventoSchema = new mongoose.Schema({
   imagen: { type: String, required: true },
     precios: [
     {
-      _id: { type: mongoose.Schema.Types.ObjectId, auto: true }, // Genera un ID único
+      _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
       nombre: { type: String, required: true },
       monto: { 
         type: Number, 
@@ -30,16 +30,16 @@ const eventoSchema = new mongoose.Schema({
   categoria: { type: mongoose.Schema.Types.ObjectId, ref: "Categoria" }, 
   lugar: { type: mongoose.Schema.Types.ObjectId, ref: "Lugar" },
   vendedor: { type: mongoose.Schema.Types.ObjectId, ref: "Vendedor" },
-  sociosProductores: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+  sociosProductores: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  publico: { type: Boolean, default: false } 
 
-}, { toJSON: { virtuals: true } }); // Permitir que Mongoose agregue virtuals al JSON
+}, { toJSON: { virtuals: true } }); 
 
-// Virtual para obtener el precio más bajo
 eventoSchema.virtual("precioMenor").get(function () {
   return this.precios.length > 0 ? Math.min(...this.precios.map(p => p.monto)) : 0;
 });
 
-//  Virtual para obtener el aforo
+
 eventoSchema.virtual("aforo").get(function () {
   return this.precios.reduce((total, precio) => total + precio.disponibles, 0);
 });
