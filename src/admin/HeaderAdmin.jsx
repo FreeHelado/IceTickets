@@ -1,3 +1,4 @@
+import config from "../config";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FaIceCream, FaTicketSimple, FaFire, FaUser, FaPowerOff } from "react-icons/fa6";
@@ -11,7 +12,7 @@ function HeaderAdmin({ token }) {
 
   useEffect(() => {
     if (token) {
-      fetch("http://localhost:5000/api/auth/perfil", {
+      fetch("${config.BACKEND_URL}/api/auth/perfil", {
         headers: { Authorization: token }
       })
         .then((res) => res.json())

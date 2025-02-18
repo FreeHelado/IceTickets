@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import EventoCard from "./EventoCard";
 
@@ -5,13 +6,13 @@ function Eventos() {
   const [eventos, setEventos] = useState([]); // Estado para guardar los eventos
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/eventos")
-  .then((response) => response.json())
-  .then((data) => {
-    console.log("🚀 Eventos recibidos:", data); // Verifica qué llega desde la API
-    setEventos(data);
-  })
-  .catch((error) => console.error("❌ Error cargando eventos:", error));
+    fetch(`${config.BACKEND_URL}/api/eventos`)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("🚀 Eventos recibidos:", data); // Verifica qué llega desde la API
+      setEventos(data);
+    })
+    .catch((error) => console.error("❌ Error cargando eventos:", error));
 
   }, []);
 

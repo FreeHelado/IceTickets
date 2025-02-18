@@ -1,3 +1,4 @@
+import config from "../config";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import * as FaIcons from "react-icons/fa";
@@ -16,13 +17,13 @@ function EventoDetalle() {
   useEffect(() => {
     const fetchEvento = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
+        const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`);
         const data = await response.json();
         setEvento(data);
 
         // ✅ Buscar datos de la categoría si no viene completa en el evento
         if (data.categoria && typeof data.categoria === "string") {
-          fetch(`http://localhost:5000/api/categorias/${data.categoria}`)
+          fetch(`${config.BACKEND_URL}/api/categorias/${data.categoria}`)
             .then((res) => res.json())
             .then((catData) => setCategoria(catData))
             .catch((error) => console.error("❌ Error cargando categoría:", error));
@@ -32,7 +33,7 @@ function EventoDetalle() {
 
         // ✅ Buscar datos del lugar si no viene completo en el evento
         if (data.lugar && typeof data.lugar === "string") {
-          fetch(`http://localhost:5000/api/lugares/${data.lugar}`)
+          fetch(`${config.BACKEND_URL}/api/lugares/${data.lugar}`)
             .then((res) => res.json())
             .then((lugarData) => setLugar(lugarData))
             .catch((error) => console.error("❌ Error cargando lugar:", error));
@@ -62,7 +63,7 @@ function EventoDetalle() {
       <section className="evento__cont">
         <div className="evento__cont--info">
           <figure className="evento__cont--info--img">
-            <img src={`http://localhost:5000/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
+            <img src={`${config.BACKEND_URL}/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
             <div className="evento__cont--info--img--data">
               <h3>{fechaFormateadaDetalle} - {evento.hora}</h3>
             </div>

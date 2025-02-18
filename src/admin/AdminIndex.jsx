@@ -1,3 +1,4 @@
+import config from "../config";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -19,7 +20,7 @@ function AdminIndex({ setToken }) {
   }, []);
 
   const cargarEventos = () => {
-    fetch("http://localhost:5000/api/eventos")
+    fetch("${config.BACKEND_URL}/api/eventos")
       .then((response) => response.json())
       .then((data) => {
         const eventosFiltrados = isAdmin 
@@ -35,7 +36,7 @@ function AdminIndex({ setToken }) {
   const cargarUsuario = () => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch("http://localhost:5000/api/auth/perfil", {
+      fetch("${config.BACKEND_URL}/api/auth/perfil", {
         headers: { Authorization: token }
       })
         .then((res) => res.json())
@@ -74,7 +75,7 @@ function AdminIndex({ setToken }) {
             eventos.map((evento) => (
               <div key={evento._id} className="adminPanel__cont--zona2--card">
                 
-                <img src={`http://localhost:5000/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
+                <img src={`${config.BACKEND_URL}/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
                 
                 <div className="adminPanel__cont--zona2--card--data">
                   <div className="adminPanel__cont--zona2--card--data--titulo">

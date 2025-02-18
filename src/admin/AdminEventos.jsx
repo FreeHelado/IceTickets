@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -58,7 +59,7 @@ function AdminEventos({ setToken }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/eventos/${id}`, {
+      const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`, {
         headers: { Authorization: token }
       });
 
@@ -113,7 +114,7 @@ function AdminEventos({ setToken }) {
 
       // ✅ Si la imagen existe, establecer la vista previa
       if (data.imagen) {
-        setImagenPreview(`http://localhost:5000/img/eventos/${data.imagen}`);
+        setImagenPreview(`${config.BACKEND_URL}/img/eventos/${data.imagen}`);
       }
 
     } catch (error) {
@@ -133,7 +134,7 @@ function AdminEventos({ setToken }) {
 
   // ✅ Cargar categorías
   useEffect(() => {
-    fetch("http://localhost:5000/api/categorias")
+    fetch("${config.BACKEND_URL}/api/categorias")
       .then((response) => response.json())
       .then(setCategorias)
       .catch((error) => console.error("❌ Error al obtener categorías:", error));
@@ -141,7 +142,7 @@ function AdminEventos({ setToken }) {
 
   // ✅ Cargar lugares
   useEffect(() => {
-    fetch("http://localhost:5000/api/lugares")
+    fetch("${config.BACKEND_URL}/api/lugares")
       .then((response) => response.json())
       .then((data) => {
         setLugares(data);
@@ -161,7 +162,7 @@ function AdminEventos({ setToken }) {
   useEffect(() => {
     const fetchEvento = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/eventos/${id}`);
+        const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`);
         const data = await response.json();
         if (!data) return;
 
@@ -316,7 +317,7 @@ function AdminEventos({ setToken }) {
       const formData = new FormData();
       formData.append("imagen", imagenSeleccionada);
       try {
-        const response = await fetch("http://localhost:5000/api/eventos/upload", { method: "POST", body: formData });
+        const response = await fetch("${config.BACKEND_URL}/api/eventos/upload", { method: "POST", body: formData });
         const data = await response.json();
         imageName = data.fileName;
       } catch (error) {
@@ -349,7 +350,7 @@ function AdminEventos({ setToken }) {
     };
 
     try {
-      const response = await fetch(`http://localhost:5000/api/eventos/${id || ""}`, {
+      const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id || ""}`, {
         method: id ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",

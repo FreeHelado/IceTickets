@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaIceCream } from "react-icons/fa6";
@@ -42,7 +43,7 @@ function VerificarCodigo() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/verify", {
+      const response = await fetch("${config.BACKEND_URL}/api/auth/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, codigo: codigoCompleto })
@@ -74,7 +75,7 @@ function VerificarCodigo() {
     if (contador > 0) return; // Evita reenviar mientras el contador sigue activo
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/resend-code", {
+      const response = await fetch("${config.BACKEND_URL}/api/auth/resend-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })

@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import * as Icons from "react-icons/fa"; // ✅ Importamos TODOS los iconos
@@ -23,7 +24,7 @@ function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categori
   useEffect(() => {
     if (!categoria) return;
 
-    fetch(`http://localhost:5000/api/categorias/${categoria}`)
+    fetch(`${config.BACKEND_URL}/api/categorias/${categoria}`)
       .then((response) => response.json())
       .then((data) => setCategoriaData(data))
       .catch((error) => console.error("❌ Error cargando categoría:", error));
@@ -36,7 +37,7 @@ function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categori
   // 📍 Cargar datos del lugar (nombre + localidad)
   useEffect(() => {
     if (!lugar) return; // Si no hay lugar, salimos
-    fetch(`http://localhost:5000/api/lugares/${lugar}`)
+    fetch(`${config.BACKEND_URL}/api/lugares/${lugar}`)
       .then(response => response.json())
       .then(data => {
         setNombreLugar(data.nombre);
@@ -58,7 +59,7 @@ function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categori
           <i><FaRegCalendar /></i>
           <span>{fechaFormateada} - {hora}</span>
         </div>
-      <img src={`http://localhost:5000/img/eventos/${imagen}`} alt={`Imagen de ${nombre}`}/>
+      <img src={`${config.BACKEND_URL}/img/eventos/${imagen}`} alt={`Imagen de ${nombre}`}/>
           </figure>
       </Link>
       <div className="eventos__item--info">

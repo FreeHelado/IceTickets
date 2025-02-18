@@ -1,3 +1,4 @@
+import config from "../config";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { format, parseISO } from "date-fns";
@@ -112,7 +113,7 @@ function Checkout({ usuario }) {
             };
 
 
-            const response = await fetch("http://localhost:5000/api/ordenes", {
+            const response = await fetch("${config.BACKEND_URL}/api/ordenes", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -176,7 +177,7 @@ function Checkout({ usuario }) {
             <div className="checkout__evento">
                 
                 <figure>
-                    <img src={`http://localhost:5000/img/eventos/${evento.imagen}`} alt={evento.nombre} className="checkout-img" />
+                    <img src={`${config.BACKEND_URL}/img/eventos/${evento.imagen}`} alt={evento.nombre} className="checkout-img" />
                 </figure>
                 <div className="checkout__evento--data">
                     
@@ -185,7 +186,7 @@ function Checkout({ usuario }) {
                     <h4>{fechaFormateada} - {evento.hora}</h4>
                     <h4>{lugar} - {direccion}</h4>
                     {logoLugar && (
-                        <img src={`http://localhost:5000/img/lugares/${logoLugar}`} alt={lugar} className="lugar-logo" />
+                        <img src={`${config.BACKEND_URL}/img/lugares/${logoLugar}`} alt={lugar} className="lugar-logo" />
                     )}
                     </div>
 

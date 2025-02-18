@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { FaTicketAlt } from "react-icons/fa";
@@ -12,7 +13,7 @@ function MisTickets() {
             const token = localStorage.getItem("token");
 
             try {
-                const response = await fetch(`http://localhost:5000/api/ordenes/mis-tickets`, {
+                const response = await fetch(`${config.BACKEND_URL}/api/ordenes/mis-tickets`, {
                     headers: { Authorization: token }
                 });
 
@@ -43,10 +44,10 @@ function MisTickets() {
                 {tickets.map((ticket, index) => (
                     <div key={index} className="ticketCard">
                         <figure>
-                            {ticket.evento.imagen && <img src={`http://localhost:5000/img/eventos/${ticket.evento.imagen}`} alt="Imagen del Evento" />}
+                            {ticket.evento.imagen && <img src={`${config.BACKEND_URL}/img/eventos/${ticket.evento.imagen}`} alt="Imagen del Evento" />}
                         </figure>
                         <div className="ticketHeader">
-                            {ticket.evento.logo && <img src={`http://localhost:5000/img/lugares/${ticket.evento.logo}`} alt="Logo del lugar" />}
+                            {ticket.evento.logo && <img src={`${config.BACKEND_URL}/img/lugares/${ticket.evento.logo}`} alt="Logo del lugar" />}
                             <h3>{ticket.evento.nombre}</h3>
                             <p>{new Date(ticket.evento.fecha).toLocaleDateString()} - {ticket.evento.hora}</p>
                         </div>
@@ -60,8 +61,8 @@ function MisTickets() {
                             <p><strong>ID Verificador:</strong> {ticket.idVerificador}</p>
                             <p><strong>Nombre:</strong> {ticket.nombre}</p>
                             <p><strong>Email:</strong> {ticket.email}</p>
-                            <p><strong>Email:</strong> {ticket.telefono}</p>
-                            <p><strong>Email:</strong> {ticket.documento}</p>
+                            <p><strong>Telefono:</strong> {ticket.telefono}</p>
+                            <p><strong>Documento:</strong> {ticket.documento}</p>
                         </div>
                     </div>
                 ))}

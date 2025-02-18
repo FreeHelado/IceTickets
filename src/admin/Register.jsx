@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaIceCream } from "react-icons/fa6";
@@ -23,7 +24,7 @@ function Register() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch("${config.BACKEND_URL}/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, nombre, telefono }) // 🔥 No enviamos isAdmin

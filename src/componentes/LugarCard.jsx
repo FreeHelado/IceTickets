@@ -1,3 +1,4 @@
+import config from "../config";
 import React from "react";
 
 function LugarCard({ lugar }) {
@@ -7,7 +8,7 @@ function LugarCard({ lugar }) {
     <div className="evento__cont--info--lugar">
 
       <div className="evento__cont--info--lugar--header">
-        {lugar.logo && <img src={`http://localhost:5000/img/lugares/${lugar.logo}`} alt={lugar.nombre} className="lugar-logo" />}
+        {lugar.logo && <img src={`${config.BACKEND_URL}/img/lugares/${lugar.logo}`} alt={lugar.nombre} className="lugar-logo" />}
         <div className="evento__cont--info--lugar--header--data">
           <h2>{lugar.nombre}</h2>
           {lugar.direccion &&<span><strong>Dirección:</strong> {lugar.direccion}, {lugar.localidad}</span>}

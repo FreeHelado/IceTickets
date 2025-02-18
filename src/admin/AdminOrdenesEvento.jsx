@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -17,7 +18,7 @@ function AdminOrdenesEvento() {
         const token = localStorage.getItem("token");
 
         try {
-            const response = await fetch(`http://localhost:5000/api/ordenes/evento/${idEvento}`, {
+            const response = await fetch(`${config.BACKEND_URL}/api/ordenes/evento/${idEvento}`, {
                 headers: { Authorization: token }
             });
 

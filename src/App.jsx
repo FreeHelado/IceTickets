@@ -1,3 +1,4 @@
+import config from "./config";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -26,7 +27,7 @@ function App() {
     const obtenerPerfil = async () => {
       if (token) {
         try {
-          const res = await axios.get("http://localhost:5000/api/auth/perfil", {
+          const res = await axios.get(`${config.BACKEND_URL}/api/auth/perfil`, {
             headers: { Authorization: token },
           });
           setUsuario(res.data); // Guardamos los datos del usuario
@@ -53,6 +54,7 @@ function AppContent({ token, setToken, usuario }) {
   // 🔥 Definimos en qué rutas queremos mostrar el HeaderAdmin
   const rutasAdmin = ["/admin", "/crearevento", "/eventosadmin", "/admin/evento/editar"];
   const esRutaAdmin = rutasAdmin.some(ruta => location.pathname.startsWith(ruta));
+
 
   return (
     <>

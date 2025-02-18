@@ -1,3 +1,4 @@
+import config from "../config";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -17,7 +18,7 @@ function AdminEventosList() {
   }, []);
 
   const cargarEventos = () => {
-    fetch("http://localhost:5000/api/eventos")
+    fetch("${config.BACKEND_URL}/api/eventos")
       .then((response) => response.json())
       .then((data) => {
         const eventosFiltrados = isAdmin 
@@ -48,7 +49,7 @@ function AdminEventosList() {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`http://localhost:5000/api/eventos/${id}`, {
+      const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: token,
@@ -80,7 +81,7 @@ function AdminEventosList() {
             eventos.map((evento) => (
               <div key={evento._id} className="adminPanel__cont--zonaListardo--card">
                 
-                <img src={`http://localhost:5000/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
+                <img src={`${config.BACKEND_URL}/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
                 
                 <div className="adminPanel__cont--zonaListardo--card--data">
                   <div className="adminPanel__cont--zonaListardo--card--data--titulo">
