@@ -111,6 +111,11 @@ function AdminEventos({ setToken }) {
         publico: data.publico ?? false // ✅ Agrega esta línea
       });
 
+      // ✅ Si la imagen existe, establecer la vista previa
+      if (data.imagen) {
+        setImagenPreview(`http://localhost:5000/img/eventos/${data.imagen}`);
+      }
+
     } catch (error) {
       console.error("❌ Error al cargar el evento:", error);
       Swal.fire({
@@ -126,7 +131,6 @@ function AdminEventos({ setToken }) {
   }, [id, isAdmin, userId, navigate]);
 
 
-
   // ✅ Cargar categorías
   useEffect(() => {
     fetch("http://localhost:5000/api/categorias")
@@ -139,9 +143,19 @@ function AdminEventos({ setToken }) {
   useEffect(() => {
     fetch("http://localhost:5000/api/lugares")
       .then((response) => response.json())
-      .then(setLugares)
+      .then((data) => {
+        setLugares(data);
+
+        if (evento.lugar && data.length > 0) {
+          const lugarEncontrado = data.find(l => l._id === evento.lugar);
+          if (lugarEncontrado) {
+            setBusquedaLugar(lugarEncontrado.nombre); // 
+          }
+        }
+      })
       .catch((error) => console.error("❌ Error al obtener lugares:", error));
-  }, []);
+  }, [evento.lugar]); 
+
 
   // ✅ Cargar sociosProductores al editar un evento
   useEffect(() => {
