@@ -45,6 +45,8 @@ function MisTickets() {
                         <h3><FaTicketAlt /> {ticket.evento.nombre}</h3>
                         <p><strong>Fecha:</strong> {new Date(ticket.evento.fecha).toLocaleDateString()}</p>
                         <p><strong>Lugar:</strong> {ticket.evento.lugar}</p>
+                        <p><strong>Tipo Entrada:</strong> {ticket.tipoEntrada} /  {ticket.monto}</p>
+                        
                         <hr />
                         <p><strong>Nombre:</strong> {ticket.nombre}</p>
                         <p><strong>Teléfono:</strong> {ticket.telefono}</p>
