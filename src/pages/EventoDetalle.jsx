@@ -92,7 +92,9 @@ function EventoDetalle() {
 
           
           <section className="evento__cont--info--ficha">
-            <h3>Información acicional del Evento:</h3>
+            {evento.tags && Object.values(evento.tags).some(valor => valor) && (
+            <>
+            <h3>Información adicional</h3>
             <div className="evento__cont--info--ficha--tags">
               <ul>
                 {evento.tags?.todoPublico && (
@@ -138,19 +140,66 @@ function EventoDetalle() {
                   </li>
                 )}
               </ul>
-            </div>
-            <div className="evento__cont--info--ficha--infoadicional">
-              <h3>Más información</h3>
-              {evento.infoAdicional &&
-                Object.entries(evento.infoAdicional)
-                  .filter(([_, value]) => value) // Solo muestra los campos con datos
-                  .map(([key, value]) => (
-                    <div key={key} className="evento__cont--info--ficha--infoadicional--item">
-                      <h3>{key.replace(/([A-Z])/g, " $1")}</h3> {/* Formatea camelCase */}
-                      <p>{value}</p>
+                </div>
+              </>
+            )}
+
+            {evento.infoAdicional &&
+              Object.values(evento.infoAdicional).some(value => value) && (
+                <div className="evento__cont--info--ficha--infoadicional">
+                  <h3>Más información</h3>
+
+                  {evento.infoAdicional.edadMinima && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Edad mínima para ingresar al evento:</h3>
+                      <p>{evento.infoAdicional.edadMinima}</p>
                     </div>
-                ))}
-            </div>
+                  )}
+
+                  {evento.infoAdicional.menoresGratis && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Menores de hasta {evento.infoAdicional.menoresGratis} gratis</h3>
+                    </div>
+                  )}
+
+                  {evento.infoAdicional.elementosProhibidos && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Elementos prohibidos:</h3>
+                      <p>{evento.infoAdicional.elementosProhibidos}</p>
+                    </div>
+                  )}
+
+                  {evento.infoAdicional.terminosCondiciones && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Términos y condiciones:</h3>
+                      <p>{evento.infoAdicional.terminosCondiciones}</p>
+                    </div>
+                  )}
+
+                  {evento.infoAdicional.horaApertura && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Horario de apertura:</h3>
+                      <p>{evento.infoAdicional.horaApertura}</p>
+                    </div>
+                  )}
+
+                  {evento.infoAdicional.estacionamiento && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Estacionamiento:</h3>
+                      <p>{evento.infoAdicional.estacionamiento}</p>
+                    </div>
+                  )}
+
+                  {evento.infoAdicional.transporte && (
+                    <div className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>Transporte para llegar al evento:</h3>
+                      <p>{evento.infoAdicional.transporte}</p>
+                    </div>
+                  )}
+
+                </div>
+              )}
+
           </section>
           
           

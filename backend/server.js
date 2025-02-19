@@ -22,9 +22,12 @@ CONFIG
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
-const BACKEND_URL = process.env.BACKEND_URL;
-/* =====================================
-===================================== */
+const BACKEND_URL = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+
+if (!MONGO_URI) {
+  console.error("❌ ERROR: No se encontró la variable MONGO_URI en .env");
+  process.exit(1);
+}
 
 const app = express();
 app.use(cors());
@@ -33,12 +36,23 @@ app.use("/api/eventos", eventosRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/ordenes", ordenesRoutes);
 
+/* =====================================
+ CONECTAR A MONGODB ATLAS
+===================================== */
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("🔥 Conectado a MongoDB Atlas"))
+.catch(err => console.error("❌ Error de conexión con MongoDB:", err));
 
-// DDBB Conectar a MongoDB
-mongoose.set("strictQuery", false); // Desactivar restricciones en consultas
-mongoose.connect(MONGO_URI)
-   .then(() => console.log(`ð Conectado a MongoDB: ${MONGO_URI}`))
-  .catch(err => console.error("â Error de conexiÃ³n con MongoDB:", err));
+  /* =====================================
+ CONECTAR A MONGODB LOCAL
+===================================== */
+// mongoose.set("strictQuery", false); // Desactivar restricciones en consultas
+// mongoose.connect(MONGO_URI)
+//    .then(() => console.log(`🔥Conectado a MongoDB: ${MONGO_URI}`))
+//   .catch(err => console.error("❌ Error de conexiÃ³n con MongoDB:", err));
 
 
 /* =====================================
@@ -49,7 +63,7 @@ app.get("/api/eventos", async (req, res) => {
     const eventos = await Evento.find();
     res.json(eventos);
   } catch (error) {
-    console.error("Ã¢ÂÂ Error al obtener eventos:", error);
+    console.error("❌ Error al obtener eventos:", error);
     res.status(500).json({ message: "Error al obtener eventos", error });
   }
 });
@@ -66,7 +80,7 @@ app.get("/api/eventos/:id", async (req, res) => {
       return res.status(400).json({ message: "ID de evento invÃ¡lido" });
     }
 
-    // ð Buscar el evento y seleccionar solo los campos necesarios
+    // 🔍🔍 Buscar el evento y seleccionar solo los campos necesarios
     const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor");
 
     if (!evento) {
