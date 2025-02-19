@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import { QRCodeCanvas } from "qrcode.react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { FaDownload, FaIceCream } from "react-icons/fa6";
+import { FaDownload, FaIceCream, FaWhatsapp } from "react-icons/fa6";
 
 function MisTickets() {
     const [tickets, setTickets] = useState([]);
@@ -108,6 +108,29 @@ function MisTickets() {
         setLoadingPDF(prev => ({ ...prev, [ticket._id]: false })); // 🔥 Desactivar carga en el botón
     };
 
+    const sendWhatsApp = async (ticket) => {
+        if (!ticket || !ticket._id) {
+            console.error("❌ Error: Ticket no definido o sin ID", ticket);
+            return;
+        }
+
+        // URL donde se alojará el PDF (versión básica sin API)
+        const pdfUrl = `${config.BACKEND_URL}/tickets/${ticket._id}.pdf`;
+
+        // Mensaje con el enlace
+        const message = encodeURIComponent(
+            `¡Hola! Aquí tienes tu ticket para ${ticket.evento.nombre} 🎟️. 
+            Descárgalo aquí: ${pdfUrl}`
+        );
+
+        // Número de WhatsApp (puede ser el que ingresó el usuario en la compra)
+        const numeroWhatsApp = ticket.telefono; 
+
+        // Abrir WhatsApp con el mensaje prellenado
+        window.open(`https://wa.me/${numeroWhatsApp}?text=${message}`, "_blank");
+    };
+
+
     if (cargando) return <p>Cargando tickets...</p>;
     if (tickets.length === 0) return <p>No tienes tickets aún.</p>;
 
@@ -180,6 +203,15 @@ function MisTickets() {
                                 </>
                             )}
                         </button>
+
+                        <button 
+                            onClick={() => sendWhatsApp(ticket)} 
+                            className="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center justify-center gap-2"
+                        >
+                            <i><FaWhatsapp /></i>
+                            <span>Enviar por WhatsApp</span>
+                        </button>
+
 
                         
                         
