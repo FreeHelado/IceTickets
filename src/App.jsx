@@ -4,18 +4,22 @@ import { useState, useEffect } from "react";
 
 import axios from "axios";
 
-import Header from "./componentes/Header"; // ✅ Header normal
-import HeaderAdmin from "./admin/HeaderAdmin"; // ✅ Header para Admin
+import Header from "./componentes/Header";
+import HeaderAdmin from "./admin/HeaderAdmin";
 import Eventos from "./componentes/Eventos";
 import EventoDetalle from "./pages/EventoDetalle";
+
 import Login from "./admin/Login";
 import Register from "./admin/Register";
 import VerificarCodigo from "./admin/VerificarCodigo";
+
 import AdminEventos from "./admin/AdminEventos";
 import AdminIndex from "./admin/AdminIndex";
 import AdminEventosList from "./admin/AdminEventosList";
 import AdminOrdenesEvento from "./admin/AdminOrdenesEvento";
 import AdminTicketsEvento from "./admin/AdminTicketsEvento";
+import AdminCategorias from "./admin/AdminCategorias";
+
 import Checkout from "./pages/Checkout"; 
 import MisTickets from "./pages/MisTickets"; 
 
@@ -72,6 +76,8 @@ function AppContent({ token, setToken, usuario }) {
         <Route path="/admin/evento/editar/:id" element={token ? <AdminEventos setToken={setToken} /> : <Navigate to="/login" />} />
         <Route path="/admin/evento/ordenes/:idEvento" element={<AdminOrdenesEvento />} /> 
         <Route path="/admin/evento/:idEvento/tickets" element={<AdminTicketsEvento />} />
+        <Route path="/admin/categorias" element={token ? <AdminCategorias isAdmin={true} /> : <Navigate to="/login" />} />
+
 
         <Route path="/checkout" element={token ? <Checkout usuario={usuario} /> : <Navigate to="/login" />} />
         <Route path="/mis-tickets" element={<MisTickets />} />

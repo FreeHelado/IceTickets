@@ -74,6 +74,14 @@ function AdminEventosList() {
       <div className="alert">
         Aquí se presentan todos los eventos de los cuales formas parte como vendedor y administrador
       </div>
+
+      <nav>
+        <ul>
+          <li><Link to="/admin/categorias">Administrar Categorías</Link></li>
+          
+        </ul>
+      </nav>
+
       <div className="adminPanel__cont">
 
         <div className="adminPanel__cont--zonaListardo">
