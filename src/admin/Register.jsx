@@ -1,8 +1,9 @@
 import config from "../config";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash, FaIceCream } from "react-icons/fa6";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+import { FaEye, FaEyeSlash, FaIceCream, FaArrowLeft } from "react-icons/fa6";
 
 function Register() {
     const [email, setEmail] = useState("");
@@ -65,11 +66,13 @@ function Register() {
 
   return (
     <main className="registro">
+      
       <div className="registro__header">
           <i><FaIceCream /></i>
           <h1>IceTicket</h1>
       </div>
       <div className="registro__cont">
+        <div className="glowLogin"></div>
         <h2>Registro</h2> 
         <form onSubmit={handleSubmit} className="registro__cont--form">
             <div className="registro__cont--form--campo">
@@ -112,7 +115,7 @@ function Register() {
                     required 
                     />
                     <i onClick={() => setMostrarPassword(!mostrarPassword)} style={{ cursor: "pointer" }}>
-                    {mostrarPassword ? <FaEyeSlash /> : <FaEye />}
+                    {mostrarPassword ?  <FaEye /> : <FaEyeSlash />}
                     </i>
             </div>
           <button type="submit">Registrarse</button>

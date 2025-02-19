@@ -106,6 +106,7 @@ function Login({ setToken }) {
         </Link>
       </div>
       <div className="login__cont">
+      <div className="glowLogin"></div>
       <div className="login__cont--header">
           <i><FaIceCream /></i>
           <h1>IceTicket</h1>
@@ -131,7 +132,7 @@ function Login({ setToken }) {
               required 
             />
             <i onClick={() => setMostrarPassword(!mostrarPassword)} style={{ cursor: "pointer" }}>
-              {mostrarPassword ? <FaEyeSlash /> : <FaEye />}
+              {mostrarPassword ?  <FaEye /> : <FaEyeSlash />}
             </i>
           </div>
 

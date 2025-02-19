@@ -1,5 +1,5 @@
 import config from "../config";
-
+import EditorDescripcion from "../componentes/EditorHtml";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -11,9 +11,10 @@ import esLocale from "date-fns/locale/es";
 /// iconos ////
 import { FaRegTrashCan, FaDog } from "react-icons/fa6";
 import { FaHamburger, FaAccessibleIcon, FaSun } from "react-icons/fa";
-import { MdFamilyRestroom } from "react-icons/md";
+import { MdFamilyRestroom, MdOutlineAttachMoney } from "react-icons/md";
 import { TbRating18Plus } from "react-icons/tb";
 import { BiSolidDrink } from "react-icons/bi";
+import { IoTicket } from "react-icons/io5";
 
 
 function AdminEventos({ setToken }) {
@@ -29,7 +30,8 @@ function AdminEventos({ setToken }) {
     imagen: "",
     precios: [{ nombre: "", monto: "", disponibles: "" }],
     categoria: "",
-    publico: false, // ✅ Por defecto en false
+    publico: false,
+    seleccionAsientos: false,
     tags: {
       todoPublico: false,
       noMenores: false,
@@ -48,6 +50,7 @@ function AdminEventos({ setToken }) {
       estacionamiento: "",
       transporte: ""
     }
+
   });
 
   const [lugares, setLugares] = useState([]);
@@ -131,8 +134,7 @@ function AdminEventos({ setToken }) {
         lugar: data.lugar || "",
         vendedor: data.vendedor || "",
         publico: data.publico ?? false,
-
-        // ✅ Aseguramos que `tags` tenga valores por defecto
+        seleccionAsientos: data.seleccionAsientos ?? false,
         tags: {
           todoPublico: data.tags?.todoPublico ?? false,
           noMenores: data.tags?.noMenores ?? false,
@@ -234,7 +236,7 @@ function AdminEventos({ setToken }) {
           lugar: data.lugar || "",
           vendedor: data.vendedor || "",
           publico: data.publico || false,
-           // ✅ Aseguramos que `tags` tenga todos los valores por defecto
+          seleccionAsientos: data.seleccionAsientos || false,
           tags: {
             todoPublico: data.tags?.todoPublico || false,
             noMenores: data.tags?.noMenores || false,
@@ -306,7 +308,6 @@ function AdminEventos({ setToken }) {
   };
   // 💰 PRECIOS
 
-
   // Socios //
   const agregarEmail = () => {
     if (nuevoEmail && !sociosEmails.includes(nuevoEmail)) {
@@ -318,7 +319,6 @@ function AdminEventos({ setToken }) {
   const eliminarEmail = (email) => {
     setSociosEmails(sociosEmails.filter(e => e !== email));
   };
-
 
   const handleChange = (e) => {
   const { name, value, type, checked } = e.target;
@@ -333,13 +333,11 @@ function AdminEventos({ setToken }) {
   }));
 };
 
-
-
-
   const handleFechaChange = (date) => {
     if (!date) return;
     setEvento({ ...evento, fecha: date }); // ✅ Guardamos la fecha como `Date`
   };
+
 
   const handleCategoriaChange = (e) => {
     setEvento({ ...evento, categoria: e.target.value });
@@ -414,8 +412,7 @@ function AdminEventos({ setToken }) {
   lugar: evento.lugar,
   sociosProductoresEmails: sociosEmails,
   publico: evento.publico,
-
-  // ✅ Aseguramos que se envíe al backend correctamente
+  seleccionAsientos: evento.seleccionAsientos,
   tags: evento.tags || {
     todoPublico: false,
     noMenores: false,
@@ -472,6 +469,7 @@ function AdminEventos({ setToken }) {
           lugar: "",
           vendedor: "",
           publico: false,
+          seleccionAsientos: false,
             tags: { 
               todoPublico: false,
               noMenores: false,
@@ -501,8 +499,6 @@ function AdminEventos({ setToken }) {
       Swal.fire({ icon: "error", title: "Error en la conexión", text: "No se pudo conectar con el servidor." });
     }
   };
-
-
 
 
   return (
@@ -543,14 +539,15 @@ function AdminEventos({ setToken }) {
           )}
         </div>
 
-        <div className="campoForm">
+        {/* <div className="campoForm">
           <label htmlFor="descripcion">Descripción del Evento</label>
           <textarea name="" id="" value={evento.descripcion || ""} 
             onChange={(content) => setEvento({ ...evento, descripcion: content })}></textarea>
+        </div> */}
+
+        <EditorDescripcion evento={evento} setEvento={setEvento} />
 
 
-     
-        </div>
         
         <div className="grupoCampos">
         <div className="campoForm">
@@ -607,6 +604,9 @@ function AdminEventos({ setToken }) {
         <div className="alert admin">
           En esta sección agrega las diferentes opciones de tickets que vas a ofrecer.
         </div>
+
+        
+
             {evento.precios.map((precio, index) => (
               <div key={index} className="camposTickets">
                 <div className="campoForm">
@@ -630,6 +630,7 @@ function AdminEventos({ setToken }) {
                     onChange={(e) => handlePrecioChange(index, e)} 
                     required 
                   />
+                  <i><MdOutlineAttachMoney /></i>
                 </div>
                 <div className="campoForm">
                   <label htmlFor="disponibles">Stock Disponible</label>
@@ -641,6 +642,7 @@ function AdminEventos({ setToken }) {
                     onChange={(e) => handlePrecioChange(index, e)} 
                     required 
                   />
+                  <i><IoTicket /></i>
                 </div>
                 {index > 0 && <button type="button" onClick={() => eliminarPrecio(index)}><i><FaRegTrashCan /></i></button>}
               </div>
@@ -652,6 +654,19 @@ function AdminEventos({ setToken }) {
             </div>
 
         <hr />
+
+        <div className="campoCheck">
+          <input
+            type="checkbox"
+            name="seleccionAsientos"
+            checked={evento.seleccionAsientos}
+            onChange={handleChange}
+          />
+          <label>Permitir selección de asientos</label>
+        </div>
+        <div className="alert">
+          Si activas esta opción, los usuarios podrán elegir asientos específicos en el evento.
+        </div>
         
         <h3>Stock del Evento</h3>
         <div className="campoForm">  

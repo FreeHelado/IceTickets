@@ -28,6 +28,8 @@
         background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
         position: relative;
 
+        
+
        h2 {
         font-weight: 500;
        }
@@ -42,10 +44,10 @@
                 position: relative;
 
                 i {
-                    font-size: 30px;
+                    font-size: 20px;
                     color: #ffffff99;
                     position: absolute;
-                    bottom: 15px;
+                    bottom: 20px;
                     right: 20px;
                     cursor: pointer;
                     @include hover();
@@ -157,11 +159,25 @@
         }
 }
 
+.glowLogin {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    width: 100%;
+    height: 150%;
+    padding: 30% 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(ellipse, #e6b7fe 20%, #5049c2 40%, rgba(58, 55, 255, 0) 60%);
+    filter: blur(50px);
+    z-index: -1;
+}
+
 .registro {
     @include flexColumn(20px);
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    padding-top: 0!important;
 
 
     &__header {

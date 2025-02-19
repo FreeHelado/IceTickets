@@ -12,6 +12,9 @@
   "dependencies": {
     "@lexical/react": "^0.24.0",
     "@sweetalert2/theme-dark": "^5.0.26",
+    "@tiptap/extension-link": "^2.11.5",
+    "@tiptap/react": "^2.11.5",
+    "@tiptap/starter-kit": "^2.11.5",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -20,6 +23,7 @@
     "express": "^4.21.2",
     "gsap": "^3.12.7",
     "html2canvas": "^1.4.1",
+    "jodit-react": "^5.2.14",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
     "mongoose": "^8.10.0",
