@@ -2,7 +2,6 @@ import config from "../config";
 
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import EditorDescripcion from "../componentes/EditorDescripcion";
 import Swal from "sweetalert2";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
