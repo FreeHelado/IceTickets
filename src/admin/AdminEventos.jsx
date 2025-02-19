@@ -6,7 +6,6 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
-import { Editor } from "@tinymce/tinymce-react";
 
 /// iconos ////
 import { FaRegTrashCan, FaDog } from "react-icons/fa6";
@@ -545,35 +544,14 @@ function AdminEventos({ setToken }) {
 
         <div className="campoForm">
           <label htmlFor="descripcion">Descripción del Evento</label>
-          <Editor
-              apiKey='1yli8xddk7o5i9q5vhqd84u36v32xfmi359kk8ec29hskklr'
-              init={{
-              language: "es", // ✅ Establece el idioma en español
-              skin: "oxide-dark", // ✅ Activa el skin oscuro de TinyMCE
-                content_css: "dark", // ✅ Hace que el contenido dentro del editor sea oscuro también
-              width: "100%",
-              toolbar: `
-                undo redo | formatselect | bold italic underline strikethrough | 
-                forecolor backcolor | alignleft aligncenter alignright alignjustify | 
-                bullist numlist outdent indent | link image media table | 
-                emoticons charmap removeformat`,
-              plugins: [
-                "advlist autolink lists link image charmap print preview anchor",
-                "searchreplace visualblocks code fullscreen",
-                "insertdatetime media table paste code help wordcount"
-              ], // ✅ Agregamos plugins útiles
-              content_style: "body { font-family:Arial,sans-serif; font-size:16px; background-color:#19191b; }", // ✅ Estilos personalizados dentro del editor
-                tinycomments_mode: 'embedded',
-                tinycomments_author: 'Author name',
-                mergetags_list: [
-                  { value: 'First.Name', title: 'First Name' },
-                  { value: 'Email', title: 'Email' },
-                ],
-                ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
-              }}
+          <textarea 
+            name="descripcion" 
+            id="descripcion" 
             value={evento.descripcion}
-            onEditorChange={(content) => setEvento({ ...evento, descripcion: content })}
-          />
+            onEditorChange={(content) => setEvento({ ...evento, descripcion: content })}>
+          </textarea>
+
+     
         </div>
         
         <div className="grupoCampos">

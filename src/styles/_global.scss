@@ -180,7 +180,7 @@ select  {
         outline: 0;
         border: 1px solid $colorPrimario;
         box-shadow: $colorPrimario 0 0 0 1px inset, $colorPrimarioClaro 0 0 0 5px;
-        background-color: $colorPrimarioClaro;
+        background-color: $colorSecundario;
     }
 
     &::placeholder {
