@@ -138,7 +138,13 @@ body {
         }
 }
 
-input,
+input[type=text],
+input[type=date],
+input[type=time],
+input[type=email],
+input[type=password],
+input[type=number],
+input[type=tel],
 textarea,
 select {
     height: 55px;
@@ -162,9 +168,14 @@ select[multiple] {
 }
 
 input[type=text],
-input[type=search],
+input[type=date],
+input[type=time],
+input[type=email],
+input[type=password],
+input[type=number],
+input[type=tel],
 textarea,
-select {
+select  {
     &:focus {
         outline: 0;
         border: 1px solid $colorPrimario;

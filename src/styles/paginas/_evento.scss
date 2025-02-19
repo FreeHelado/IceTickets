@@ -84,6 +84,58 @@
                 }
             }
 
+            &--ficha {
+                @include flexColumn(25px);
+                width: 100%;
+                padding-block: 40px;
+
+                &--tags {
+                    ul {
+                        @include flex();
+                        flex-wrap: wrap;
+                        li {
+                            border: 1px solid oscuro($colorTag, 20%);
+                            border-radius: 10px;
+                            padding: 20px 15px;
+                            @include flexColumn(4px);
+                            align-items: center;
+
+                            span {
+                                font-size: 13px;
+                                font-weight: 500;
+                            }
+                            i {
+                                font-size: 35px;
+                            }
+                        }
+                    }
+                }
+
+                &--infoadicional {
+                    @include flexColumn(0);
+                    width: 100%;
+                    border: 1px solid oscuro($colorTag, 20%);
+                    border-radius: 20px;
+                    padding: 25px 30px;
+                    &--item {
+                        @include grid(3);
+                        width: 100%;
+                        border-bottom: 1px solid oscuro($colorTag, 40%);
+                        @extend .notUltimo;
+                        padding-block: 15px;
+                        h3 {
+                            font-size: 18px;
+                            font-weight: 400;
+                            grid-column: 1 / 2;
+                            text-transform: capitalize;
+                        }
+                        span {
+                            grid-column: 2 / 4;
+                        }
+                    }
+                }
+            }
+
             &--lugar {
                 @include flexColumn();
                 width: 100%;

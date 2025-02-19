@@ -8,6 +8,13 @@ import CompraEntradas from "../componentes/CompraEntradas"; // Importa el nuevo 
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
 
+/// iconos ////
+import { FaRegTrashCan, FaDog } from "react-icons/fa6";
+import { FaHamburger, FaAccessibleIcon, FaSun } from "react-icons/fa";
+import { MdFamilyRestroom } from "react-icons/md";
+import { TbRating18Plus } from "react-icons/tb";
+import { BiSolidDrink } from "react-icons/bi";
+
 function EventoDetalle() {
   const { id } = useParams(); // Captura el ID del evento desde la URL
   const [evento, setEvento] = useState(null);
@@ -85,24 +92,62 @@ function EventoDetalle() {
 
           
           <section className="evento__cont--info--ficha">
+            <h3>Información acicional del Evento:</h3>
             <div className="evento__cont--info--ficha--tags">
               <ul>
-                {evento.tags &&
-                  Object.entries(evento.tags)
-                    .filter(([_, value]) => value) // Solo muestra los `true`
-                    .map(([key]) => (
-                      <li key={key}>{key.replace(/([A-Z])/g, " $1")}</li> // Convierte camelCase en texto
-                ))}
+                {evento.tags?.todoPublico && (
+                  <li>
+                    <i><MdFamilyRestroom /></i>
+                    <span>PARA TODO PÚBLICO</span>
+                  </li>
+                )}
+                {evento.tags?.noMenores && (
+                  <li>
+                    <i><TbRating18Plus /></i>
+                    <span>PARA MAYORES DE 18</span>
+                  </li>
+                )}
+                {evento.tags?.ventaComida && (
+                  <li>
+                    <i><FaHamburger /></i>
+                    <span>VENTA DE COMIDA</span>
+                  </li>
+                )}
+                {evento.tags?.ventaBebida && (
+                  <li>
+                   <i><BiSolidDrink /></i>
+                <span>VENTA DE BEBIDA</span>
+                  </li>
+                )}
+                {evento.tags?.petFriendly && (
+                  <li>
+                     <i><FaDog /></i>
+                <span>PET FIENDLY</span>
+                  </li>
+                )}
+                {evento.tags?.accesible && (
+                  <li>
+                   <i><FaAccessibleIcon /></i>
+                <span>ACCESIBLE E INCLUSIVO</span>
+                  </li>
+                )}
+                {evento.tags?.aireLibre && (
+                  <li>
+                    <i><FaSun /></i>
+              <span>AIRE LIBRE</span>
+                  </li>
+                )}
               </ul>
             </div>
             <div className="evento__cont--info--ficha--infoadicional">
+              <h3>Más información</h3>
               {evento.infoAdicional &&
                 Object.entries(evento.infoAdicional)
                   .filter(([_, value]) => value) // Solo muestra los campos con datos
                   .map(([key, value]) => (
                     <div key={key} className="evento__cont--info--ficha--infoadicional--item">
                       <h3>{key.replace(/([A-Z])/g, " $1")}</h3> {/* Formatea camelCase */}
-                      <span>{value}</span>
+                      <p>{value}</p>
                     </div>
                 ))}
             </div>

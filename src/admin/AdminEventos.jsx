@@ -7,7 +7,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
 import { Editor } from "@tinymce/tinymce-react";
-import { FaRegTrashCan } from "react-icons/fa6";
+
+/// iconos ////
+import { FaRegTrashCan, FaDog } from "react-icons/fa6";
+import { FaHamburger, FaAccessibleIcon, FaSun } from "react-icons/fa";
+import { MdFamilyRestroom } from "react-icons/md";
+import { TbRating18Plus } from "react-icons/tb";
+import { BiSolidDrink } from "react-icons/bi";
 
 
 function AdminEventos({ setToken }) {
@@ -711,50 +717,77 @@ function AdminEventos({ setToken }) {
           </select>
         </div>
 
-        <span>Selecciona las etiquetas que se ven en el evento</span>
-          <div className="grupoTags">
-            <label>
-              <input type="checkbox" name="todoPublico" 
+        <span>Selecciona las etiquetas quequieres presentar en tu evento</span>
+        <div className="grupoTags">
+          <div className="grupoTags__tag">
+              <input type="checkbox" name="todoPublico" id="todoPublico"
                 checked={evento.tags.todoPublico} 
                 onChange={handleChange} />
-              Evento para todo público
+              <label htmlFor="todoPublico">
+                <i><MdFamilyRestroom /></i>
+                <span>PARA TODO PÚBLICO</span>
+              </label>
+          </div>
+          <div className="grupoTags__tag">
+                <input type="checkbox" name="noMenores" id="noMenores" 
+                  checked={evento.tags.noMenores} 
+                  onChange={handleChange} />
+            <label htmlFor="noMenores">
+              <i><TbRating18Plus /></i>
+              <span>PARA MAYORES DE 18</span>
             </label>
-            <label>
-              <input type="checkbox" name="noMenores" 
-                checked={evento.tags.noMenores} 
-                onChange={handleChange} />
-              No apto para menores de edad
-            </label>
-            <label>
-              <input type="checkbox" name="ventaComida" 
+          </div>
+
+          <div className="grupoTags__tag">
+              <input type="checkbox" name="ventaComida" id="ventaComida" 
                 checked={evento.tags.ventaComida} 
                 onChange={handleChange} />
-              Venta de comida
+            <label htmlFor="ventaComida">
+              <i><FaHamburger /></i>
+              <span>VENTA DE COMIDA</span>
             </label>
-            <label>
-              <input type="checkbox" name="ventaBebida" 
+          </div>
+          <div className="grupoTags__tag">
+              <input type="checkbox" name="ventaBebida" id="ventaBebida" 
                 checked={evento.tags.ventaBebida} 
                 onChange={handleChange} />
-              Venta de bebida
-            </label>
-            <label>
-              <input type="checkbox" name="petFriendly" 
+            <label htmlFor="ventaBebida">
+              <i><BiSolidDrink /></i>
+                <span>VENTA DE BEBIDA</span>
+              </label>
+          </div>
+          <div className="grupoTags__tag">
+              <input type="checkbox" name="petFriendly" id="petFriendly"
                 checked={evento.tags.petFriendly} 
                 onChange={handleChange} />
-              Pet Friendly
-            </label>
-            <label>
-              <input type="checkbox" name="accesible" 
+              <label htmlFor="petFriendly">
+              <i><FaDog /></i>
+                <span>PET FIENDLY</span>
+              </label>
+          </div>
+
+          <div className="grupoTags__tag">
+              <input type="checkbox" name="accesible" id="accesible" 
                 checked={evento.tags.accesible} 
                 onChange={handleChange} />
-              Accesible (Acceso inclusivo)
-            </label>
-            <label>
-              <input type="checkbox" name="aireLibre" 
+              <label htmlFor="accesible">
+                <i><FaAccessibleIcon /></i>
+                <span>ACCESIBLE E INCLUSIVO</span>
+              </label>
+          </div>
+
+          <div className="grupoTags__tag">
+              <input type="checkbox" name="aireLibre" id="aireLibre" 
                 checked={evento.tags.aireLibre} 
                 onChange={handleChange} />
-              Al aire libre
+            <label htmlFor="aireLibre">
+              <i><FaSun /></i>
+              <span>AIRE LIBRE</span>
+             
             </label>
+
+          </div>
+            
           </div>
 
         
