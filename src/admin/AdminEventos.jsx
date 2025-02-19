@@ -1,6 +1,8 @@
 import config from "../config";
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import EditorDescripcion from "../componentes/EditorDescripcion";
 import Swal from "sweetalert2";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -544,12 +546,13 @@ function AdminEventos({ setToken }) {
 
         <div className="campoForm">
           <label htmlFor="descripcion">Descripción del Evento</label>
-          <textarea 
-            name="descripcion" 
-            id="descripcion" 
-            value={evento.descripcion}
-            onEditorChange={(content) => setEvento({ ...evento, descripcion: content })}>
-          </textarea>
+          <textarea name="" id="" value={evento.descripcion || ""} 
+            onChange={(content) => setEvento({ ...evento, descripcion: content })}></textarea>
+
+          {/* <EditorDescripcion 
+            value={evento.descripcion || ""} 
+            onChange={(content) => setEvento({ ...evento, descripcion: content })}
+          /> */}
 
      
         </div>
@@ -807,12 +810,10 @@ function AdminEventos({ setToken }) {
 
           <div className="campoForm">
             <label>Términos y Condiciones</label>
-            <textarea 
-              name="terminosCondiciones" 
-              value={evento.infoAdicional.terminosCondiciones} 
-              onChange={handleChange} 
-              placeholder="Escribe aquí las reglas del evento..."
-            ></textarea>
+            <EditorDescripcion 
+              value={evento.descripcion} 
+              onChange={(content) => setEvento({ ...evento, descripcion: content })}
+            />
         </div>
         
         <div className="campoForm">
