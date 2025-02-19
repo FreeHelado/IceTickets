@@ -548,10 +548,6 @@ function AdminEventos({ setToken }) {
           <textarea name="" id="" value={evento.descripcion || ""} 
             onChange={(content) => setEvento({ ...evento, descripcion: content })}></textarea>
 
-          {/* <EditorDescripcion 
-            value={evento.descripcion || ""} 
-            onChange={(content) => setEvento({ ...evento, descripcion: content })}
-          /> */}
 
      
         </div>
@@ -809,10 +805,12 @@ function AdminEventos({ setToken }) {
 
           <div className="campoForm">
             <label>Términos y Condiciones</label>
-            <EditorDescripcion 
-              value={evento.descripcion} 
-              onChange={(content) => setEvento({ ...evento, descripcion: content })}
-            />
+            <textarea 
+              name="terminosCondiciones" 
+              value={evento.infoAdicional.terminosCondiciones} 
+              onChange={handleChange} 
+              placeholder="Ingresa aquí los términos y condiciones del evento"
+            ></textarea>
         </div>
         
         <div className="campoForm">

@@ -54,7 +54,7 @@ function Header({ token }) {
         {token && (
           <Link to="/login" onClick={handleLogout}>
             <FaPowerOff />
-            <span>Cerrar SesiÃ³n</span>
+            <span>Cerrar Sesión</span>
           </Link>
         )}
 
