@@ -14,7 +14,7 @@ function Header({ token }) {
   
     useEffect(() => {
     const handleScroll = () => {
-        setIsScrolled(window.scrollY > 1); // Si baja m�s de 50px, cambia el estado
+        setIsScrolled(window.scrollY > 1); // Si baja más de 50px, cambia el estado
       };
       window.addEventListener("scroll", handleScroll);
       return () => window.removeEventListener("scroll", handleScroll);
@@ -54,7 +54,7 @@ function Header({ token }) {
         {token && (
           <Link to="/login" onClick={handleLogout}>
             <FaPowerOff />
-            <span>Cerrar Sesión</span>
+            <span>Cerrar SesiÃ³n</span>
           </Link>
         )}
 
