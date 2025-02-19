@@ -30,10 +30,7 @@ if (!MONGO_URI) {
 }
 
 const app = express();
-app.use(cors({
-  origin: ["http://localhost:5173", "https://tu-frontend.vercel.app"], // Agrega ambas
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use("/api/eventos", eventosRoutes);
 app.use("/api/auth", authRoutes);
