@@ -33,16 +33,14 @@ router.get("/:id", async (req, res) => {
       return res.status(400).json({ message: "ID de evento inválido" });
     }
 
-    // Buscar el evento incluyendo "publico"
     const evento = await Evento.findById(id).select(
-      "nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor sociosProductores publico"
+      "nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor sociosProductores publico tags infoAdicional"
     );
+
 
     if (!evento) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
-
-    console.log("Evento encontrado:", evento);
 
     // Buscar los emails de los sociosProductores manualmente
     const sociosInfo = await User.find(
@@ -73,7 +71,22 @@ router.get("/:id", async (req, res) => {
 ===================================== */
 router.post("/", verificarToken, async (req, res) => {
   try {
-    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails, publico } = req.body;
+    const {
+      nombre,
+      fecha,
+      hora,
+      descripcion,
+      stock,
+      estado,
+      imagen,
+      precios,
+      categoria,
+      lugar,
+      sociosProductoresEmails,
+      publico,
+      tags,
+      infoAdicional
+    } = req.body;
 
 
     // ✅ Convertir fecha a Date antes de guardarla
@@ -115,7 +128,9 @@ router.post("/", verificarToken, async (req, res) => {
       lugar,
       vendedor,
       sociosProductores,
-      publico
+      publico,
+      tags,
+      infoAdicional
     });
 
     await nuevoEvento.save();
@@ -133,7 +148,22 @@ router.post("/", verificarToken, async (req, res) => {
 router.put("/:id", verificarToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, fecha, hora, descripcion, stock, estado, imagen, precios, categoria, lugar, sociosProductoresEmails, publico } = req.body;
+    const {
+      nombre,
+      fecha,
+      hora,
+      descripcion,
+      stock,
+      estado,
+      imagen,
+      precios,
+      categoria,
+      lugar,
+      sociosProductoresEmails,
+      publico,
+      tags,
+      infoAdicional
+    } = req.body;
     const userId = req.user.userId; // 🔥 Usuario autenticado
     const isAdmin = req.user.isAdmin; // 🔥 Si es admin
 
@@ -175,6 +205,8 @@ router.put("/:id", verificarToken, async (req, res) => {
       categoria,
       lugar,
       sociosProductores,
+      tags,
+      infoAdicional
     };
 
     // ✅ Agregar `publico` solo si está definido en la petición

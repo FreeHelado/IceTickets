@@ -89,7 +89,10 @@
             }
         }
 
-        
+        .grupoTags {
+            @include flex();
+            flex-wrap: wrap;
+        }
         
 
         .imgPrev {

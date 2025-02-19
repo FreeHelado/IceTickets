@@ -23,7 +23,25 @@ function AdminEventos({ setToken }) {
     imagen: "",
     precios: [{ nombre: "", monto: "", disponibles: "" }],
     categoria: "",
-    publico: false // ✅ Por defecto en false
+    publico: false, // ✅ Por defecto en false
+    tags: {
+      todoPublico: false,
+      noMenores: false,
+      ventaComida: false,
+      ventaBebida: false,
+      petFriendly: false,
+      accesible: false,
+      aireLibre: false
+    },
+    infoAdicional: {
+      edadMinima: "",
+      menoresGratis: "",
+      elementosProhibidos: "",
+      terminosCondiciones: "",
+      horaApertura: "",
+      estacionamiento: "",
+      transporte: ""
+    }
   });
 
   const [lugares, setLugares] = useState([]);
@@ -46,8 +64,7 @@ function AdminEventos({ setToken }) {
   useEffect(() => {
   const fetchEvento = async () => {
     const token = localStorage.getItem("token");
-    
-    // 🔒 Si no hay token, redirigir al login
+
     if (!token) {
       Swal.fire({
         icon: "warning",
@@ -60,7 +77,7 @@ function AdminEventos({ setToken }) {
 
     try {
       const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`, {
-        headers: { Authorization: token }
+        headers: { Authorization: token },
       });
 
       if (!response.ok) {
@@ -70,11 +87,11 @@ function AdminEventos({ setToken }) {
       const data = await response.json();
       if (!data) return;
 
-      // 🔐 Verificar si el usuario puede editar
+      // 🔐 Verificar permisos
       const puedeEditar =
-        isAdmin || 
-        userId === data.vendedor || 
-        data.sociosProductores.some(socio => socio._id === userId);
+        isAdmin ||
+        userId === data.vendedor ||
+        data.sociosProductores?.some((socio) => socio._id === userId);
 
       if (!puedeEditar) {
         Swal.fire({
@@ -86,37 +103,55 @@ function AdminEventos({ setToken }) {
         return;
       }
 
-     
-
       setEvento({
         nombre: data.nombre || "",
         fecha: data.fecha ? parseISO(data.fecha) : null,
         hora: data.hora || "",
         descripcion: data.descripcion || "",
-        stock: { 
-          aforo: data.stock?.aforo || "", 
-          vendidas: data.stock?.vendidas || 0  
+        stock: {
+          aforo: data.stock?.aforo || "",
+          vendidas: data.stock?.vendidas || 0,
         },
         estado: data.estado || "proximo",
         imagen: data.imagen || "",
-        precios: data.precios?.length > 0 
-          ? data.precios.map(precio => ({
+        precios: data.precios?.length
+          ? data.precios.map((precio) => ({
               nombre: precio.nombre || "",
               monto: precio.monto || "",
-              disponibles: precio.disponibles || ""
+              disponibles: precio.disponibles || "",
             }))
           : [{ nombre: "", monto: "", disponibles: "" }],
         categoria: data.categoria || "",
         lugar: data.lugar || "",
         vendedor: data.vendedor || "",
-        publico: data.publico ?? false // ✅ Agrega esta línea
+        publico: data.publico ?? false,
+
+        // ✅ Aseguramos que `tags` tenga valores por defecto
+        tags: {
+          todoPublico: data.tags?.todoPublico ?? false,
+          noMenores: data.tags?.noMenores ?? false,
+          ventaComida: data.tags?.ventaComida ?? false,
+          ventaBebida: data.tags?.ventaBebida ?? false,
+          petFriendly: data.tags?.petFriendly ?? false,
+          accesible: data.tags?.accesible ?? false,
+          aireLibre: data.tags?.aireLibre ?? false,
+        },
+
+        // ✅ Aseguramos que `infoAdicional` tenga valores por defecto
+        infoAdicional: {
+          edadMinima: data.infoAdicional?.edadMinima || "",
+          menoresGratis: data.infoAdicional?.menoresGratis || "",
+          elementosProhibidos: data.infoAdicional?.elementosProhibidos || "",
+          terminosCondiciones: data.infoAdicional?.terminosCondiciones || "",
+          horaApertura: data.infoAdicional?.horaApertura || "",
+          estacionamiento: data.infoAdicional?.estacionamiento || "",
+          transporte: data.infoAdicional?.transporte || "",
+        },
       });
 
-      // ✅ Si la imagen existe, establecer la vista previa
       if (data.imagen) {
         setImagenPreview(`${config.BACKEND_URL}/img/eventos/${data.imagen}`);
       }
-
     } catch (error) {
       console.error("❌ Error al cargar el evento:", error);
       Swal.fire({
@@ -129,7 +164,8 @@ function AdminEventos({ setToken }) {
   };
 
   if (id) fetchEvento();
-  }, [id, isAdmin, userId, navigate]);
+}, [id, isAdmin, userId, navigate]);
+
 
 
   // ✅ Cargar categorías
@@ -191,7 +227,28 @@ function AdminEventos({ setToken }) {
           categoria: data.categoria || "",
           lugar: data.lugar || "",
           vendedor: data.vendedor || "",
-          publico: data.publico || false 
+          publico: data.publico || false,
+           // ✅ Aseguramos que `tags` tenga todos los valores por defecto
+          tags: {
+            todoPublico: data.tags?.todoPublico || false,
+            noMenores: data.tags?.noMenores || false,
+            ventaComida: data.tags?.ventaComida || false,
+            ventaBebida: data.tags?.ventaBebida || false,
+            petFriendly: data.tags?.petFriendly || false,
+            accesible: data.tags?.accesible || false,
+            aireLibre: data.tags?.aireLibre || false
+          },
+
+          // ✅ Lo mismo para `infoAdicional`
+          infoAdicional: {
+            edadMinima: data.infoAdicional?.edadMinima || "",
+            menoresGratis: data.infoAdicional?.menoresGratis || "",
+            elementosProhibidos: data.infoAdicional?.elementosProhibidos || "",
+            terminosCondiciones: data.infoAdicional?.terminosCondiciones || "",
+            horaApertura: data.infoAdicional?.horaApertura || "",
+            estacionamiento: data.infoAdicional?.estacionamiento || "",
+            transporte: data.infoAdicional?.transporte || ""
+          }
         });
       } catch (error) {
         console.error("❌ Error al cargar el evento:", error);
@@ -258,15 +315,19 @@ function AdminEventos({ setToken }) {
 
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setEvento((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked :
-        (name === "aforo" || name === "vendidas")
-        ? { ...prev.stock, [name]: value }
-        : value
-    }));
-  };
+  const { name, value, type, checked } = e.target;
+  setEvento(prev => ({
+    ...prev,
+    tags: prev.tags && name in prev.tags ? { ...prev.tags, [name]: checked } : prev.tags,
+    infoAdicional: prev.infoAdicional && name in prev.infoAdicional ? { ...prev.infoAdicional, [name]: value } : prev.infoAdicional,
+    [name]: type === "checkbox" ? checked :
+      name in prev.stock
+      ? { ...prev.stock, [name]: value }
+      : value
+  }));
+};
+
+
 
 
   const handleFechaChange = (date) => {
@@ -328,26 +389,48 @@ function AdminEventos({ setToken }) {
 
     // ✅ Construir el objeto `evento` con la nueva estructura
     const eventoData = {
-      nombre: evento.nombre,
-      fecha: evento.fecha.toISOString(), // ✅ Convertimos Date a ISO antes de enviar
-      hora: evento.hora,
-      descripcion: evento.descripcion,
-      stock: { 
-        aforo: evento.stock.aforo, 
-        vendidas: evento.stock.vendidas || 0 
-      },
-      estado: evento.estado,
-      imagen: imageName,
-      precios: evento.precios.map(precio => ({
-        nombre: precio.nombre,
-        monto: precio.monto,
-        disponibles: precio.disponibles
-      })),
-      categoria: evento.categoria,
-      lugar: evento.lugar,
-      sociosProductoresEmails: sociosEmails,
-      publico: evento.publico // ✅ Se agrega para que se envíe al backend
-    };
+  nombre: evento.nombre,
+  fecha: evento.fecha.toISOString(),
+  hora: evento.hora,
+  descripcion: evento.descripcion,
+  stock: {
+    aforo: evento.stock.aforo,
+    vendidas: evento.stock.vendidas || 0,
+  },
+  estado: evento.estado,
+  imagen: imageName,
+  precios: evento.precios.map((precio) => ({
+    nombre: precio.nombre,
+    monto: precio.monto,
+    disponibles: precio.disponibles,
+  })),
+  categoria: evento.categoria,
+  lugar: evento.lugar,
+  sociosProductoresEmails: sociosEmails,
+  publico: evento.publico,
+
+  // ✅ Aseguramos que se envíe al backend correctamente
+  tags: evento.tags || {
+    todoPublico: false,
+    noMenores: false,
+    ventaComida: false,
+    ventaBebida: false,
+    petFriendly: false,
+    accesible: false,
+    aireLibre: false,
+  },
+
+  infoAdicional: evento.infoAdicional || {
+    edadMinima: "",
+    menoresGratis: "",
+    elementosProhibidos: "",
+    terminosCondiciones: "",
+    horaApertura: "",
+    estacionamiento: "",
+    transporte: "",
+  },
+};
+
 
     try {
       const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id || ""}`, {
@@ -382,6 +465,25 @@ function AdminEventos({ setToken }) {
           categoria: "",
           lugar: "",
           vendedor: "",
+          publico: false,
+            tags: { 
+              todoPublico: false,
+              noMenores: false,
+              ventaComida: false,
+              ventaBebida: false,
+              petFriendly: false,
+              accesible: false,
+              aireLibre: false
+            },
+            infoAdicional: {
+              edadMinima: "",
+              menoresGratis: "",
+              elementosProhibidos: "",
+              terminosCondiciones: "",
+              horaApertura: "",
+              estacionamiento: "",
+              transporte: ""
+            }
         });
 
         setImagenPreview(null);
@@ -498,7 +600,7 @@ function AdminEventos({ setToken }) {
 
         <h3>Imagen de tu Evento</h3>
         <div className="alert">
-          Medidas recomendadas: 
+          Medidas recomendadas: La imágen debe ser de 1200px x 628px y pesar menos de 400 kb. Recomendamos que sea en formato jpg, png o webp.
         </div>
         <div className="campoForm addImagen">
           <input 
@@ -609,10 +711,132 @@ function AdminEventos({ setToken }) {
           </select>
         </div>
 
+        <span>Selecciona las etiquetas que se ven en el evento</span>
+          <div className="grupoTags">
+            <label>
+              <input type="checkbox" name="todoPublico" 
+                checked={evento.tags.todoPublico} 
+                onChange={handleChange} />
+              Evento para todo público
+            </label>
+            <label>
+              <input type="checkbox" name="noMenores" 
+                checked={evento.tags.noMenores} 
+                onChange={handleChange} />
+              No apto para menores de edad
+            </label>
+            <label>
+              <input type="checkbox" name="ventaComida" 
+                checked={evento.tags.ventaComida} 
+                onChange={handleChange} />
+              Venta de comida
+            </label>
+            <label>
+              <input type="checkbox" name="ventaBebida" 
+                checked={evento.tags.ventaBebida} 
+                onChange={handleChange} />
+              Venta de bebida
+            </label>
+            <label>
+              <input type="checkbox" name="petFriendly" 
+                checked={evento.tags.petFriendly} 
+                onChange={handleChange} />
+              Pet Friendly
+            </label>
+            <label>
+              <input type="checkbox" name="accesible" 
+                checked={evento.tags.accesible} 
+                onChange={handleChange} />
+              Accesible (Acceso inclusivo)
+            </label>
+            <label>
+              <input type="checkbox" name="aireLibre" 
+                checked={evento.tags.aireLibre} 
+                onChange={handleChange} />
+              Al aire libre
+            </label>
+          </div>
+
         
         <hr />
 
+        <h3>Información Adicional</h3>
+          <div className="campoForm">
+            <label>Edad mínima para acceder</label>
+            <input 
+              type="text" 
+              name="edadMinima" 
+              value={evento.infoAdicional.edadMinima} 
+              onChange={handleChange} 
+              placeholder="Ej: 18 años"
+            />
+          </div>
+
+          <div className="campoForm">
+            <label>Menores de (edad) no pagan</label>
+            <input 
+              type="text" 
+              name="menoresGratis" 
+              value={evento.infoAdicional.menoresGratis} 
+              onChange={handleChange} 
+              placeholder="Ej: 10 años"
+            />
+          </div>
+
+          <div className="campoForm">
+            <label>Elementos prohibidos</label>
+            <input 
+              type="text" 
+              name="elementosProhibidos" 
+              value={evento.infoAdicional.elementosProhibidos} 
+              onChange={handleChange} 
+              placeholder="Ej: Botellas de vidrio, armas..."
+            />
+          </div>
+
+          <div className="campoForm">
+            <label>Términos y Condiciones</label>
+            <textarea 
+              name="terminosCondiciones" 
+              value={evento.infoAdicional.terminosCondiciones} 
+              onChange={handleChange} 
+              placeholder="Escribe aquí las reglas del evento..."
+            ></textarea>
+        </div>
         
+        <div className="campoForm">
+        <label>Horario de Apertura</label>
+        <input 
+          type="text" 
+          name="horaApertura" 
+          value={evento.infoAdicional.horaApertura} 
+          onChange={handleChange} 
+          placeholder="Ej: 19:00 hs"
+        />
+      </div>
+
+      <div className="campoForm">
+        <label>Estacionamiento</label>
+        <textarea 
+          name="estacionamiento" 
+          value={evento.infoAdicional.estacionamiento} 
+          onChange={handleChange} 
+          placeholder="Ej: Estacionamiento privado a 200m, tarifa $500/hora"
+        ></textarea>
+      </div>
+
+      <div className="campoForm">
+        <label>Transporte recomendado</label>
+        <textarea 
+          name="transporte" 
+          value={evento.infoAdicional.transporte} 
+          onChange={handleChange} 
+          placeholder="Ej: Líneas de colectivo 152, 59 y 168"
+        ></textarea>
+      </div>
+
+
+        <hr />
         <div className="campoCheck">
             <input
               type="checkbox"

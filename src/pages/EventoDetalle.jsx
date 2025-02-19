@@ -84,6 +84,29 @@ function EventoDetalle() {
           <div dangerouslySetInnerHTML={{ __html: evento.descripcion }} />
 
           
+          <section className="evento__cont--info--ficha">
+            <div className="evento__cont--info--ficha--tags">
+              <ul>
+                {evento.tags &&
+                  Object.entries(evento.tags)
+                    .filter(([_, value]) => value) // Solo muestra los `true`
+                    .map(([key]) => (
+                      <li key={key}>{key.replace(/([A-Z])/g, " $1")}</li> // Convierte camelCase en texto
+                ))}
+              </ul>
+            </div>
+            <div className="evento__cont--info--ficha--infoadicional">
+              {evento.infoAdicional &&
+                Object.entries(evento.infoAdicional)
+                  .filter(([_, value]) => value) // Solo muestra los campos con datos
+                  .map(([key, value]) => (
+                    <div key={key} className="evento__cont--info--ficha--infoadicional--item">
+                      <h3>{key.replace(/([A-Z])/g, " $1")}</h3> {/* Formatea camelCase */}
+                      <span>{value}</span>
+                    </div>
+                ))}
+            </div>
+          </section>
           
           
           {/* ✅ Renderizar LugarCard con los datos del lugar */}

@@ -31,7 +31,29 @@ const eventoSchema = new mongoose.Schema({
   lugar: { type: mongoose.Schema.Types.ObjectId, ref: "Lugar" },
   vendedor: { type: mongoose.Schema.Types.ObjectId, ref: "Vendedor" },
   sociosProductores: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  publico: { type: Boolean, default: false } 
+  publico: { type: Boolean, default: false },
+  
+  // ✅ 🔥 Aseguramos que `tags` tenga valores por defecto
+  tags: {
+    todoPublico: { type: Boolean, default: false },
+    noMenores: { type: Boolean, default: false },
+    ventaComida: { type: Boolean, default: false },
+    ventaBebida: { type: Boolean, default: false },
+    petFriendly: { type: Boolean, default: false },
+    accesible: { type: Boolean, default: false },
+    aireLibre: { type: Boolean, default: false },
+  },
+
+  // ✅ 🔥 Aseguramos que `infoAdicional` también tenga valores por defecto
+  infoAdicional: {
+    edadMinima: { type: String, default: "" },
+    menoresGratis: { type: String, default: "" },
+    elementosProhibidos: { type: String, default: "" },
+    terminosCondiciones: { type: String, default: "" },
+    horaApertura: { type: String, default: "" },
+    estacionamiento: { type: String, default: "" },
+    transporte: { type: String, default: "" },
+  },
 
 }, { toJSON: { virtuals: true } }); 
 
