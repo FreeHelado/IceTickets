@@ -6,36 +6,46 @@
         grid-column: 1 / 4;
         @include flexColumn(50px);
 
+        &--evento {
+            @include flex(15px);
+            figure {
+                position: relative;
+                overflow: hidden;
+                border-radius: 10px;
+                width: 250px;
+                @include flex();
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+
+            &--data {
+                @include flexColumn(5px);
+                h1 {
+                    font-weight: 600;
+                    font-size: 40px;
+                }
+                h2 {
+                    font-size: 24px;
+                    font-weight: 400;
+                }
+            }
+        }
+
         &--aforo {
             @include flexColumn(6px);
             width: 100%;
-            
-            &--total {
-                @include flex();
-                justify-content: space-between;
-                background-color: $colorTagDestacado;
-                width: 100%;
-                padding: 2px 25px;
-                border-radius: 5px;
-                position: relative;
-                span {
-                    font-size: 18px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                }
-                strong {
-                    font-size: 30px;
-                } 
-            }
-            
+        
             &--vendidas {
                 @include flex();
                 justify-content: space-between;
-                background-color: color-opacity($amarelo, .5);
-                color: $colorSecundario;
+                background-color: color-opacity($colorTagDestacado, .10);
+                //border: 1px solid #fff;
                 width: 100%;
-                padding: 10px 25px;
-                border-radius: 5px;
+                padding: 6px 20px;
+                border-radius: 10px;
                 position: relative;
                 overflow: hidden;
 
@@ -45,19 +55,26 @@
                     top: 0;
                     height: 100%;
                     width: 50%;
-                    background-color: $amarelo;
+                    background-color: $colorTagDestacado;
                     z-index: 0;
                 }
-                span {
-                    font-size: 24px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    z-index: 1;
+
+                .progress-text {
+                    @include flex();
+                    justify-content: space-between;
+                    width: 100%;
+                    color: #fff;
+                    span {
+                        font-size: 20px;
+                        font-weight: 400;
+                        z-index: 1;
+                    }
+                    strong {
+                        font-size: 36px;
+                        z-index: 1;
+                        font-weight: 500
+                    } 
                 }
-                strong {
-                    font-size: 36px;
-                    z-index: 1;
-                } 
             }
         }
 
@@ -66,32 +83,62 @@
             width: 100%;
 
             ul {
-                @include flex(25px);
+                @include flexColumn(10px);
                 width: 100%;
                 li {
-                    @include flexColumn();
+                    @include grid(3);
                     width: 100%;
-                    max-width: 120px;
                     
                     .progress {
-                        height: 280px;
-                        background-color: color-opacity($verde, .2);
+                        height: 30px;
+                        background-color: color-opacity($amarelo, .2);
                         border-radius: 6px;
                         width: 100%;
                         position: relative;
                         overflow: hidden;
+                        grid-column: 1 / 3;
                         
                         .progressVendidas {
                             position: absolute;
                             bottom: 0;
                             left: 0;
-                            height: 0px;
-                            width: 100%;
-                            background-color: $verde;
+                            height: 100%;
+                            width: 0%;
+                            background-color: $amarelo;
+                        }
+                    }
+
+                    .ticketData {
+                        grid-column: 3 / 4;
+                        @include flexColumn(0px);
+
+                        strong {
+                            font-weight: 400;
                         }
                     }
                 }
 
+            }
+        }
+
+        &--recaudado {
+            @include flex(25px);
+            padding: 15px;
+            background-color: $colorSecundario;
+            border: 2px solid color-opacity(#fff, .2);
+            border-radius: 15px;
+            width: 100%;
+
+            i {
+                font-size: 50px;
+            }
+
+            &--data {
+                @include flexColumn(0px);
+                strong {
+                    font-size: 40px;
+                    font-weight: 500;
+                }
             }
         }
     }
@@ -101,14 +148,111 @@
         border: 2px solid claro($colorSecundario, 20);
         border-radius: 20px;
         padding: 20px 25px;
-        @include flexColumn(30px);
+        @include flexColumn();
+        justify-content: space-between;
+
+
+
+        &--tabla {
+            @include flexColumn(0px);
+            width: 100%;
+            margin-bottom: auto;
+            li {
+                @include grid(6);
+                align-items: center;
+                justify-content: space-between;
+                gap: 15px;
+                border-bottom: 1px solid #ffffff3d;
+                padding-block: 15px;
+                width: 100%;
+                span {
+                    font-size: 14px;
+                }
+                .comprador {
+                    @include flexColumn(0px);
+                    grid-column: 1 / 3;
+                }
+                .total {
+                    @include flex(15px);
+                    margin-left: auto;
+                    span {
+                        font-size: 18px;
+                        font-weight: 500;
+                    }
+                    .xTicket {
+                        position: relative;
+                        i {
+                            color: $amarelo;
+                            position: absolute;
+                            font-size: 40px;
+                            z-index: -1;
+                            top: 50%;
+                            transform: translateY(-50%) rotate(-45deg);
+                            right: 10px;
+
+                        }
+                        span {
+                            color: $colorPrimario;
+                            margin-right: 20px;
+                            font-size: 16px;
+                            font-weight: 700;
+                        }
+                    }
+                }
+
+                &.recaudado {
+                    @include flex();
+                    justify-content: flex-start;
+                    border-bottom: none;
+                    background-color: color-opacity($amarelo, .05);
+                    padding-inline: 15px;
+                    strong {
+                        margin-left: auto;
+                        font-size: 26px;
+                        font-weight: 600;
+                    }
+                    i {
+                        font-size: 36px;
+                    }
+                    span {
+                        font-size: 24px;
+                    }
+                }
+            }
+        }
+
+        &--tools {
+            @include flex();
+            justify-content: space-between;
+
+            a {
+                @include flex(5px);
+                background-color: #fff;
+                color: $colorPrimario;
+                padding: 6px 10px;
+                border-radius: 6px;
+                @include hover();
+                &:hover {
+                    background-color: claro($colorSecundario, 7);
+                    color: #fff;
+                }
+            }
+        }
     }
 }
 
 .ventasNav {
-    @include flex(15px);
-    padding-block: 15px;
+    @include flex(25px);
+    padding-block: 25px;
     a {
         @include flex(5px);
+        color: #fff;
+        @include hover();
+        span {
+            font-size: 14px;
+        }
+        &:hover {
+            color: $colorTagDestacado;
+        }
     }
 }

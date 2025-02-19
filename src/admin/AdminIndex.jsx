@@ -57,7 +57,7 @@ function AdminIndex({ setToken }) {
   };
 
   return (
-    <div className="adminPanel">
+    <main className="adminPanel">
 
       <div className="adminPanel__cont">
         <div className="adminPanel__cont--zona1">
@@ -126,7 +126,7 @@ function AdminIndex({ setToken }) {
       </div>
 
 
-    </div>
+    </main>
   );
 }
 

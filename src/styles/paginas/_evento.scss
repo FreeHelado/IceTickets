@@ -129,7 +129,7 @@
             grid-column: 9 / 13;
             @extend .caja;
             position: sticky;
-            top: 25px;
+            top: 100px;
             height: fit-content;
             background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
 

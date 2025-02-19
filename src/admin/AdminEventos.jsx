@@ -398,7 +398,7 @@ function AdminEventos({ setToken }) {
 
 
   return (
-    <div className="admin-eventos adminPanel">
+    <main className="admin-eventos adminPanel">
       <h2>{id ? "Editar Evento" : "Agregar Nuevo Evento"}</h2>
       <form onSubmit={handleSubmit}>
 
@@ -671,7 +671,7 @@ function AdminEventos({ setToken }) {
 
         <button type="submit" className="enviarEvento">{id ? "Actualizar Evento" : "Guardar Evento"}</button>
         </form>
-    </div>
+    </main>
   );
 }
 

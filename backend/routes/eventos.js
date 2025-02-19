@@ -20,6 +20,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+
 /* =====================================
 🔍 Obtener un evento por ID (sin autenticación)
 ===================================== */
@@ -65,8 +66,6 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
-
-
 
 
 /* ====================================
@@ -126,6 +125,7 @@ router.post("/", verificarToken, async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
+
 
 /* =====================================
 // ✨ Actualizar un evento (requiere autenticación)
@@ -196,7 +196,6 @@ router.put("/:id", verificarToken, async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
-
 
 
 /* =====================================

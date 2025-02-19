@@ -3,6 +3,17 @@ header {
     @include flex();
     justify-content: space-between;
     position: relative;
+    position: fixed;
+        top: 0;
+        z-index: 5;
+        width: 100%;
+    transition: background-color 0.15s ease-in-out, backdrop-filter 0.1s ease-in-out,;
+    
+        &.scroll {
+            background-color: color-opacity($colorBg, .8);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid claro($colorPrimario, 2);
+    }
 
     .header__logo {
         a {
@@ -19,7 +30,6 @@ header {
                 font-size: 28px;
             }
             span {
-                
                 color: $colorTag;
                 font-size: 13px;
                 font-weight: 500;
@@ -37,11 +47,13 @@ header {
         @include flex();
         width: 100%;
         max-width: 500px;
+        margin-left: auto;
         input {
             background-color: $colorBg !important;
-            border-radius: 60px !important;
-            padding: 15px 25px;
+            border-radius: 5px !important;
+            padding: 15px;
             border: $borde;
+            height: 35px;
         }
         
     }
@@ -61,7 +73,7 @@ header {
                 }
             span {
                 font-size: 14px;
-                font-weight: 600;
+                font-weight: 400;
             }
             i {
                 font-size: 24px;

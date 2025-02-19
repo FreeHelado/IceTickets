@@ -2,9 +2,11 @@ import config from "../config";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare, FaRegTrashCan, FaChartLine } from "react-icons/fa6";
+import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare, FaRegTrashCan, FaChartLine, FaMoneyBill1Wave, FaTicketSimple, FaFire } from "react-icons/fa6";
 import AdminTicketsEvento from "./AdminTicketsEvento";
 import Swal from "sweetalert2";
+import { format, parseISO } from "date-fns";
+import esLocale from "date-fns/locale/es"; // Para formato en español
 
 function AdminOrdenesEvento() {
     const { idEvento } = useParams();
@@ -71,32 +73,44 @@ function AdminOrdenesEvento() {
     if (!evento) return <p>Error al cargar evento.</p>;
 
     return (
-        <div className="adminPanel">
+        <main className="adminPanel">
             <nav className="ventasNav">
-                <Link to={`/evento/${evento._id}`} target="_blank" rel="noopener noreferrer">
+                <Link to={`/evento/${idEvento}`} target="_blank" rel="noopener noreferrer">
                     <i><FaRegEye /></i>
                     <span>Ir al Evento</span>
                 </Link>
-                <Link to={`/admin/evento/editar/${evento._id}`}>
+                <Link to={`/admin/evento/editar/${idEvento}`}>
                     <i><FaRegPenToSquare /></i>
                     <span>Editar Evento</span>
                 </Link>
                 <Link to={`/admin/`}>
-                    <i><FaRegPenToSquare /></i>
-                    <span>Volver</span>
+                    <i><FaFire /></i>
+                    <span>Volver al admin</span>
                 </Link>
             </nav>
             <section className="ventas">
 
-                <div className="ventas__stats">   
-                    <h1>{evento.nombre}</h1>
+                
+                <div className="ventas__stats">
+                    <div className="ventas__stats--evento">
+                        <figure>
+                            <img src={`${config.BACKEND_URL}/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
+                        </figure>
+
+                        <div className="ventas__stats--evento--data">
+                            <h1>{evento.nombre}</h1>
+                            <h2> {evento.fecha ? format(parseISO(evento.fecha), "dd 'de' MMMM yyyy", { locale: esLocale }) : "Fecha no disponible"}</h2>
+                        </div>
+                    </div>
                     
                     <div className="ventas__stats--aforo">
                         
                         <div className="ventas__stats--aforo--vendidas">
                             <div className="progress" style={{ width: `${porcentajeVendidas}%` }} ></div>
-                            <span>Entradas vendidas:</span>
-                            <strong>{evento.stock.vendidas}/{evento.stock.aforo}</strong>
+                            <div className="progress-text">
+                                <span>Entradas vendidas:</span>
+                                <strong>{evento.stock.vendidas}/{evento.stock.aforo}</strong>
+                            </div>
                         </div>   
                         <div className="alert">
                             El aforo: Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cum tempora vel id officia sit commodi similique pariatur placeat nesciunt nam.
@@ -119,61 +133,78 @@ function AdminOrdenesEvento() {
                                     <div className="progress">
                                         <div 
                                             className="progressVendidas" 
-                                            style={{ height: `${porcentaje}%` }} // 🔥 Ajustamos el ancho según el porcentaje
+                                            style={{ width: `${porcentaje}%` }} // 🔥 Ajustamos el ancho según el porcentaje
                                         ></div>
                                     </div>
-                                    <strong>{tipo}:</strong> 
-                                    <span>{cantidadVendida}/{cantidadDisponible}</span>
+                                    <div className="ticketData">
+                                        <strong>{tipo}: ({cantidadVendida}/{cantidadDisponible})</strong> 
+                                    </div>
                                 </li>
                             );
                         })}
                             
                         </ul>
                         
-                    </div>                   
-                    <p><strong>Total recaudado:</strong> ${resumen.totalRecaudado}</p>
+                    </div>  
+                    
                 </div>
 
                 <div className="ventas__lista">
                     {/* 📝 LISTADO DE ÓRDENES */}
                     <h3>Lista de Órdenes</h3>
                     {ordenes.length > 0 ? (
-                        <table className="tablaOrdenes">
-                        <thead>
-                            <tr>
-                            <th>Comprador</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Total</th>
-                            <th>Cantidad Tickets</th> {/* 🆕 Nueva columna */}
-                            <th>Método de Pago</th>
-                            <th>Estado</th>
-                            <th>Fecha Compra</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <ul className="ventas__lista--tabla">
+                            <li>
+                                <div className="comprador">
+                                    <strong>Comprador</strong>
+                                </div>
+                                
+                                <strong>Pago</strong>
+                                <strong>Estado</strong>
+                                <strong>Fecha Compra</strong>
+                                <div className="total">
+                                    <strong>Total</strong>
+                                </div>
+                            </li>
+                       
+                        
                             {ordenes.map(orden => (
-                            <tr key={orden._id}>
-                                <td>{orden.comprador.nombre}</td>
-                                <td>{orden.comprador.email}</td>
-                                <td>{orden.comprador.telefono}</td>
-                                <td>${orden.total}</td>
-                                <td>x {orden.tickets.length}</td> {/* ✅ Nueva celda: cantidad de tickets comprados */}
-                                <td>{orden.metodoPago}</td>
-                                <td>{orden.estado}</td>
-                                <td>{new Date(orden.fechaCompra).toLocaleDateString()}</td>
-                            </tr>
+                            <li key={orden._id}>
+                                <div className="comprador">
+                                    <span>{orden.comprador.nombre}</span>
+                                    <span>{orden.comprador.email}</span>
+                                    <span>{orden.comprador.telefono}</span>
+                                </div>    
+                                <span>{orden.metodoPago}</span>
+                                <span>{orden.estado}</span>
+                                    <span>{new Date(orden.fechaCompra).toLocaleDateString()}</span>
+                                    <div className="total">
+                                        <div className="xTicket">
+                                            <i><FaTicketSimple /></i>
+                                            <span>x{orden.tickets.length}</span>
+                                        </div>
+                                        <span>${orden.total}</span>
+                                    </div>
+                            </li>
                             ))}
-                        </tbody>
-                        </table>
+                            <li className="recaudado">
+                                <i><FaMoneyBill1Wave /></i>
+                                <span>Recaudado</span>
+                                <strong>${resumen.totalRecaudado}</strong> 
+                                
+                            </li>
+                        </ul>
+                        
                     ) : (
                         <p>No hay órdenes registradas aún.</p>
                     )}
 
+                    <div className="ventas__lista--tools">
                     <Link to={`/admin/evento/${idEvento}/tickets`}>
                         <i><FaRegEye /></i>
                         <span>Ver Tickets</span>
                     </Link>
+                    </div>
 
                 </div>
 
@@ -182,7 +213,7 @@ function AdminOrdenesEvento() {
         
 
 
-    </div>
+        </main>
     );
 }
 

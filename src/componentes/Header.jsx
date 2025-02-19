@@ -1,26 +1,33 @@
 import { Link } from "react-router-dom";
 import { FaIceCream, FaTicketSimple, FaFire, FaUser, FaPowerOff } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
-    navigate("/login");
-  };
 
 function Header({ token }) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const handleLogout = () => {
+      localStorage.removeItem("token");
+      setToken(null);
+      navigate("/login");
+    };
+  
+    useEffect(() => {
+    const handleScroll = () => {
+        setIsScrolled(window.scrollY > 1); // Si baja más de 50px, cambia el estado
+      };
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+  
   return (
     
-    <header>
+    <header className={isScrolled ? "scroll" : ""}>
       <div className="header__logo">
         <Link to={`/`}>
           <i><FaIceCream /></i>
           <h1>IceTicket</h1>
         </Link>
-      </div>
-
-      <div className="header__search">
-        <input type="search" placeholder="Buscar aquÃ­"/>
       </div>
 
       <div className="header__tools">

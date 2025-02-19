@@ -37,8 +37,8 @@ app.use("/api/ordenes", ordenesRoutes);
 // DDBB Conectar a MongoDB
 mongoose.set("strictQuery", false); // Desactivar restricciones en consultas
 mongoose.connect(MONGO_URI)
-   .then(() => console.log(`🚀 Conectado a MongoDB: ${MONGO_URI}`))
-  .catch(err => console.error("❌ Error de conexión con MongoDB:", err));
+   .then(() => console.log(`ð Conectado a MongoDB: ${MONGO_URI}`))
+  .catch(err => console.error("â Error de conexiÃ³n con MongoDB:", err));
 
 
 /* =====================================
@@ -49,7 +49,7 @@ app.get("/api/eventos", async (req, res) => {
     const eventos = await Evento.find();
     res.json(eventos);
   } catch (error) {
-    console.error("â Error al obtener eventos:", error);
+    console.error("Ã¢ÂÂ Error al obtener eventos:", error);
     res.status(500).json({ message: "Error al obtener eventos", error });
   }
 });
@@ -61,26 +61,26 @@ app.get("/api/eventos/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    //  Validar si el ID es un ObjectId válido
+    //  Validar si el ID es un ObjectId vÃ¡lido
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "ID de evento inválido" });
+      return res.status(400).json({ message: "ID de evento invÃ¡lido" });
     }
 
-    // 🔍 Buscar el evento y seleccionar solo los campos necesarios
+    // ð Buscar el evento y seleccionar solo los campos necesarios
     const evento = await Evento.findById(id).select("nombre fecha hora descripcion stock estado imagen precios categoria lugar vendedor");
 
     if (!evento) {
       return res.status(404).json({ message: "Evento no encontrado" });
     }
 
-    // ð¥ Adaptamos la estructura segÃºn el nuevo esquema
+    // Ã°ÂÂÂ¥ Adaptamos la estructura segÃÂºn el nuevo esquema
     res.json({
       nombre: evento.nombre,
       fecha: evento.fecha,
       hora: evento.hora,
       descripcion: evento.descripcion,
       stock: {
-        aforo: evento.stock?.aforo || null, // `aforo` puede ser null si no está definido
+        aforo: evento.stock?.aforo || null, // `aforo` puede ser null si no estÃ¡ definido
         disponibles: evento.stock?.disponibles || 0, // `disponibles` se calcula en el POST
       },
       estado: evento.estado,
@@ -96,37 +96,37 @@ app.get("/api/eventos/:id", async (req, res) => {
     });
 
   } catch (error) {
-    console.error("❌ Error al obtener el evento:", error);
+    console.error("â Error al obtener el evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
 
 
 /* =====================================
-GET /api/categorias // Obtener todas las categorÃÂ­as
+GET /api/categorias // Obtener todas las categorÃÂÃÂ­as
 ===================================== */
 app.get("/api/categorias", async (req, res) => {
   try {
     const categorias = await Categoria.find();
     res.json(categorias);
   } catch (error) {
-    console.error("❌ Error al obtener categorí­as:", error);
-    res.status(500).json({ message: "Error al obtener categorí­as" });
+    console.error("â Error al obtener categorÃ­Â­as:", error);
+    res.status(500).json({ message: "Error al obtener categorÃ­Â­as" });
   }
 });
 
 /* =====================================
-GET /api/categorias/:id // Obtener una categorÃÂ­a por ID
+GET /api/categorias/:id // Obtener una categorÃÂÃÂ­a por ID
 ===================================== */
 app.get("/api/categorias/:id", async (req, res) => {
   try {
     const categoria = await Categoria.findById(req.params.id);
     if (!categoria) {
-      return res.status(404).json({ message: "Categorí­a no encontrada" });
+      return res.status(404).json({ message: "CategorÃ­Â­a no encontrada" });
     }
     res.json(categoria);
   } catch (error) {
-    console.error("❌ Error al obtener la categorÃÂ­a:", error);
+    console.error("â Error al obtener la categorÃÂÃÂ­a:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
@@ -140,7 +140,7 @@ app.get("/api/lugares", async (req, res) => {
     const lugares = await Lugar.find();
     res.json(lugares);
   } catch (error) {
-    console.error("❌ Error al obtener lugares:", error);
+    console.error("â Error al obtener lugares:", error);
     res.status(500).json({ message: "Error al obtener lugares" });
   }
 });
@@ -154,7 +154,7 @@ app.get("/api/lugares/:id", async (req, res) => {
     
     // / Verificar si el ID tiene el formato correcto de MongoDB
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "ID de lugar no válido" });
+      return res.status(400).json({ message: "ID de lugar no vÃ¡lido" });
     }
 
     const lugar = await Lugar.findById(id);
@@ -164,7 +164,7 @@ app.get("/api/lugares/:id", async (req, res) => {
 
     res.json(lugar);
   } catch (error) {
-    console.error("❌ Error al obtener el lugar:", error);
+    console.error("â Error al obtener el lugar:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
@@ -184,7 +184,7 @@ app.put("/api/eventos/:id", async (req, res) => {
 
     res.json(eventoActualizado);
   } catch (error) {
-    console.error("❌ Error al actualizar el evento:", error);
+    console.error("â Error al actualizar el evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
@@ -199,7 +199,7 @@ app.get("/api/vendedores", async (req, res) => {
     const vendedores = await Vendedor.find();
     res.json(vendedores);
   } catch (error) {
-    console.error("❌ Error al obtener vendedores:", error);
+    console.error("â Error al obtener vendedores:", error);
     res.status(500).json({ message: "Error al obtener vendedores" });
   }
 });
@@ -212,17 +212,17 @@ app.post("/api/eventos", async (req, res) => {
   try {
     const { nombre, fecha, hora, descripcion, aforo, estado, imagen, precios, categoria, lugar, vendedor } = req.body;
 
-    // ð ValidaciÃ³n: `precios` debe ser un array con al menos una entrada
+    // Ã°ÂÂÂ ValidaciÃÂ³n: `precios` debe ser un array con al menos una entrada
     if (!Array.isArray(precios) || precios.length === 0) {
       return res.status(400).json({ message: "Debe haber al menos un tipo de entrada con precio y stock" });
     }
 
     for (let precio of precios) {
       if (typeof precio.monto !== "number" || precio.monto <= 0) {
-        return res.status(400).json({ message: `El monto de la entrada "${precio.nombre}" debe ser un número mayor a 0` });
+        return res.status(400).json({ message: `El monto de la entrada "${precio.nombre}" debe ser un nÃºmero mayor a 0` });
       }
       if (typeof precio.disponibles !== "number" || precio.disponibles < 0) {
-        return res.status(400).json({ message: `Las entradas disponibles para "${precio.nombre}" deben ser 0 o más` });
+        return res.status(400).json({ message: `Las entradas disponibles para "${precio.nombre}" deben ser 0 o mÃ¡s` });
       }
     }
 
@@ -247,18 +247,18 @@ app.post("/api/eventos", async (req, res) => {
     });
 
     await nuevoEvento.save();
-    res.status(201).json({ message: "✨ Evento creado exitosamente", evento: nuevoEvento });
+    res.status(201).json({ message: "â¨ Evento creado exitosamente", evento: nuevoEvento });
   } catch (error) {
-    console.error("❌ Error al crear evento:", error);
+    console.error("â Error al crear evento:", error);
     res.status(500).json({ message: "Error en el servidor" });
   }
 });
 
 
 /* =====================================
-// ConfiguraciÃ³n de almacenamiento de imÃÂ¡genes
+// ConfiguraciÃÂ³n de almacenamiento de imÃÂÃÂ¡genes
 ===================================== */
-// â¹â¹ Asegurar que `public/img/eventos/` existe antes de guardar imÃÂ¡genes
+// Ã¢ÂÂ¹Ã¢ÂÂ¹ Asegurar que `public/img/eventos/` existe antes de guardar imÃÂÃÂ¡genes
 const uploadPath = path.join(process.cwd(), "public/img/eventos");
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
@@ -266,27 +266,27 @@ if (!fs.existsSync(uploadPath)) {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/img/eventos"); // Ruta donde se guardaran las imÃ¡genes
+    cb(null, "public/img/eventos"); // Ruta donde se guardaran las imÃÂ¡genes
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const fileName = `${Date.now()}${ext}`; // Genera un nombre Ãºnico
+    const fileName = `${Date.now()}${ext}`; // Genera un nombre ÃÂºnico
     cb(null, fileName);
   }
 });
 
 const upload = multer({ storage });
 
-// Nueva ruta para subir imÃ¡genes
+// Nueva ruta para subir imÃÂ¡genes
 app.post("/api/eventos/upload", upload.single("imagen"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ message: "No se subió ninguna imagen" });
+    return res.status(400).json({ message: "No se subiÃ³ ninguna imagen" });
   }
 
   res.json({ fileName: req.file.filename });
 });
 
-// Servir archivos estÃticos desde `public/img/eventos/`
+// Servir archivos estÃÂticos desde `public/img/eventos/`
 app.use("/img/eventos", express.static("public/img/eventos"));
 app.use("/img/lugares", express.static("public/img/lugares"));
 
@@ -297,5 +297,5 @@ app.use("/img/lugares", express.static("public/img/lugares"));
 /* =====================================
 Iniciar el servidor en el puerto 5000
 ===================================== */
-app.listen(PORT, () => console.log(`🚀 Servidor corriendo en ${BACKEND_URL || `http://localhost:${PORT}`}`));
+app.listen(PORT, () => console.log(`ð Servidor corriendo en ${BACKEND_URL || `http://localhost:${PORT}`}`));
 

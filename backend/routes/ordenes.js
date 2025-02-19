@@ -116,6 +116,7 @@ router.get("/evento/:idEvento", verificarToken, async (req, res) => {
             evento: {
                 id: evento._id,
                 nombre: evento.nombre,
+                imagen: evento.imagen,
                 fecha: evento.fecha,
                 stock: evento.stock, // Incluye aforo y vendidas
                 precios: evento.precios // Para ver precios y stock por tipo de entrada
@@ -173,7 +174,6 @@ router.get("/mis-tickets", verificarToken, async (req, res) => {
         res.status(500).json({ message: "Error en el servidor" });
     }
 });
-
 
 
 export default router;

@@ -17,20 +17,20 @@ function Eventos() {
   }, []);
 
   return (
-    <>
-    <div className="eventosHeader">    
-      <h2>Eventos</h2>
-    </div>
-    <div className="eventos">
-      {eventos.length > 0 ? (
-        eventos
-          .filter(evento => evento.publico) // 🔥 Filtrar solo eventos públicos
-          .map((evento) => <EventoCard key={evento._id} {...evento} />)
-      ) : (
-        <p>Cargando eventos...</p>
-      )}
-    </div>
-    </>
+    <main>
+      <div className="eventosHeader">    
+        <h2>Eventos</h2>
+      </div>
+      <div className="eventos">
+        {eventos.length > 0 ? (
+          eventos
+            .filter(evento => evento.publico) // 🔥 Filtrar solo eventos públicos
+            .map((evento) => <EventoCard key={evento._id} {...evento} />)
+        ) : (
+          <p>Cargando eventos...</p>
+        )}
+      </div>
+    </main>
   );
 }
 

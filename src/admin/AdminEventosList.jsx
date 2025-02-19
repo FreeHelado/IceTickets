@@ -69,7 +69,7 @@ function AdminEventosList() {
   };
 
   return (
-    <div className="adminPanel">
+    <main className="adminPanel">
       <h2>Listado de Eventos</h2>
       <div className="alert">
         Aquí se presentan todos los eventos de los cuales formas parte como vendedor y administrador
@@ -143,7 +143,7 @@ function AdminEventosList() {
         </div>
       </div>
 
-    </div>
+    </main>
   );
 }
 

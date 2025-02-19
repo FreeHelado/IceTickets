@@ -9,6 +9,7 @@ function HeaderAdmin({ token }) {
 
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -32,10 +33,18 @@ function HeaderAdmin({ token }) {
     navigate("/login");
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+        setIsScrolled(window.scrollY > 1); // Si baja m�s de 50px, cambia el estado
+      };
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
 
 
   return (
-    <header>
+    <header className={isScrolled ? "scroll" : ""}>
       <div className="header__logo">
         <Link to={`/admin`}>
           <i><FaIceCream /></i>
@@ -54,10 +63,10 @@ function HeaderAdmin({ token }) {
 
         
         {token && (
-        <a href="" >
-          <i><FaTicketSimple /></i>
-          <span>Mis Tickets</span>
-          </a>
+        <Link to="/mis-tickets">
+            <i><FaTicketSimple /></i>
+            <span>Mis Tickets</span>
+          </Link>
         )}
 
         {token && (

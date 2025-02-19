@@ -2,7 +2,8 @@ import config from "../config";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { FaEye, FaEyeSlash, FaIceCream } from "react-icons/fa6";
+import { Link } from "react-router-dom";
+import { FaEye, FaEyeSlash, FaIceCream, FaArrowLeft } from "react-icons/fa6";
 
 function Login({ setToken }) {
   const [email, setEmail] = useState("");
@@ -98,6 +99,12 @@ function Login({ setToken }) {
 
   return (
     <main className="login">
+      <div className="backHome">
+        <Link to={`/`}>
+          <i><FaArrowLeft /></i>
+          <span>Volver al Inicio</span>
+        </Link>
+      </div>
       <div className="login__cont">
       <div className="login__cont--header">
           <i><FaIceCream /></i>
