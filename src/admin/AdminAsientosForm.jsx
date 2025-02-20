@@ -65,17 +65,49 @@ function AdminAsientosForm() {
     };
 
     const handleRemoveFila = (sectorIndex, filaIndex) => {
-        const updatedSectores = [...sectores];
-        updatedSectores[sectorIndex].filas.splice(filaIndex, 1); // 🗑️ Borra la fila en el índice indicado
-        setSectores(updatedSectores);
+        Swal.fire({
+            title: "¿Eliminar esta fila?",
+            text: "Esta acción eliminará la fila y sus asientos.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+            const updatedSectores = [...sectores];
+            updatedSectores[sectorIndex].filas.splice(filaIndex, 1);
+            setSectores(updatedSectores);
+            
+            Swal.fire("Eliminado", "La fila ha sido eliminada con éxito.", "success");
+            }
+        });
     };
 
 
     const handleRemoveSector = (sectorIndex) => {
-        const updatedSectores = [...sectores];
-        updatedSectores.splice(sectorIndex, 1); // 🗑️ Borra el sector completo
-        setSectores(updatedSectores);
-     };
+        Swal.fire({
+            title: "⚠️ ¿Estás seguro de eliminar este sector?",
+            html: `<span style="font-size:15px;">Todos los datos de este sector, incluyendo filas y asientos, se perderán.</span><br/><br/>Para confirmar escribe: <strong> aplicar-cambio-destructivo</strong>`,
+            input: "text",
+            inputPlaceholder: "escribe aquí:",
+            showCancelButton: true,
+            confirmButtonText: "⚠ Eliminar Sector",
+            cancelButtonText: "Cancelar",
+            inputValidator: (value) => {
+            if (value !== "aplicar-cambio-destructivo") {
+                return "Debes escribir exactamente 'Aplicar cambio destructivo'";
+            }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+            const updatedSectores = [...sectores];
+            updatedSectores.splice(sectorIndex, 1);
+            setSectores(updatedSectores);
+            
+            Swal.fire("Eliminado", "El sector ha sido eliminado con éxito.", "success");
+            }
+        });
+        };
 
 
   
@@ -121,7 +153,7 @@ function AdminAsientosForm() {
       <h2>Editar Sectores y Asientos:</h2>
       {sectores.map((sector, sectorIndex) => (
           <div key={sectorIndex} className="sector">
-              <h3>{sector.nombreSector}</h3>
+              <h3>Sector: {sector.nombreSector}</h3>
               <div className="sectorBox">    
                   <div className="campoForm">
                       <label>Nombre del sector</label>
@@ -136,50 +168,62 @@ function AdminAsientosForm() {
                             placeholder="Nombre del sector"
                         />
                   </div>
+
                   <div className="filas">
-                    <h4>Filas</h4>  
-
                     {sector.filas.map((fila, filaIndex) => (
-                        <div key={filaIndex} className="campoForm">
-                        <label>Nombre de la fila</label>
-                        <input
-                            type="text"
-                            value={fila.nombreFila}
-                            onChange={(e) => {
-                            const updatedSectores = [...sectores];
-                            updatedSectores[sectorIndex].filas[filaIndex].nombreFila = e.target.value;
-                            setSectores(updatedSectores);
-                            }}
-                            placeholder="Nombre de la fila"
-                            />
-                            
-                         <button onClick={() => handleRemoveFila(sectorIndex, filaIndex)}>
-                            ❌ Borrar Fila
-                        </button>
-   
+                        <div key={filaIndex} className="filas__item">
+                            <h4>Filas: {fila.nombreFila}</h4>  
+                            <div className="campoForm">
+                                <label>Nombre de la fila</label>
+                                <input
+                                    type="text"
+                                    value={fila.nombreFila}
+                                    onChange={(e) => {
+                                    const updatedSectores = [...sectores];
+                                    updatedSectores[sectorIndex].filas[filaIndex].nombreFila = e.target.value;
+                                    setSectores(updatedSectores);
+                                    }}
+                                    placeholder="Nombre de la fila"
+                                    />
+                                    
+                                <button onClick={() => handleRemoveFila(sectorIndex, filaIndex)} className="borrarFila">
+                                    <span>X</span>
+                                </button>
 
-                        <div className="asientos">
-                            <h5>Asientos</h5>
-
-                            {fila.asientos.map((asiento, asientoIndex) => (
-                            <div key={asientoIndex} className="asientos__item">
-                                <span>{asiento.nombreAsiento}</span>
-                                <small>{asiento.ocupado ? "Ocupado" : "Disponible"}</small>
-                                {asientoIndex === fila.asientos.length - 1 && (
-                                <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>Borrar Último Asiento</button>
-                                )}
                             </div>
-                            ))}
+                        
 
-                            <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 1)}>Agregar 1 asiento</button>
-                            <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 10)}>Agregar 10 asientos</button>
-                            <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 50)}>Agregar 50 asientos</button>
-                            <button onClick={() => handleRemoveAllAsientos(sectorIndex, filaIndex)}>Borrar todos los asientos</button>
-                        </div>
+                            <div className="asientos__cont">
+                                <h6>Asientos de la Fila: {fila.nombreFila}</h6>
 
-                        <hr/>
+                                <div className="asientos">
+                                {fila.asientos.map((asiento, asientoIndex) => (
+                                    <div
+                                        key={asientoIndex}
+                                        className={`asientos__item ${asiento.ocupado ? "ocupado" : "libre"}`}
+                                    >
+                                        <span>{asiento.nombreAsiento}</span>
+                                    
+                                        {asientoIndex === fila.asientos.length - 1 && (
+                                        <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>x</button>
+                                        )}
+                                    </div>
+                                ))}
+                                </div>
+
+                                <div className="asientos-tools">
+                                    <span>Agregar asientos: </span>
+                                    <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 1)}>+ 1</button>
+                                    <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 10)}>+ 10</button>
+                                    <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 50)}>+ 50</button>
+                                    <button onClick={() => handleRemoveAllAsientos(sectorIndex, filaIndex)} className="eliminar">Borrar todos los asientos</button>
+                                </div>
+                            </div>
+
+                            <hr/>
                         </div>
                     ))}
+                      
 
                     <button onClick={() => handleAddFila(sectorIndex)}>
                         <i><FaPlus /></i>
@@ -188,14 +232,15 @@ function AdminAsientosForm() {
                 </div>
  
               </div>
-                    <button onClick={() => handleRemoveSector(sectorIndex)}>
-  ❌ Borrar Sector
-</button>
+            <button onClick={() => handleRemoveSector(sectorIndex)} className="borrarSector">Borrar Sector</button>
 
           </div>
       ))}
-      <button onClick={handleAddSector}>Agregar Sector</button>
-      <button onClick={handleSave}>Guardar Cambios</button>
+          <button onClick={handleAddSector} className="agregarSector">
+              <i><FaPlus /></i>
+              <span> Agregar Sector</span>
+          </button>
+      <button onClick={handleSave} className="enviarCambios">Guardar Cambios</button>
     </main>
   );
 }
