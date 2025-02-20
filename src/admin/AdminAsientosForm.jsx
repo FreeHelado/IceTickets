@@ -34,46 +34,86 @@ function AdminAsientosForm() {
     setSectores(updatedSectores);
   };
 
-  const handleAddAsientos = (sectorIndex, filaIndex, cantidad) => {
-    const updatedSectores = [...sectores];
-    const nombreFila = updatedSectores[sectorIndex].filas[filaIndex].nombreFila || "X";
-    updatedSectores[sectorIndex].filas[filaIndex].asientos = Array.from(
-      { length: cantidad },
-      (_, i) => `${nombreFila}${i + 1}`
-    );
-    setSectores(updatedSectores);
-  };
+    const handleAddAsiento = (sectorIndex, filaIndex, cantidad) => {
+        const updatedSectores = [...sectores];
+        const fila = updatedSectores[sectorIndex].filas[filaIndex];
+        const nombreFila = fila.nombreFila || "X"; // Si la fila no tiene nombre, usamos "X"
 
-  const handleSave = async () => {
-  try {
-    const token = localStorage.getItem("token");
+        const nuevosAsientos = Array.from({ length: cantidad }, (_, i) => ({
+            nombreAsiento: `${nombreFila}${fila.asientos.length + i + 1}`, // A1, A2, A3...
+            ocupado: false,
+        }));
 
-    const payload = { sectores };
-    console.log("📦 Datos enviados:", JSON.stringify(payload, null, 2)); // 🔥 Ver qué se está mandando
-
-    const response = await fetch(`${config.BACKEND_URL}/api/lugares/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-    console.log("📌 Respuesta del servidor:", data); // 🔥 Ver qué responde el backend
-
-    if (response.ok) {
-      Swal.fire("Éxito", "Sectores actualizados", "success");
-      navigate("/admin/mis-lugares");
-    } else {
-      Swal.fire("Error", data.message || "No se pudo guardar", "error");
-    }
-  } catch (error) {
-    console.error("❌ Error al guardar:", error);
-    Swal.fire("Error", "Hubo un problema en el servidor", "error");
-  }
+        fila.asientos = [...fila.asientos, ...nuevosAsientos];
+        setSectores(updatedSectores);
     };
+
+    const handleRemoveAsiento = (sectorIndex, filaIndex) => {
+    const updatedSectores = [...sectores];
+    const fila = updatedSectores[sectorIndex].filas[filaIndex];
+
+    if (fila.asientos.length > 0) {
+        fila.asientos.pop(); // 🔥 Borra el último asiento
+        setSectores(updatedSectores);
+    }
+    };
+
+    const handleRemoveAllAsientos = (sectorIndex, filaIndex) => {
+        const updatedSectores = [...sectores];
+        updatedSectores[sectorIndex].filas[filaIndex].asientos = []; // 🔥 Borra todos los asientos
+        setSectores(updatedSectores);
+    };
+
+    const handleRemoveFila = (sectorIndex, filaIndex) => {
+        const updatedSectores = [...sectores];
+        updatedSectores[sectorIndex].filas.splice(filaIndex, 1); // 🗑️ Borra la fila en el índice indicado
+        setSectores(updatedSectores);
+    };
+
+
+    const handleRemoveSector = (sectorIndex) => {
+        const updatedSectores = [...sectores];
+        updatedSectores.splice(sectorIndex, 1); // 🗑️ Borra el sector completo
+        setSectores(updatedSectores);
+     };
+
+
+  
+    const handleSave = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+            Swal.fire("Error", "No tienes permiso para esta acción", "error");
+            return;
+            }
+
+            // 📦 Mandamos solo los sectores
+            const response = await fetch(`${config.BACKEND_URL}/api/lugares/${id}/sectores`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: token, // ✅ Enviamos el token en el header
+            },
+            body: JSON.stringify({ sectores }), // ✅ Solo enviamos sectores
+            });
+
+            const data = await response.json();
+            console.log("📌 Respuesta del servidor:", data);
+
+            if (response.ok) {
+            Swal.fire("Éxito", "Sectores actualizados", "success");
+            navigate("/admin/mis-lugares");
+            } else {
+            Swal.fire("Error", data.message || "No se pudo guardar", "error");
+            }
+        } catch (error) {
+            console.error("❌ Error al guardar:", error);
+            Swal.fire("Error", "Hubo un problema en el servidor", "error");
+        }
+    };
+
+
+
 
 
   return (
@@ -98,7 +138,7 @@ function AdminAsientosForm() {
                   </div>
                   <div className="filas">
                     <h4>Filas</h4>  
-                    
+
                     {sector.filas.map((fila, filaIndex) => (
                         <div key={filaIndex} className="campoForm">
                         <label>Nombre de la fila</label>
@@ -111,21 +151,48 @@ function AdminAsientosForm() {
                             setSectores(updatedSectores);
                             }}
                             placeholder="Nombre de la fila"
-                        />
-                        <button onClick={() => handleAddAsientos(sectorIndex, filaIndex, 10)}>
-                            Agregar 10 Asientos
+                            />
+                            
+                         <button onClick={() => handleRemoveFila(sectorIndex, filaIndex)}>
+                            ❌ Borrar Fila
                         </button>
-                        <p>Asientos: {fila.asientos.join(", ")}</p>
+   
+
+                        <div className="asientos">
+                            <h5>Asientos</h5>
+
+                            {fila.asientos.map((asiento, asientoIndex) => (
+                            <div key={asientoIndex} className="asientos__item">
+                                <span>{asiento.nombreAsiento}</span>
+                                <small>{asiento.ocupado ? "Ocupado" : "Disponible"}</small>
+                                {asientoIndex === fila.asientos.length - 1 && (
+                                <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>Borrar Último Asiento</button>
+                                )}
+                            </div>
+                            ))}
+
+                            <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 1)}>Agregar 1 asiento</button>
+                            <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 10)}>Agregar 10 asientos</button>
+                            <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 50)}>Agregar 50 asientos</button>
+                            <button onClick={() => handleRemoveAllAsientos(sectorIndex, filaIndex)}>Borrar todos los asientos</button>
+                        </div>
+
                         <hr/>
                         </div>
                     ))}
-                      <button onClick={() => handleAddFila(sectorIndex)}>
-                          <i><FaPlus /></i>
-                          <span>Agregar Fila</span>
-                      </button>
-                  </div>  
+
+                    <button onClick={() => handleAddFila(sectorIndex)}>
+                        <i><FaPlus /></i>
+                        <span>Agregar Fila</span>
+                    </button>
+                </div>
+ 
               </div>
-        </div>
+                    <button onClick={() => handleRemoveSector(sectorIndex)}>
+  ❌ Borrar Sector
+</button>
+
+          </div>
       ))}
       <button onClick={handleAddSector}>Agregar Sector</button>
       <button onClick={handleSave}>Guardar Cambios</button>
