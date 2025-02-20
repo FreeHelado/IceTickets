@@ -1,0 +1,103 @@
+.selecAcientos {
+    @include flexColumn(35px);
+    max-width: (900px);
+
+    .sector {
+        @include flexColumn(10px);
+        width: 100%;
+        
+        .sectorBox {
+            width: 100%;
+            padding: 25px 30px;
+            border-radius: 15px;
+            background-color: oscuro($colorSecundario, 3%);
+            border: 1px solid claro($colorSecundario, 6%);
+            @include flexColumn(10px);
+
+            
+            .filas {
+                padding: 25px;
+                border: 2px solid #ffffff1f;
+                border-radius: 15px;
+                @include flexColumn(10px);
+                align-items: center;
+                width: 100%;
+
+                hr {
+                        border: none;
+                        height: 1px;
+                        background-color: claro($colorSecundario, 10);
+                        width: 100%;
+                        margin: 20px 0;
+                    }
+                h4 {
+                    font-size: 20px;
+                    text-align: left;
+                    align-self: flex-start;
+                }
+
+                button {
+                    background-color: transparent;
+                    @include flex();
+                    justify-content: center;
+                    padding: 5px;
+                    cursor: pointer;
+                    @include hover();
+                    &:hover {
+                        opacity: .5;
+                    }
+
+                }
+            }
+            
+            .campoForm {
+                    @include flexColumn(6px);
+                    width: 100%;
+                    position: relative;
+            
+                    label {
+                        color: #ffffffbc;
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+            
+                    input[type=text],
+                    input[type=date],
+                    input[type=time],
+                    input[type=email],
+                    input[type=password],
+                    input[type=number],
+                    input[type=file],
+                    textarea,
+                    select {
+                        background-color: claro($colorSecundario, 5);
+                        border-color: claro($colorSecundario, 13);
+                        width: 100%;
+                    }
+            
+                    input[type=text],
+                    input[type=date],
+                    input[type=time],
+                    input[type=email],
+                    input[type=password],
+                    input[type=number],
+                    input[type=file],
+                    textarea,
+                    select {
+                        &:focus {
+                            outline: 0;
+                            border: 1px solid claro($colorSecundario, 20);
+                            box-shadow: $colorTag 0 0 0 1px inset, claro($colorSecundario, 12) 0 0 0 4px;
+            
+                        }
+            
+                        &::placeholder {
+                            color: #ffffff77;
+                            font-weight: 400;
+                            font-size: 14px;
+                        }
+                    }
+            }
+        }
+    }
+}

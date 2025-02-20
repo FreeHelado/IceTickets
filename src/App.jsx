@@ -19,6 +19,7 @@ import AdminEventosList from "./admin/AdminEventosList";
 import AdminOrdenesEvento from "./admin/AdminOrdenesEvento";
 import AdminTicketsEvento from "./admin/AdminTicketsEvento";
 import AdminCategorias from "./admin/AdminCategorias";
+import AdminAsientosForm from "./admin/AdminAsientosForm"; 
 import AdminLugaresList from "./admin/AdminLugaresList";
 import AdminLugarForm from "./admin/AdminLugarForm";
 
@@ -80,6 +81,7 @@ function AppContent({ token, setToken, usuario }) {
         <Route path="/admin/evento/:idEvento/tickets" element={<AdminTicketsEvento />} />
         <Route path="/admin/categorias" element={token ? <AdminCategorias isAdmin={true} /> : <Navigate to="/login" />} />
         <Route path="/admin/mis-lugares" element={token ? <AdminLugaresList setToken={setToken} /> : <Navigate to="/login" />} />
+        <Route path="/admin/asientos/editar/:id" element={<AdminAsientosForm />} /> 
         <Route path="/admin/mis-lugares/crearlugar" element={token ? <AdminLugarForm setToken={setToken} /> : <Navigate to="/login" />} />
         <Route path="/admin/mis-lugares/editar/:id" element={token ? <AdminLugarForm setToken={setToken} /> : <Navigate to="/login" />} />
         
