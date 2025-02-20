@@ -2,7 +2,8 @@ import config from "../config";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare } from "react-icons/fa6";
+import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenToSquare, } from "react-icons/fa6";
+import { MdOutlinePlace } from "react-icons/md";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
 
@@ -113,6 +114,11 @@ function AdminIndex({ setToken }) {
             <button onClick={() => navigate("/eventosadmin")}>
               <i><FaRegCalendarCheck /></i>
               <span>Mis Eventos</span>
+            </button>
+            
+            <button onClick={() => navigate("/admin/mis-lugares")}>
+              <i><MdOutlinePlace /></i>
+              <span>Mis Lugares</span>
             </button>
             
             <button onClick={() => navigate("/")}>

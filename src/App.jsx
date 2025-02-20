@@ -19,6 +19,7 @@ import AdminEventosList from "./admin/AdminEventosList";
 import AdminOrdenesEvento from "./admin/AdminOrdenesEvento";
 import AdminTicketsEvento from "./admin/AdminTicketsEvento";
 import AdminCategorias from "./admin/AdminCategorias";
+import AdminLugaresList from "./admin/AdminLugaresList";
 
 import Checkout from "./pages/Checkout"; 
 import MisTickets from "./pages/MisTickets"; 
@@ -77,6 +78,8 @@ function AppContent({ token, setToken, usuario }) {
         <Route path="/admin/evento/ordenes/:idEvento" element={<AdminOrdenesEvento />} /> 
         <Route path="/admin/evento/:idEvento/tickets" element={<AdminTicketsEvento />} />
         <Route path="/admin/categorias" element={token ? <AdminCategorias isAdmin={true} /> : <Navigate to="/login" />} />
+        <Route path="/admin/mis-lugares" element={token ? <AdminLugaresList setToken={setToken} /> : <Navigate to="/login" />} />
+        
 
 
         <Route path="/checkout" element={token ? <Checkout usuario={usuario} /> : <Navigate to="/login" />} />
