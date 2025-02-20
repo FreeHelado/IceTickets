@@ -1,10 +1,11 @@
 .admin-eventos {
     @include cuerpo(900px);
-    @include flexColumn();
+    @include flexColumn(25px);
     align-items: center;
     padding-bottom: 50px;
     h2 { 
         text-align: center;
+        font-weight: 500;
     }
     form {
         @include flexColumn(20px);
@@ -65,6 +66,7 @@
             input[type=email],
             input[type=password],
             input[type=number],
+            input[type=file],
             textarea,
             select {
                 background-color: claro($colorSecundario, 5);
@@ -78,6 +80,7 @@
             input[type=email],
             input[type=password],
             input[type=number],
+            input[type=file],
             textarea,
             select {
                 &:focus {

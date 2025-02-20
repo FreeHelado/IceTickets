@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import config from "../config";
 import Swal from "sweetalert2";
+import AdminTools from "./AdminTools";
+import { FaRegEdit } from "react-icons/fa";
+import { MdOutlineEventSeat } from "react-icons/md";
+import { FaRegTrashCan } from "react-icons/fa6";
 
 function AdminLugaresList() {
   const [lugares, setLugares] = useState([]);
@@ -67,24 +71,48 @@ function AdminLugaresList() {
         };
 
   return (
-    <main className="adminPanel">
+    <main className="adminPanel lugares">
       <h2>Listado de Lugares</h2>
-      <div className="alert">Aquí se presentan los lugares que puedes administrar</div>
+      <div className="alert">Aquí se presentan los lugares que puedes administrar. Ten en cuenta que cualquier usuario puede asignar tu lugar a un evento</div>
 
       <div className="adminPanel__cont">
-         <button onClick={() => navigate("/admin/mis-lugares/crearlugar/")}>Nuevo Lugar</button>
 
-        <ul>
-          {lugares.map((lugar) => (
-            <li key={lugar._id}>
-              <h3>{lugar.nombre}</h3>
-              <p>{lugar.direccion}</p>
-              <small>Vendedor: {lugar.vendedor}</small>
-              <button onClick={() => navigate(`/admin/mis-lugares/editar/${lugar._id}`)}>✍Editar</button>
-              <button onClick={() => handleDelete(lugar._id)}>🗑 Eliminar</button>
-            </li>
-          ))}
-        </ul>
+        <div className="adminPanel__cont--zonaLugares">
+          <ul>
+            {lugares.map((lugar) => (
+              <li key={lugar._id}>
+                <figure>
+                  {lugar.logo && <img src={`${config.BACKEND_URL}/img/lugares/${lugar.logo}`} alt={lugar.nombre} />}
+                </figure>
+                <div className="dataLugar">
+                  <h3>{lugar.nombre}</h3>
+                  <p>{lugar.direccion}, {lugar.localidad}</p>
+                  <small>Administrador: {lugar.vendedor}</small>
+                </div>
+                <div className="toolsLugar">
+                  <button onClick={() => navigate(`/admin/mis-lugares/editar/${lugar._id}`)}>
+                    <i><FaRegEdit /></i>
+                    <span>Editar</span>
+                  </button>
+                  <button onClick={() => navigate(`/admin/asientos/editar/${lugar._id}`)}>
+                    <i><MdOutlineEventSeat /></i>
+                    <span>Sectores/Asientos</span>
+                  </button>
+                  <button onClick={() => handleDelete(lugar._id)} className="eliminar">
+                    <i><FaRegTrashCan /></i>
+                    <span>Eliminar</span>
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          
+        </div>
+
+        <div className="adminPanel__cont--zona3">
+          <AdminTools />
+        </div>
+
       </div>
     </main>
   );

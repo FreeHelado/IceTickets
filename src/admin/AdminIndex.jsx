@@ -6,6 +6,7 @@ import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenTo
 import { MdOutlinePlace } from "react-icons/md";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
+import AdminTools from "./AdminTools";
 
 function AdminIndex({ setToken }) {
   const [eventos, setEventos] = useState([]);
@@ -105,28 +106,7 @@ function AdminIndex({ setToken }) {
         </div>
 
         <div className="adminPanel__cont--zona3">
-          <nav>
-            <button onClick={() => navigate("/crearevento")}>
-              <i><FaRegCalendarPlus /></i>
-              <span>Nuevo Evento</span>
-            </button>
-
-            <button onClick={() => navigate("/eventosadmin")}>
-              <i><FaRegCalendarCheck /></i>
-              <span>Mis Eventos</span>
-            </button>
-            
-            <button onClick={() => navigate("/admin/mis-lugares")}>
-              <i><MdOutlinePlace /></i>
-              <span>Mis Lugares</span>
-            </button>
-            
-            <button onClick={() => navigate("/")}>
-              <i><FaIceCream /></i>
-              <span>Inicio</span>
-            </button>
-          </nav>
-
+          <AdminTools />
         </div>
 
       </div>

@@ -1,0 +1,7 @@
+.lugares {
+    @include flexColumn(24px);
+
+    &__cont {
+        grid-column: 1 / 3;
+    }
+}

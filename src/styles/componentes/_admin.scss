@@ -1,22 +1,23 @@
 .adminPanel {
     @include cuerpo(1600px);
-
+    @include flexColumn(24px);
     &__cont {
         @include grid(6);
         padding-block: 25px;
+        width: 100%;
 
         &--zonaListardo {
             grid-column: 1 / 6;
             @include grid(2);
             &--card {
-            position: relative;
-            @include flex();
-            justify-content: center;
-            overflow: hidden;
-            border-radius: 25px;
-            border: 1px solid oscuro($colorTag, 20%);
-            margin: 0;
-            background-color: $colorPrimarioClaro;
+                position: relative;
+                @include flex();
+                justify-content: center;
+                overflow: hidden;
+                border-radius: 25px;
+                border: 1px solid oscuro($colorTag, 20%);
+                margin: 0;
+                background-color: $colorPrimarioClaro;
     
             &:hover {
                 img {
@@ -106,6 +107,80 @@
                 }
             }
             
+            }
+        }
+
+        &--zonaLugares {
+            grid-column: 1 / 6;
+            @include flexColumn(15px);
+            width: 100%;
+
+            ul { 
+                @include flexColumn(15px);
+                width: 100%;
+                li {
+                    @include flex(20px);
+                    width: 100%;
+                    padding: 25px 30px;
+                    border-radius: 15px;
+                    background-color: oscuro($colorSecundario, 3%);
+                    border: 1px solid claro($colorSecundario, 6%);
+                    @include hover();
+                    &:hover {
+                        background-color: oscuro($colorSecundario, 4%);
+                    }
+                    span {
+                        font-size: 18px;
+                        font-weight: 500;
+                    }
+                    h3 {
+                        font-weight: 500;
+                    }
+                   
+                    figure {
+                        @include flex();
+                        width: 130px;
+                        border-radius: 30px;
+                        overflow: hidden;
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+                    .toolsLugar {
+                        @include flex();
+                        margin-left: auto;
+                        button {
+                            color: $colorSecundario;
+                            background-color: #fff;
+                            border-radius: 10px;
+                            padding: 10px;
+                            @include flex();
+                            justify-content: center;
+                            @include hover();
+                            cursor: pointer;
+                            i {
+                                font-size: 18px;
+                            }
+                            span {
+                                font-size: 14px;
+                            }
+
+                            &:hover {
+                                background-color: #ffffffa1;
+                            }
+                            &.eliminar {
+                                background-color: $rojo;
+                                color: #fff;
+                                &:hover {
+                                        opacity: .8;
+                                    }
+                            }
+                        }
+
+                    }
+                }
             }
         }
 
@@ -213,13 +288,14 @@
             grid-column: 6 / 7;
 
             nav {
-                @include flexColumn(10px);
+                @include flexColumn(30px);
                 align-items: center;
                 button {
                     background-color: transparent;
                     @include flexColumn();
                     align-items: center;
                     cursor: pointer;
+                    padding: 0;
                     @include hover();
                     i {
                         font-size: 30px;

@@ -6,6 +6,7 @@ import { FaRegCalendarPlus, FaRegCalendarCheck, FaIceCream, FaRegEye, FaRegPenTo
 import Swal from "sweetalert2";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es"; // Para formato en español
+import AdminTools from "./AdminTools";
 
 function AdminEventosList() {
   const [eventos, setEventos] = useState([]);
@@ -75,13 +76,6 @@ function AdminEventosList() {
         Aquí se presentan todos los eventos de los cuales formas parte como vendedor y administrador
       </div>
 
-      <nav>
-        <ul>
-          <li><Link to="/admin/categorias">Administrar Categorías</Link></li>
-          
-        </ul>
-      </nav>
-
       <div className="adminPanel__cont">
 
         <div className="adminPanel__cont--zonaListardo">
@@ -131,23 +125,7 @@ function AdminEventosList() {
         </div>
 
         <div className="adminPanel__cont--zona3">
-            <nav>
-              <button onClick={() => navigate("/crearevento")}>
-                <i><FaRegCalendarPlus /></i>
-                <span>Nuevo Evento</span>
-              </button>
-
-              <button onClick={() => navigate("/eventosadmin")}>
-                <i><FaRegCalendarCheck /></i>
-                <span>Mis Eventos</span>
-              </button>
-              
-              <button onClick={() => navigate("/")}>
-                <i><FaIceCream /></i>
-                <span>Inicio</span>
-              </button>
-            </nav>
-
+          <AdminTools />
         </div>
       </div>
 

@@ -145,6 +145,7 @@ input[type=email],
 input[type=password],
 input[type=number],
 input[type=tel],
+input[type=file],
 textarea,
 select {
     height: 55px;
@@ -174,6 +175,7 @@ input[type=email],
 input[type=password],
 input[type=number],
 input[type=tel],
+input[type=file],
 textarea,
 select  {
     &:focus {
