@@ -4,18 +4,34 @@ header {
     justify-content: space-between;
     position: relative;
     position: fixed;
-        top: 0;
-        z-index: 5;
-        width: 100%;
+    top: 0;
+    z-index: 5;
+    width: 100%;
     transition: background-color 0.15s ease-in-out, backdrop-filter 0.1s ease-in-out,;
     
+    @include desktop(){
+
         &.scroll {
             background-color: color-opacity($colorBg, .8);
             backdrop-filter: blur(5px);
             border-bottom: 1px solid claro($colorPrimario, 2);
+        
+        }
+    }
+    @include mobile() {
+        z-index: 2;
+        @include flex();
+        justify-content: flex-start;
+        position: relative;
+        pointer-events: none;
     }
 
     .header__logo {
+        @include mobile(){
+            @include flex();
+            justify-content: flex-start;
+        }
+
         a {
             color: #fff;
             @include flex();
@@ -59,8 +75,8 @@ header {
     }
 
     .header__tools {
-       
-            @include flex(25px);
+        @include flex(25px);
+
         a, div {
             @include flex(5px);
             align-items: center;
@@ -77,6 +93,42 @@ header {
             }
             i {
                 font-size: 24px;
+            }
+        }
+        @include mobile(){
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding-block: 10px;
+            padding-inline: 15px;
+            background-color: $amarelo;
+            background: linear-gradient(0deg, oscuro($amarelo, 10) 0%, $amarelo 100%);
+            @include flex();
+            justify-content: space-between;
+            z-index: 1;
+            pointer-events: all;
+            a,
+            div {
+                @include flexColumn(5px);
+                align-items: center;
+                color: $colorPrimario;
+                @include hover(.05s);
+                @include active();
+                &:hover {
+                    color: $colorPrimario;
+                }
+        
+                span {
+                    font-size: 13px;
+                    font-weight: 400;
+                    line-height: 1 !important;
+                    text-align: center;
+                }
+        
+                i {
+                    font-size: 22px;
+                }
             }
         }
     }

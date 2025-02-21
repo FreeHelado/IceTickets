@@ -1,17 +1,21 @@
 .carrito {
     position: fixed;
-    bottom: -100%;
-    left: 15px;
-    width: 50vw;
-    max-width: 500px;
     border-radius: 15px;
     background-color: $amarelo;
     color: $colorPrimario;
     padding: 20px 25px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
     border: 1px solid oscuro($amarelo, 30%);
-    transform-origin: bottom left; // ?? Origen del crecimiento
-    z-index: 10;
+    z-index: 1000;
+
+    @include mobile(){
+        width: 100%;
+        bottom: 120px;
+        z-index: 1000;
+        min-height: 100vh;
+        padding-top: 50px;
+        overflow-x: scroll;
+    }
 
     &__cerrar {
         position: absolute;
@@ -24,6 +28,11 @@
         width: 30px;
         height: 30px;
         background-color: oscuro($colorPrimario, 05);
+
+        @include mobile(){
+            right: 15px;
+            top: 15px;
+        }
     }
 
     &__lista {
@@ -133,6 +142,14 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.6);
     cursor: pointer;
     transition: all 0.3s ease;
+
+    @include mobile(){
+        top: 25px;
+        bottom: auto;
+        left: auto;
+        right: 25px;
+        padding: 15px;
+    }
     
 
     strong {
@@ -140,13 +157,18 @@
         top: -50px;
         left: 0;
         color: #fff;
+        @include mobile {
+            display: none;
+        }
     }
     
-
 
     i {
         font-size: 50px;
         position: relative;
+        @include mobile {
+            font-size: 45px;
+        }
     }
 
     span {
@@ -164,6 +186,10 @@
         font-weight: 600;
         color: #fff;
         @include hover();
+        @include mobile(){
+            left: -5px;
+            right: auto;
+        }
     }
 
     &:hover {
@@ -181,6 +207,7 @@
     width: fit-content;
     @include flex();
     justify-content: space-between;
+    
     span {
         position: absolute;
         top: 40%;

@@ -8,6 +8,11 @@
         @include grid(12);
         gap: 25px;
         position: relative;
+
+        @include mobile(){
+            @include flexColumn(15px);
+        }
+
         
         &--info {
             grid-column: 1 / 9;
@@ -16,6 +21,10 @@
             h1 {
                 font-weight: 600;
                 font-size: 50px;
+
+                @include mobile() {
+                    font-size: 30px;
+                }
             }
 
             &--categoria {
@@ -24,20 +33,36 @@
                     padding: 6px 15px;
                     border-radius: 6px;
                     @include flex(5px);
+
+                    @include mobile() {
+                        padding: 4px 10px;
+                    }
                 
                     &[title*="Teatro"] {
                         background-color: rgb(198, 21, 71);
+                        color: #FFF;
+                    }
+                    &[title*="Deportes"] {
+                        background-color: $colorTag;
                         color: #FFF;
                     }
                 
                     span {
                         font-size: 20px;
                         font-weight: 600;
+                        @include mobile() {
+                                font-size: 16px;
+                                font-weight: 400;
+                            }
                     }
                 
                     i {
                         font-size: 24px;
+                        @include mobile() {
+                            font-size: 15px;
+                        }
                     }
+                    
             }
 
             &--img {
@@ -76,10 +101,19 @@
                     bottom: 30px;
                     left: 20px;
                     z-index: 2;
+
+                    @include mobile() {
+                        bottom: 15px;
+                    }
+
                     h3 {
                         font-size: 24px;
                         font-weight: 600;
                         text-transform: uppercase;
+
+                        @include mobile() {
+                            font-size: 14px;
+                        }
                     }
                 }
             }
@@ -100,12 +134,23 @@
                             @include flexColumn(4px);
                             align-items: center;
 
+                            @include mobile(){
+                                padding: 10px;
+                                flex-direction: row;
+                            }
+
                             span {
                                 font-size: 13px;
                                 font-weight: 500;
+                                @include mobile() {
+                                    font-size: 11px;
+                                }
                             }
                             i {
                                 font-size: 35px;
+                                @include mobile() {
+                                    font-size: 20px;
+                                }
                             }
                         }
                     }
@@ -117,8 +162,18 @@
                     border: 1px solid oscuro($colorTag, 20%);
                     border-radius: 20px;
                     padding: 25px 30px;
+
+                    @include mobile(){
+                        padding: 20px 25px;
+
+                    }
+
                     h3 {
                         padding-block: 10px 20px;
+                        @include mobile() {
+                            padding-block: 5px 10px;
+                    
+                        }
                     }
                     &--item {
                         @include grid(3);
@@ -127,6 +182,9 @@
                         border-bottom: 1px solid oscuro($colorTag, 40%);
                         @extend .notUltimo;
                         padding-block: 15px;
+                        @include mobile() {
+                            @include flexColumn(5px);
+                        }
                         h3 {
                             font-size: 16px;
                             font-weight: 600;
@@ -151,6 +209,10 @@
                 
                 &--header {
                     @include flex(25px);
+                    @include mobile() {
+                        @include flexColumn(15px);
+                        align-items: center;
+                    }
                     img {
                         border-radius: 50%;
                         overflow: hidden;
@@ -159,11 +221,20 @@
                     }
                     &--data {
                         @include flexColumn(0px);
+                        @include mobile() {
+                            gap: 10px;
+                        }
                         h2 {
                             font-size: 30px;
+                            @include mobile() {
+                                font-size: 20px;
+                            }
                         }
                         span, strong {
                             font-size: 18px;
+                            @include mobile() {
+                                font-size: 14px;
+                            }
                         }
                         strong {
                             font-weight: 500;
@@ -190,6 +261,11 @@
             top: 100px;
             height: fit-content;
             background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
+
+            @include mobile(){
+                margin-bottom: 50px;
+            }
+            
 
             .compra {
                 @include flexColumn(15px);
@@ -220,6 +296,12 @@
                                 .precio {
                                     font-size: 36px;
                                     font-weight: 600;
+
+                                    @include mobile(){
+                                        font-size: 24px;
+                                        font-weight: 500;
+                                    }
+
                                 }
                             }
 
@@ -227,6 +309,8 @@
                                 @include flex(0px);
                                 background-color: $colorPrimario;
                                 border-radius: 10px;
+
+
 
                                 &.agotada{
                                     border: 2px dashed $rojo;
@@ -255,6 +339,12 @@
                                     border: none;
                                     border-radius: 0;
                                     border-inline: 1px solid $colorPrimarioClaro;
+
+                                    @include mobile() {
+                                        width: 50px;
+                                        height: 40px;
+                                        font-size: 18px;
+                                    }
                                 }
                                 input[type="number"] {
                                     appearance: textfield;
@@ -282,9 +372,17 @@
                                     &:hover {
                                         background-color: $colorTag;
                                     }
+                                    @include mobile() {
+                                        width: 30px;
+                                        height: 40px;
+                                        font-size: 18px;
+                                    }
                                     i {
                                         font-size: 30px;
-                                    }
+                                        @include mobile() {
+                                            font-size: 24px;
+                                        }
+                                }
                                 }
                             }
                         }
@@ -301,16 +399,29 @@
                     cursor: pointer;
                     padding-inline: 36px;
                     @include hover();
+                    $mask: 20px;
 
-                   
                     -webkit-mask-image: 
-                        radial-gradient(circle at left center, transparent 20px, black 20px),
-                        radial-gradient(circle at right center, transparent 20px, black 20px);
+                        radial-gradient(circle at left center, transparent $mask, black $mask),
+                        radial-gradient(circle at right center, transparent $mask, black $mask);
                     mask-image: 
-                        radial-gradient(circle at left center, transparent 20px, black 20px),
-                        radial-gradient(circle at right center, transparent 20px, black 20px);
+                        radial-gradient(circle at left center, transparent $mask, black $mask),
+                        radial-gradient(circle at right center, transparent $mask, black $mask);
                     -webkit-mask-composite: destination-in;
                     mask-composite: intersect;
+
+                    @include mobile(){
+                        padding-inline: 24px;
+                        $maskMobile: 15px;
+                        -webkit-mask-image:
+                                radial-gradient(circle at left center, transparent $maskMobile, black $maskMobile),
+                                radial-gradient(circle at right center, transparent $maskMobile, black $maskMobile);
+                            mask-image:
+                                radial-gradient(circle at left center, transparent $maskMobile, black $maskMobile),
+                                radial-gradient(circle at right center, transparent $maskMobile, black $maskMobile);
+                            -webkit-mask-composite: destination-in;
+                            mask-composite: intersect;
+                    }
 
 
                     &:hover {
@@ -324,17 +435,56 @@
                         font-size: 20px;
                         border-right: 1px dashed #fff;
                         padding-right: 25px;
+                        @include mobile(){
+                            font-size: 18px;
+                            line-height: 1;
+                            padding-right: 5px;
+                        }
                     }
                     .montoTotal {
                         @include flex(2px);
                         strong {
                             font-size: 36px;
+                            @include mobile(){
+                                font-size: 30px;
+                                font-weight: 600;
+                            }
                         }
                         small {
                             font-size: 24px;
                             font-weight: 200;
+                            @include mobile() {
+                                    font-size: 18px;
+                                }
                         }
                     }
+                }
+            }
+        }
+
+        .btnMobile {
+            visibility: hidden;
+            opacity: 0;
+            
+            @include mobile(){
+                position: fixed;
+                bottom: 70px;
+                z-index: 1;
+                left: 0;
+                width: 100%;
+                @include flex();
+                padding: 10px;
+                visibility: visible;
+                opacity: 1;
+    
+                &__cont {
+                    background-color: $colorTagDestacado;
+                    padding: 15px;
+                    border-radius: 10px;
+                    width: 100%;
+                    @include flex();
+                    justify-content: center;
+                    box-shadow: 0 0 25px 0 rgba(0, 0, 0, .5);
                 }
             }
         }

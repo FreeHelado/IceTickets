@@ -28,7 +28,14 @@
         background-image: radial-gradient(circle, color-opacity($colorPrimarioClaro, 1) 0%, color-opacity($colorPrimarioClaro, 0.5));
         position: relative;
 
-        
+        @include mobile(){
+            width: 80vw;
+            padding: 25px;
+        }
+
+        span {
+            font-size: 14px;
+        }
 
        h2 {
         font-weight: 500;
@@ -78,13 +85,25 @@
                position: absolute;
                left: 50%;
                transform: translate(-50%, -180%);
+
+               @include mobile(){
+                   flex-direction: row;
+                   
+               }
     
                i {
                    font-size: 75px;
+                    @include mobile() {
+                        font-size: 50px;
+                    }
+
                }
     
                h1 {
                    font-size: 24px;
+                    @include mobile() {
+                        font-size: 18px;
+                    }
                }
            }
     }
@@ -96,6 +115,9 @@
         color: #fff;
         span, strong {
             font-size: 16px;
+            @include mobile(){
+                font-size: 13px;
+            }
         }
 
         strong {

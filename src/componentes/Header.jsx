@@ -47,14 +47,14 @@ function Header({ token }) {
         {token && (
           <Link to="/admin">
           <i><FaFire /></i>
-            <span>Panel de Vendedor</span>
+            <span>Vendedor</span>
           </Link>
         )}
 
         {token && (
           <Link to="/login" onClick={handleLogout}>
             <FaPowerOff />
-            <span>Cerrar Sesión</span>
+            <span>Salir</span>
           </Link>
         )}
 

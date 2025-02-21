@@ -3,6 +3,10 @@
     @include flexColumn(25px);
     padding-block: 50px;
 
+    @include mobile(){
+        padding-block: 50px 120px;
+    }
+
     h1 {
         font-weight: 500;
     }
@@ -44,6 +48,19 @@
                 radial-gradient(circle at right center, transparent $maskticket, black $maskticket);
         -webkit-mask-composite: destination-in;
         mask-composite: intersect;
+
+        @include mobile(){
+            flex-direction: column;
+            $maskticketMobile: 15px;
+                -webkit-mask-image:
+                    radial-gradient(circle at left center, transparent $maskticketMobile, black $maskticketMobile),
+                    radial-gradient(circle at right center, transparent $maskticketMobile, black $maskticketMobile);
+                mask-image:
+                    radial-gradient(circle at left center, transparent $maskticketMobile, black $maskticketMobile),
+                    radial-gradient(circle at right center, transparent $maskticketMobile, black $maskticketMobile);
+                -webkit-mask-composite: destination-in;
+                mask-composite: intersect;
+        }
         
         figure {
             max-width: 500px;
@@ -60,6 +77,9 @@
         &--data {
             padding-inline: 25px 35px;
             @include flexColumn(15px);
+            @include mobile(){
+                padding: 30px 40px;
+            }
 
             &--evento {
                 @include flexColumn(5px);
@@ -92,6 +112,14 @@
         width: 100%;
         @include hover();
 
+        @include mobile() {
+                flex-direction: column;
+                gap: 0;
+                padding: 15px;
+            }
+
+
+
         &:hover {
             background-color: $colorTag;
             box-shadow: 0 0 50px 0 color-opacity($colorTagDestacado, .5);
@@ -100,6 +128,9 @@
         span,
         strong {
             font-size: 30px;
+            @include mobile(){
+                font-size: 24px;
+            }
         }
     }
     
@@ -111,6 +142,10 @@
             @include grid(3);
             width: 100%;
             padding-block: 10px;
+
+            @include mobile(){
+                @include flexColumn();
+            }
             
             &__item {
                 @extend .caja;

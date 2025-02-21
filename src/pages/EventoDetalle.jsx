@@ -1,12 +1,14 @@
 import config from "../config";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import * as FaIcons from "react-icons/fa";
 import LugarCard from "../componentes/LugarCard";
 import CompraEntradas from "../componentes/CompraEntradas"; // Importa el nuevo componente
-
+import gsap from "gsap";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
 /// iconos ////
 import { FaRegTrashCan, FaDog } from "react-icons/fa6";
@@ -20,6 +22,21 @@ function EventoDetalle() {
   const [evento, setEvento] = useState(null);
   const [categoria, setCategoria] = useState(null);
   const [lugar, setLugar] = useState(null);
+  
+  const btnMobileRef = useRef(null);
+  const lateralRef = useRef(null);
+ 
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin); // 🔥 Registrar ambos
+
+  const scrollToLateral = () => {
+    if (lateralRef.current) {
+      gsap.to(window, {
+        duration: 1,
+        scrollTo: { y: lateralRef.current.offsetTop, autoKill: false }, // 🔥 Cambié `y: lateralRef.current`
+        ease: "power2.inOut",
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchEvento = async () => {
@@ -54,6 +71,42 @@ function EventoDetalle() {
 
     fetchEvento();
   }, [id]);
+
+  useEffect(() => {
+    const btnMobile = btnMobileRef.current;
+    const lateral = lateralRef.current;
+
+    if (!btnMobile || !lateral) {
+      return;
+    }
+
+    // 🔥 Usamos `requestAnimationFrame` para asegurarnos de que los elementos están en el DOM
+    requestAnimationFrame(() => {
+      ScrollTrigger.create({
+        trigger: lateral,
+        start: "top bottom",
+        end: "bottom bottom",
+        onEnter: () => {
+          gsap.to(btnMobile, { 
+            y: 100, 
+            opacity: 0, 
+            duration: 0.8, // ⏳ Ajustá la duración
+            ease: "elastic.in(1, 0.5)" // 🔥 Entrada más elástica
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(btnMobile, { 
+            y: 0, 
+            opacity: 1, 
+            duration: 0.6, // ⏳ Un poco más rápido en la salida
+            ease: "elastic.out(1, 0.5)" // 🔥 Rebote más fluido
+          });
+        },
+      });
+    });
+
+  }, [evento]); // 🔥 Se ejecuta cuando `evento` cambia
+
 
   if (!evento) return <p>Cargando...</p>;
 
@@ -207,10 +260,15 @@ function EventoDetalle() {
           
           {lugar && <LugarCard lugar={lugar} />}
 
+          <div ref={btnMobileRef} className="btnMobile" onClick={scrollToLateral}>
+          <div className="btnMobile__cont">
+            <span>COMPRAR TICKETS</span>
+          </div>
+        </div>
         </div>
          
-          {/* 📌 Sección lateral para compra de entradas o mensaje de agotado */}
-        <div className="evento__cont--lateral">
+        
+        <div ref={lateralRef} className="evento__cont--lateral">
           {todasAgotadas ? (
             <div className="agotado-box">
               <h3>Entradas agotadas</h3>
@@ -221,6 +279,8 @@ function EventoDetalle() {
 
           )}
         </div>
+
+        
  
       </section>
       

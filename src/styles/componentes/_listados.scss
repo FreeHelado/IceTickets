@@ -2,6 +2,11 @@
     @include cuerpo();
     @include grid(3);
 
+    @include mobile(){
+        @include grid(1);
+        gap: 25px;
+    }
+
     &__item {
         @extend .caja;
         @include flexColumn(0px);
@@ -30,6 +35,10 @@
             justify-content: center;
             @include hover();
             position: relative;
+
+            @include mobile() {
+                height: 200px;
+            }
 
             &::after {
                 content: '';
@@ -75,13 +84,24 @@
             @include flexColumn(8px);
             width: 100%;
             padding: 20px;
+            @include mobile() {
+                padding: 15px;
+            }
             h2 {
                 font-size: 24px;
                 font-weight: 500;
+
+                @include mobile() {
+                    font-size: 22px;
+                }
             }
             h4 {
                 font-size: 18px;
                 font-weight: 300;
+                @include mobile() {
+                    font-size: 16px;
+                    line-height: 1.5;
+                }
             }
 
             a {
@@ -103,6 +123,21 @@
 
                 span, small {
                     font-size: 18px;
+                }
+
+                @include mobile() {
+                    padding: 10px 15px;
+                    border-radius: 6px;
+
+                    &:hover {
+                        background-color: $colorBg;
+                    }
+                    @include active();
+
+                    span, small {
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
                 }
             }
 

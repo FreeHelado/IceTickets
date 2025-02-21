@@ -65,9 +65,25 @@ function AdminIndex({ setToken }) {
         <div className="adminPanel__cont--zona1">
           <h1>Bienvenido a IceTicket {usuario?.nombre || usuario?.email || "Usuario"} 👋</h1>
           <h2>Desde este panel vas a poder vender tus tickets y administrarlos</h2>
-          <span>Ayuda</span>
+          
 
-          {isAdmin && <span>Super Usuario Full Manager</span>}
+          {isAdmin &&
+            <div className="fullManagerTools"> 
+              <span>✨ Tu usuario ({usuario?.email}) es Admin Full de esta basurita, y podes hacer cosas que el resto de los mortales (No Hackers) no pueden hacer 🎃</span>
+
+              <nav>
+              <Link to={`/admin/categorias`}>
+                <span>Administrar Categorías</span>
+              </Link>
+              <Link to={`/admin/categorias`}>
+                <span>Usuarios</span>
+              </Link>
+              <Link to={`/admin/categorias`}>
+                <span>Ordenes</span>
+              </Link>
+              </nav>
+              </div>
+          }
 
         </div>
 

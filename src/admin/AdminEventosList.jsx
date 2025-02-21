@@ -34,40 +34,48 @@ function AdminEventosList() {
 
 
   const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Eliminar Evento",
-      text: "¿Estás seguro que quieres borrar el evento?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    });
-
-    if (!result.isConfirmed) return;
-
-    const token = localStorage.getItem("token");
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: token,
-        },
+      const { value: confirmText } = await Swal.fire({
+          title: "Eliminar Evento",
+          html: `<span style="font-size:15px;">Todos los datos de este evento se perderán, incluyendo los tickets generados, todo se perderá ya no hay regreso bro.</span><br/><br/>Para confirmar escribe: <strong> aplicar-cambios-destructivos</strong>`,
+          icon: "warning",
+          input: "text",
+          inputPlaceholder: "Escribe aquí...",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Eliminar",
+          cancelButtonText: "Cancelar",
+          inputValidator: (value) => {
+              if (value !== "aplicar-cambios-destructivos") {
+                  return "Debes escribir exactamente 'aplicar-cambios-destructivos' para confirmar.";
+              }
+          },
       });
 
-      if (response.ok) {
-        Swal.fire("Eliminado!", "El evento ha sido eliminado correctamente.", "success");
-        cargarEventos(); // ✅ Recarga los eventos después de eliminar
-      } else {
-        Swal.fire("Error", "No se pudo eliminar el evento.", "error");
+      if (!confirmText) return;
+
+      const token = localStorage.getItem("token");
+
+      try {
+          const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`, {
+              method: "DELETE",
+              headers: {
+                  Authorization: token,
+              },
+          });
+
+          if (response.ok) {
+              Swal.fire("Eliminado!", "El evento ha sido eliminado correctamente.", "success");
+              cargarEventos(); // ✅ Recarga los eventos después de eliminar
+          } else {
+              Swal.fire("Error", "No se pudo eliminar el evento.", "error");
+          }
+      } catch (error) {
+          console.error("❌ Error al eliminar evento:", error);
+          Swal.fire("Error", "Error en la conexión con el servidor.", "error");
       }
-    } catch (error) {
-      console.error("❌ Error al eliminar evento:", error);
-      Swal.fire("Error", "Error en la conexión con el servidor.", "error");
-    }
   };
+
 
   return (
     <main className="adminPanel">

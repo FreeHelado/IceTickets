@@ -84,74 +84,71 @@ const AdminCategorias = () => {
 
   return (
     <main className="adminPanel">
-      <h2>📂 Categorías</h2>
 
-      {/* 🟢 Listado de Categorías */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginBottom: "20px" }}>
-        {categorias.map((categoria) => {
-          const Icono = FaIcons[categoria.icono] || FaIcons.FaQuestionCircle;
-          return (
-            <div key={categoria._id} style={{ textAlign: "center", padding: "10px", border: "1px solid #ddd", borderRadius: "8px", position: "relative" }}>
-              <Icono size={30} />
-              <p>{categoria.nombre}</p>
-              {/* 🗑️ Botón de eliminar */}
-              <button
-                onClick={() => eliminarCategoria(categoria._id)}
-                style={{
-                  position: "absolute",
-                  top: "5px",
-                  right: "5px",
-                  background: "red",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  width: "25px",
-                  height: "25px",
-                  fontSize: "14px",
-                }}
-              >
-                ✖
-              </button>
-            </div>
-          );
-        })}
-      </div>
+      <div className="adminCategorias">
+        <h2>Categorías</h2>
 
-      {/* 📝 Formulario para Agregar Categoría */}
-      <form onSubmit={agregarCategoria} style={{ display: "flex", flexDirection: "column", gap: "10px", textAlign: "left" }}>
-        <label>
-          Nombre:
-          <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required style={{ width: "100%", padding: "5px", borderRadius: "5px" }} />
-        </label>
-
-        <label>
-          Icono:
-          <select value={icono} onChange={(e) => setIcono(e.target.value)} style={{ width: "100%", padding: "5px", borderRadius: "5px" }}>
-            {Object.keys(FaIcons).map((iconoNombre) => (
-              <option key={iconoNombre} value={iconoNombre}>
-                {iconoNombre}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {/* Previsualización del Icono */}
-        <div style={{ textAlign: "center", marginBottom: "10px" }}>
-          {icono && FaIcons[icono] ? (
-            (() => {
-              const IconoPreview = FaIcons[icono];
-              return <IconoPreview size={40} />;
-            })()
-          ) : (
-            <FaIcons.FaQuestionCircle size={40} />
-          )}
+        
+        <div className="adminCategorias__grid">
+          {categorias.map((categoria) => {
+            const Icono = FaIcons[categoria.icono] || FaIcons.FaQuestionCircle;
+            return (
+              <div key={categoria._id} className="adminCategorias__item">
+                <Icono size={30} />
+                <span>{categoria.nombre}</span>
+                
+                <button
+                  onClick={() => eliminarCategoria(categoria._id)}>
+                  ✖
+                </button>
+              </div>
+            );
+          })}
         </div>
 
-        <button type="submit" style={{ padding: "10px", backgroundColor: "#28a745", color: "#fff", borderRadius: "5px", cursor: "pointer" }}>
-          ➕ Agregar Categoría
-        </button>
-      </form>
+       
+        <form onSubmit={agregarCategoria}>
+          <div className="camposCategorias">
+            <div className="campoForm">
+              <label>Nombre de la categoría:</label>
+              <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required/>
+            </div>
+
+              <div className="campoForm">  
+              <label>Icono:</label>
+                <select value={icono} onChange={(e) => setIcono(e.target.value)} style={{ width: "100%", padding: "5px", borderRadius: "5px" }}>
+                  {Object.keys(FaIcons).map((iconoNombre) => (
+                    <option key={iconoNombre} value={iconoNombre}>
+                      {iconoNombre}
+                    </option>
+                  ))}
+                </select>
+              
+            </div>
+            <div className="alert">
+              <span>Podés buscar el indicado aquí:</span>
+              <a href="https://react-icons.github.io/react-icons/icons/fa/" target="_blank">Font Awesome 5</a>
+            </div>
+            <button type="submit">Agregar Categoría</button>
+          </div>
+
+
+          {/* Previsualización del Icono */}
+          <div className="prevIcon">
+            <span>Previa del ícono:</span>
+            {icono && FaIcons[icono] ? (
+              (() => {
+                const IconoPreview = FaIcons[icono];
+                return <IconoPreview size={100} />;
+              })()
+            ) : (
+              <FaIcons.FaQuestionCircle size={100} />
+            )}
+          </div>
+
+          
+        </form>
+      </div>
     </main>
   );
 };

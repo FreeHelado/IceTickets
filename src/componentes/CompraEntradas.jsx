@@ -19,54 +19,85 @@ function CompraEntradas({ precios, aforo, evento }) {
     const cantidadesGuardadas = JSON.parse(localStorage.getItem("cantidades")) || {};
     return precios.reduce((acc, precio) => ({
         ...acc,
-        [precio.nombre]: cantidadesGuardadas[precio.nombre] || 0, // Si hay datos en storage, los usa
+        [precio.nombre]: cantidadesGuardadas[precio.nombre] || 0, 
         }), {});
     });
 
-    // 🟢 🔥 Agregamos la referencia del modal
+
     const modalRef = useRef(null);
+    
     useEffect(() => {
-    if (modalRef.current) {
-        gsap.set(modalRef.current, { bottom: "-100%", opacity: 0, visibility: "hidden" });
-    }
+        if (modalRef.current) {
+            gsap.set(modalRef.current, { bottom: "-100%", opacity: 0, visibility: "hidden" });
+        }
     }, []);
 
-    const cerrarCarrito = () => {
-        if (!modalRef.current) return; 
+    useEffect(() => {
+    const updateCarritoPos = () => {
+        const esMobile = window.innerWidth < 768; // 🔥 Detectar si es mobile
 
-        gsap.to(modalRef.current, {
-            bottom: "-100%", 
-            opacity: 0,
-            duration: 0.4,
-            ease: "power2.in",
-            onComplete: () => {
-                modalRef.current.style.visibility = "hidden";
-            },
+        gsap.set(modalRef.current, {
+            left: esMobile ? "0px" : "15px",
+            bottom: esMobile ? "auto" : "15px", // En mobile no debe estar en bottom
+            top: esMobile ? "-100%" : "auto", // 📌 En mobile, inicia fuera de la pantalla arriba
+            width: esMobile ? "100%" : "500px",
+            borderRadius: esMobile ? "0px" : "10px",
         });
     };
 
-    const mostrarCarrito = () => {
+    updateCarritoPos(); // Ejecutar una vez al inicio
+    window.addEventListener("resize", updateCarritoPos); // 🔥 Detecta cambios en tamaño
+
+    return () => {
+        window.removeEventListener("resize", updateCarritoPos); // Cleanup
+    };
+}, []);
+
+const cerrarCarrito = () => {
+    if (!modalRef.current) return; 
+
+    gsap.to(modalRef.current, {
+        top: "-100%", // 📌 En mobile se va hacia arriba
+        bottom: "auto",
+        opacity: 0,
+        duration: 0.4,
+        ease: "power2.in",
+        onComplete: () => {
+            modalRef.current.style.visibility = "hidden";
+        },
+    });
+};
+
+const mostrarCarrito = () => {
     if (!modalRef.current) return; 
 
     modalRef.current.style.visibility = "visible";
 
-        gsap.fromTo(
-            modalRef.current,
-            {
-                scale: 0.3, 
-                bottom: "-100%",
-                opacity: 0,
-                transformOrigin: "bottom left",
-            },
-            {
-                scale: 1, 
-                bottom: "15px",
-                opacity: 1,
-                duration: 0.8,
-                ease: "elastic.out(1, 0.6)",
-            }
-        );
-    };
+    // 🔥 Detectar si es mobile o desktop
+    const esMobile = window.innerWidth <= 768;
+
+    gsap.fromTo(
+        modalRef.current,
+        {
+            scale: 0.3,
+            top: esMobile ? "-100%" : "auto",
+            bottom: esMobile ? "auto" : "-100%",
+            left: esMobile ? "0px" : "auto",
+            opacity: 0,
+            transformOrigin: esMobile ? "top center" : "bottom left",
+        },
+        {
+            scale: 1,
+            top: esMobile ? "0px" : "auto",
+            bottom: esMobile ? "auto" : "15px",
+            left: esMobile ? "0px" : "15px",
+            opacity: 1,
+            duration: 0.8,
+            ease: "elastic.out(1, 0.6)",
+        }
+    );
+};
+
 
 
 
@@ -75,13 +106,10 @@ function CompraEntradas({ precios, aforo, evento }) {
     }, [cantidades]);
 
 
-    // 🔢 Sumar el total de entradas seleccionadas en el botón
     const totalBoton = precios.reduce((acc, precio) => acc + cantidades[precio.nombre] * precio.monto, 0);
-
-    // 🔢 Sumar el total de entradas seleccionadas
     const totalEntradas = Object.values(cantidades).reduce((acc, val) => acc + val, 0);
 
-    // 🔔 Detectar si alguna entrada llegó al límite y lanzar alerta
+    
     useEffect(() => {
         precios.forEach((precio) => {
         if (cantidades[precio.nombre] >= precio.disponibles && precio.disponibles > 0) {
@@ -93,9 +121,9 @@ function CompraEntradas({ precios, aforo, evento }) {
             });
         }
         });
-    }, [cantidades, precios]); // 🛑 Se ejecuta cada vez que `cantidades` cambia
+    }, [cantidades, precios]); 
 
-    // 🛒 Guardar en localStorage cuando cambia el carrito
+  
     useEffect(() => {
         localStorage.setItem("carrito", JSON.stringify(carrito));
     }, [carrito]);
@@ -104,7 +132,6 @@ function CompraEntradas({ precios, aforo, evento }) {
         setCantidades((prev) => {
         const nuevaCantidad = prev[nombre] + 1;
 
-        // 🚫 Evita que el usuario agregue más de lo permitido
         if (nuevaCantidad > disponibles) return prev;
 
         return {
@@ -114,7 +141,6 @@ function CompraEntradas({ precios, aforo, evento }) {
         });
     };
 
-    // 🔽 Disminuir cantidad (mínimo 0)
     const disminuirCantidad = (nombre) => {
         setCantidades((prev) => ({
         ...prev,
@@ -123,28 +149,26 @@ function CompraEntradas({ precios, aforo, evento }) {
     };
 
     const vaciarCarrito = () => {
-        setCarrito([]); // 🛒 Limpia el estado del carrito
-        localStorage.removeItem("carrito"); // 🗑️ Borra el carrito del localStorage
+        setCarrito([]); //
+        localStorage.removeItem("carrito"); 
     };
 
-    // 🛒 Agregar entradas al carrito
     const agregarAlCarrito = () => {
-
         if (!evento._id) {  
-            console.error("⚠️ Error: El evento no tiene un ID válido", evento);
+            console.error("💀 Error: El evento no tiene un ID válido", evento);
             return;
         }
 
         const nuevasEntradas = precios
             .filter(precio => cantidades[precio.nombre] > 0)
             .map(precio => ({
-                idPrecio: precio._id, // 🔥 Agregamos el ID del precio
+                idPrecio: precio._id, 
                 nombre: precio.nombre,
                 cantidad: cantidades[precio.nombre],
                 monto: precio.monto,
                 subtotal: cantidades[precio.nombre] * precio.monto,
                 evento: { 
-                    id: evento._id || "",  // 
+                    id: evento._id || "", 
                     nombre: evento.nombre || "Evento sin nombre",
                     imagen: evento.imagen || "",
                     fecha: evento.fecha || "",
@@ -165,34 +189,29 @@ function CompraEntradas({ precios, aforo, evento }) {
         }
 
         setCarrito(nuevasEntradas);
-        // 🔥 Guardamos el evento correctamente en localStorage
         localStorage.setItem("evento", JSON.stringify({
-            id: evento._id,  // ✅ Guarda el ID correctamente
+            id: evento._id,
             nombre: evento.nombre,
             imagen: evento.imagen,
             fecha: evento.fecha,
             hora: evento.hora,
             lugar: evento.lugar?.nombre,
             direccion: evento.lugar?.direccion,
-            logoLugar: evento.lugar?.logo || "" // ✅ Guarda el logo del lugar
+            logoLugar: evento.lugar?.logo || ""
         }));
         
         localStorage.setItem("carrito", JSON.stringify(nuevasEntradas));
-        // 🎯 Ejecutar la animación después de actualizar el carrito
+        
     mostrarCarrito();
     };
     JSON.parse(localStorage.getItem("carrito"))
 
-
-    // 🛒🎫 Calcular total en el carrito
     const totalEntradasCarrito = carrito.reduce((acc, item) => acc + item.cantidad, 0);
-
-    // 🛒 Calcular total en el carrito
     const totalCarrito = carrito.reduce((acc, item) => acc + item.subtotal, 0);
 
-    // ✅ Redirigir a Checkout con el evento y el carrito
+    
     const irAConfirmacion = () => {
-        const token = localStorage.getItem("token"); // 🔍 Verifica si el usuario está logueado
+        const token = localStorage.getItem("token"); 
 
         if (!evento) {
             Swal.fire({
@@ -205,25 +224,23 @@ function CompraEntradas({ precios, aforo, evento }) {
         }
 
         if (!token) {
-            // 📌 Guarda que el destino real es /checkout
+            
             localStorage.setItem("prevPage", "/checkout"); 
             localStorage.setItem("carrito", JSON.stringify(carrito));
             if (evento && evento.lugar) {
                 localStorage.setItem("evento", JSON.stringify(evento));
             }
             
-            navigate("/login"); // 🔄 Redirige a login
+            navigate("/login");
             return;
         }
 
         
-
-        // ✅ Si el usuario está logueado, sigue al checkout como antes
         navigate("/checkout", { 
             state: { 
                 carrito, 
                 evento: { 
-                    id: evento.id || evento._id, // 🔥 Asegurar que el ID esté presente
+                    id: evento.id || evento._id,
                     nombre: evento.nombre, 
                     imagen: evento.imagen, 
                     fecha: evento.fecha, 
@@ -274,12 +291,12 @@ function CompraEntradas({ precios, aforo, evento }) {
         </div>
       </div>
 
-          {/* 🔥 Botón con total actualizado */}
+         
             <button className="comprarBtn" onClick={agregarAlCarrito}>
               <span>{carrito.length > 0 ? "Actualizar Carrito" : "Comprar Entradas"}</span>
                 <div className="montoTotal">
                     <small>$</small>
-                    <strong>{totalBoton}</strong> {/* ✅ Total de lo seleccionado antes de agregar al carrito */}
+                    <strong>{totalBoton}</strong> {/* â Total de lo seleccionado antes de agregar al carrito */}
                 </div>
           </button>
 

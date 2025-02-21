@@ -204,13 +204,7 @@ function MisTickets() {
                             )}
                         </button>
 
-                        <button 
-                            onClick={() => sendWhatsApp(ticket)} 
-                            className="mt-3 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center justify-center gap-2"
-                        >
-                            <i><FaWhatsapp /></i>
-                            <span>Enviar por WhatsApp</span>
-                        </button>
+                       
 
 
                         

@@ -19,7 +19,7 @@ function Eventos() {
   return (
     <main>
       <div className="eventosHeader">    
-        <h2>Eventos</h2>
+        <h2>Eventos Destacados</h2>
       </div>
       <div className="eventos">
         {eventos.length > 0 ? (

@@ -11,6 +11,14 @@
     }
 }
 
+@mixin desktop {
+    @media screen and (min-width: 576px) {
+        @content;
+    }
+}
+
+
+
 // MIXINS FLEX //
 @mixin flex($gap : 10px) {
     display: flex;
@@ -52,6 +60,13 @@
 //// MIXIN UTILES
 @mixin hover($tiempo : .2s) {
     transition: all $tiempo;
+}
+
+@mixin active() {
+    &:active {
+        transform: translate(-2px, -1px);
+        scale: .95;
+    }
 }
 
 //// LIGHT MODE
