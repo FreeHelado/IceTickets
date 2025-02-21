@@ -28,7 +28,7 @@ function AdminEventos({ setToken }) {
     disponibles: "",
     estado: "proximo",
     imagen: "",
-    precios: [{ nombre: "", monto: "", disponibles: "" }],
+    precios: [{ nombre: "", monto: "", disponibles: "", sector: "" }],
     categoria: "",
     publico: false,
     seleccionAsientos: false,
@@ -128,8 +128,9 @@ function AdminEventos({ setToken }) {
               nombre: precio.nombre || "",
               monto: precio.monto || "",
               disponibles: precio.disponibles || "",
+              sector: precio.sector || "" // ✅ Agregamos el sector aquí
             }))
-          : [{ nombre: "", monto: "", disponibles: "" }],
+          : [{ nombre: "", monto: "", disponibles: "", sector: "" }],
         categoria: data.categoria || "",
         lugar: data.lugar || "",
         vendedor: data.vendedor || "",
@@ -257,9 +258,10 @@ function AdminEventos({ setToken }) {
             ? data.precios.map(precio => ({
                 nombre: precio.nombre || "",
                 monto: precio.monto || "",
-                disponibles: precio.disponibles || ""
+                disponibles: precio.disponibles || "",
+                sector: precio.sector || "" // ✅ Agregamos el sector aquí
               }))
-            : [{ nombre: "", monto: "", disponibles: "" }],
+            : [{ nombre: "", monto: "", disponibles: "", sector: "" }],
           categoria: data.categoria || "",
           lugar: data.lugar || "",
           vendedor: data.vendedor || "",
@@ -440,46 +442,47 @@ function AdminEventos({ setToken }) {
 
     // ✅ Construir el objeto `evento` con la nueva estructura
     const eventoData = {
-  nombre: evento.nombre,
-  fecha: evento.fecha.toISOString(),
-  hora: evento.hora,
-  descripcion: evento.descripcion,
-  stock: {
-    aforo: evento.stock.aforo,
-    vendidas: evento.stock.vendidas || 0,
-  },
-  estado: evento.estado,
-  imagen: imageName,
-  precios: evento.precios.map((precio) => ({
-    nombre: precio.nombre,
-    monto: precio.monto,
-    disponibles: precio.disponibles,
-  })),
-  categoria: evento.categoria,
-  lugar: evento.lugar,
-  sociosProductoresEmails: sociosEmails,
-  publico: evento.publico,
-  seleccionAsientos: evento.seleccionAsientos,
-  tags: evento.tags || {
-    todoPublico: false,
-    noMenores: false,
-    ventaComida: false,
-    ventaBebida: false,
-    petFriendly: false,
-    accesible: false,
-    aireLibre: false,
-  },
+    nombre: evento.nombre,
+    fecha: evento.fecha.toISOString(),
+    hora: evento.hora,
+    descripcion: evento.descripcion,
+    stock: {
+      aforo: evento.stock.aforo,
+      vendidas: evento.stock.vendidas || 0,
+    },
+    estado: evento.estado,
+    imagen: imageName,
+    precios: evento.precios.map((precio) => ({
+      nombre: precio.nombre,
+      monto: precio.monto,
+      disponibles: precio.disponibles,
+      sector: precio.sector || null, // 🔥 Guardamos el sector seleccionado
+    })),
+    categoria: evento.categoria,
+    lugar: evento.lugar,
+    sociosProductoresEmails: sociosEmails,
+    publico: evento.publico,
+    seleccionAsientos: evento.seleccionAsientos,
+    tags: evento.tags || {
+      todoPublico: false,
+      noMenores: false,
+      ventaComida: false,
+      ventaBebida: false,
+      petFriendly: false,
+      accesible: false,
+      aireLibre: false,
+    },
 
-  infoAdicional: evento.infoAdicional || {
-    edadMinima: "",
-    menoresGratis: "",
-    elementosProhibidos: "",
-    terminosCondiciones: "",
-    horaApertura: "",
-    estacionamiento: "",
-    transporte: "",
-  },
-};
+    infoAdicional: evento.infoAdicional || {
+      edadMinima: "",
+      menoresGratis: "",
+      elementosProhibidos: "",
+      terminosCondiciones: "",
+      horaApertura: "",
+      estacionamiento: "",
+      transporte: "",
+    },
+  };
 
 
     try {
@@ -511,7 +514,7 @@ function AdminEventos({ setToken }) {
           stock: { aforo: "", vendidas: 0 },
           estado: "proximo",
           imagen: "",
-          precios: [{ nombre: "", monto: "", disponibles: "" }],
+          precios: [{ nombre: "", monto: "", disponibles: "", sector: "" }],
           categoria: "",
           lugar: "",
           vendedor: "",
@@ -702,20 +705,20 @@ function AdminEventos({ setToken }) {
 
 
                 {/* 🔥 Si el usuario activó selección de asientos, mostramos sectores */}
-                  {evento.seleccionAsientos && (
-                    <div className="campoForm">
-                      <label>Sector Disponible</label>
-                      <select
-                        value={precio.sector || ""}
-                        onChange={(e) => actualizarSector(index, e.target.value)}
-                      >
-                        <option value="">Seleccionar sector</option>
-                        {sectores.map((sector) => (
-                          <option key={sector._id} value={sector._id}>{sector.nombreSector}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
+                {evento.seleccionAsientos && (
+                  <div className="campoForm">
+                    <label>Sector Disponible</label>
+                    <select
+                      value={precio.sector || ""}
+                      onChange={(e) => actualizarSector(index, e.target.value)}
+                    >
+                      <option value="">Seleccionar sector</option>
+                      {sectores.map((sector) => (
+                        <option key={sector._id} value={sector._id}>{sector.nombreSector}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {index > 0 && <button type="button" onClick={() => eliminarPrecio(index)}><i><FaRegTrashCan /></i></button>}
               </div>
