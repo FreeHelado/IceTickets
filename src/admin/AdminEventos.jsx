@@ -660,9 +660,25 @@ function AdminEventos({ setToken }) {
 
         <h3>Tickets</h3>
         <div className="alert admin">
-          En esta sección agrega las diferentes opciones de tickets que vas a ofrecer.
+          En esta sección agrega las diferentes opciones de tickets que vas a ofrecer. Si tu evento va a manejar tickets por sectores o selección de asientos marca el check y asignale a cada ticket un sector de tu lugar
         </div>
 
+          
+        <div className="campoCheck">
+          <input
+            type="checkbox"
+            name="seleccionAsientos"
+            checked={evento.seleccionAsientos}
+            onChange={(e) => {
+              handleChange(e);
+              if (e.target.checked && evento.lugar) {
+                cargarSectores(evento.lugar); // 🔥 Cargar sectores sin guardar el evento
+              }
+            }}
+          />
+          <label>Permitir selección de asientos</label>
+        </div>
+        
         
 
             {evento.precios.map((precio, index) => (
@@ -731,24 +747,7 @@ function AdminEventos({ setToken }) {
 
         <hr />
 
-        <div className="campoCheck">
-          <input
-            type="checkbox"
-            name="seleccionAsientos"
-            checked={evento.seleccionAsientos}
-            onChange={(e) => {
-              handleChange(e);
-              if (e.target.checked && evento.lugar) {
-                cargarSectores(evento.lugar); // 🔥 Cargar sectores sin guardar el evento
-              }
-            }}
-          />
-          <label>Permitir selección de asientos</label>
-        </div>
-        <div className="alert">
-          Si activas esta opción, los usuarios podrán elegir asientos específicos en el evento.
-        </div>
-        
+    
         <h3>Stock del Evento</h3>
         <div className="campoForm">  
           <label>Aforo Total</label>

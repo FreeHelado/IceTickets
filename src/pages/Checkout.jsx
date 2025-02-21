@@ -36,20 +36,25 @@ function Checkout({ usuario }) {
     const lugar = evento?.lugar || "Lugar no disponible";
     const direccion = evento?.direccion || "Dirección no disponible";
 
-
+    
     const [formularios, setFormularios] = useState(
         carrito.flatMap(item => 
+            
             Array(item.cantidad).fill().map(() => ({
                 nombre: "",
                 email: "",
                 telefono: "",
                 documento: "",
                 tipoEntrada: item.nombre,
-                idPrecio: item.idPrecio, // ❌ Si no está en el carrito, llega undefined
-                monto: item.monto
+                idPrecio: item.idPrecio,
+                monto: item.monto,
+                sector: item.sector || "",
+                fila: "",
+                asiento: ""
             }))
         )
     );
+
 
     const [ticketUsuario, setTicketUsuario] = useState(null); // Guardará el índice del ticket con los datos del comprador
 
@@ -61,6 +66,14 @@ function Checkout({ usuario }) {
         ));
     };
 
+    const handleFilaChange = (index, e) => {
+        const { value } = e.target;
+
+        setFormularios(prev => prev.map((form, i) =>
+            i === index ? { ...form, fila: value, asiento: "" } : form
+        ));
+    };
+
     // 🚀 Manejo del checkbox "Es para mí"
     const handleEsParaMi = (index) => {
         setFormularios(prev => prev.map((form, i) => 
@@ -69,6 +82,53 @@ function Checkout({ usuario }) {
                 : (i === ticketUsuario ? { ...form, nombre: "", email: "", telefono: "" } : form) // Limpia el anterior
         ));
         setTicketUsuario(index);
+    };
+
+    const handleSectorChange = (index, e) => {
+        const { value } = e.target;
+
+        setFormularios(prev => prev.map((form, i) =>
+            i === index ? { ...form, sector: value, fila: "", asiento: "" } : form
+        ));
+    };
+
+
+    // 🚀 Cargar filas cuando llega el carrito
+    useEffect(() => {
+        
+        carrito.forEach(item => {
+            if (item.sector) {
+                obtenerFilasPorSector(item.sector);
+            }
+        });
+    }, [carrito]);
+
+
+    /// Obtener Filas de cada sector /// 
+    const [filasPorSector, setFilasPorSector] = useState({});
+    
+    const obtenerFilasPorSector = async (sectorId) => {
+        if (!sectorId) return;
+
+        try {
+            
+            const response = await fetch(`${config.BACKEND_URL}/api/lugares/sector/${sectorId}`);
+            if (!response.ok) throw new Error(`Error ${response.status}: No se encontró el sector`);
+
+            const sector = await response.json();
+
+            setFilasPorSector(prev => {
+                const nuevoEstado = {
+                    ...prev,
+                    [sectorId]: sector.filas || [] // 🔥 Guarda filas con el sector como key
+                };
+                console.log("📦 Estado actualizado de filasPorSector:", nuevoEstado);
+                return nuevoEstado;
+            });
+
+        } catch (error) {
+            console.error(`❌ Error al obtener filas del sector ${sectorId}:`, error);
+        }
     };
 
 
@@ -159,8 +219,6 @@ function Checkout({ usuario }) {
     }
 
 
-    console.log("Evento en Checkout:", evento);
-
 
     return (
         <main className="checkout">
@@ -215,6 +273,7 @@ function Checkout({ usuario }) {
                     </div>
                     <div className="entradasForm">
                         {formularios.map((form, index) => (
+                            
                             <div key={index} className="entradasForm__item">
 
                                 <div className="entradasForm__item--header">
@@ -248,6 +307,48 @@ function Checkout({ usuario }) {
                                     <label htmlFor="documento">Documento</label>
                                     <input type="text" name="documento" placeholder="Documento de Identidad" value={form.documento} onChange={(e) => handleInputChange(index, e)} required />
                                 </div>
+
+                                {form.sector && Array.isArray(filasPorSector[form.sector]) && filasPorSector[form.sector].length > 0 && (
+                                    <div className="entradasForm__item--campo">
+                                        <label htmlFor="fila">Fila</label>
+                                        <select
+                                            name="fila"
+                                            value={form.fila || ""}
+                                            onChange={(e) => handleFilaChange(index, e)}
+                                            required
+                                        >
+                                            <option value="">Selecciona una fila</option>
+                                            {filasPorSector[form.sector].map((fila) => (
+                                                <option key={fila._id} value={fila.nombreFila}>
+                                                    {fila.nombreFila}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
+                                {form.fila && filasPorSector[form.sector]?.some(f => f.nombreFila === form.fila) && (
+                                    <div className="entradasForm__item--campo">
+                                        <label htmlFor="asiento">Asiento</label>
+                                        <select
+                                            name="asiento"
+                                            value={form.asiento || ""}
+                                            onChange={(e) => handleInputChange(index, e)}
+                                            required
+                                        >
+                                            <option value="">Selecciona un asiento</option>
+                                            {filasPorSector[form.sector]
+                                                .find(f => f.nombreFila === form.fila)?.asientos
+                                                .filter(asiento => !asiento.ocupado)
+                                                .map(asiento => (
+                                                    <option key={asiento._id} value={asiento.nombreAsiento}>
+                                                        {asiento.nombreAsiento}
+                                                    </option>
+                                                ))}
+                                        </select>
+                                    </div>
+                                )}
+
                             </div>
                         ))}
                     </div>

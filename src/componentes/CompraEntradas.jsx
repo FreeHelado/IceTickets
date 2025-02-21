@@ -152,7 +152,9 @@ function CompraEntradas({ precios, aforo, evento }) {
                 hora: evento.hora || "",
                 lugar: evento.lugar?.nombre || "Lugar no disponible",
                 direccion: evento.lugar?.direccion || "Dirección no disponible"
-            }
+            },
+            // ✅ Solo incluimos el sector si la selección de asientos está activada
+            ...(evento.seleccionAsientos ? { sector: precio.sector } : {}) // ✅ Agregamos el sector del precio seleccionado
         }));
 
     if (nuevasEntradas.length === 0) {
