@@ -539,11 +539,19 @@ function AdminEventos({ setToken }) {
           )}
         </div>
 
-        {/* <div className="campoForm">
-          <label htmlFor="descripcion">Descripción del Evento</label>
-          <textarea name="" id="" value={evento.descripcion || ""} 
-            onChange={(content) => setEvento({ ...evento, descripcion: content })}></textarea>
-        </div> */}
+        <div className="campoForm">
+          <label htmlFor="estado">Estado del Evento</label>
+          <select name="estado" value={evento.estado} onChange={handleChange} required>
+            <option value="proximo">Próximo</option>
+            <option value="mañana">Mañana</option>
+            <option value="hoy">Hoy</option>
+            <option value="finalizado">Finalizado</option>
+            <option value="cancelado">Cancelado</option>
+            <option value="liquidado">Liquidado</option>
+          </select>
+        </div>
+
+
 
         <EditorDescripcion evento={evento} setEvento={setEvento} />
 
