@@ -175,6 +175,20 @@ function AdminEventos({ setToken }) {
 }, [id, isAdmin, userId, navigate]);
 
 
+  useEffect(() => {
+    const fetchLugares = async () => {
+      try {
+        const response = await fetch(`${config.BACKEND_URL}/api/lugares`);
+        const data = await response.json();
+        setLugares(data);
+      } catch (error) {
+        console.error("❌ Error al obtener lugares:", error);
+      }
+    };
+
+    fetchLugares();
+  }, []);
+
 
   // ✅ Cargar categorías
   useEffect(() => {
@@ -184,22 +198,36 @@ function AdminEventos({ setToken }) {
       .catch((error) => console.error("❌ Error al obtener categorías:", error));
   }, []);
 
-  // ✅ Cargar lugares
-  useEffect(() => {
-    fetch(`${config.BACKEND_URL}/api/lugares`)
-      .then((response) => response.json())
-      .then((data) => {
-        setLugares(data);
+  // ✅ Estado para almacenar los sectores del lugar seleccionado
+  const [sectores, setSectores] = useState([]);
 
-        if (evento.lugar && data.length > 0) {
-          const lugarEncontrado = data.find(l => l._id === evento.lugar);
-          if (lugarEncontrado) {
-            setBusquedaLugar(lugarEncontrado.nombre); // 
-          }
-        }
-      })
-      .catch((error) => console.error("❌ Error al obtener lugares:", error));
-  }, [evento.lugar]); 
+  const cargarSectores = async (idLugar) => {
+    if (!idLugar) return;
+
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/lugares/${idLugar}`);
+      const data = await response.json();
+      if (data.sectores) {
+        setSectores(data.sectores); // Guardamos los sectores disponibles
+      }
+    } catch (error) {
+      console.error("❌ Error al cargar sectores:", error);
+    }
+  };
+
+  // ✅ Solo llamamos `cargarSectores` cuando cambia `evento.lugar`
+  useEffect(() => {
+    if (evento.lugar && lugares.length > 0) {
+      const lugarEncontrado = lugares.find((l) => l._id === evento.lugar);
+      if (lugarEncontrado) {
+        setBusquedaLugar(lugarEncontrado.nombre); // 🔥 Mostrar el nombre en el input
+        cargarSectores(evento.lugar); // Cargar sectores del lugar
+      }
+    }
+  }, [evento.lugar, lugares]);
+  // Se ejecuta cuando cambian `evento.lugar` o `lugares`
+
+  
 
 
   // ✅ Cargar sociosProductores al editar un evento
@@ -282,6 +310,15 @@ function AdminEventos({ setToken }) {
   }
   };
 
+  ///// actualizar sector handlesector
+  const actualizarSector = (index, sectorId) => {
+    setEvento((prev) => {
+      const nuevosPrecios = [...prev.precios];
+      nuevosPrecios[index] = { ...nuevosPrecios[index], sector: sectorId };
+      return { ...prev, precios: nuevosPrecios };
+    });
+  };
+
   // 💰 PRECIOS
   const handlePrecioChange = (index, e) => {
     const { name, value } = e.target;
@@ -344,20 +381,30 @@ function AdminEventos({ setToken }) {
   };
 
   const handleBuscarLugar = (e) => {
-    const texto = e.target.value;
-    setBusquedaLugar(texto);
-    if (texto.trim() === "") {
-      setFiltroLugares([]);
+    const texto = e.target.value.toLowerCase();
+    setBusquedaLugar(e.target.value);
+
+    if (!texto.trim()) {
+      setFiltroLugares([]); // Si está vacío, no mostrar nada
       return;
     }
-    setFiltroLugares(lugares.filter((lugar) => lugar.nombre.toLowerCase().includes(texto.toLowerCase())));
+
+    setFiltroLugares(
+      lugares.filter((lugar) => 
+        lugar.nombre && lugar.nombre.toLowerCase().includes(texto)
+      )
+    );
   };
 
+
+
   const handleSeleccionLugar = (lugar) => {
-    setBusquedaLugar(lugar.nombre);
-    setEvento({ ...evento, lugar: lugar._id });
-    setFiltroLugares([]);
+    setBusquedaLugar(lugar.nombre); // Mostrar el nombre en el input
+    setEvento((prev) => ({ ...prev, lugar: lugar._id })); // Guardar el ID en el evento
+    setFiltroLugares([]); // Ocultar lista de opciones
+    cargarSectores(lugar._id); // Cargar sectores del lugar seleccionado
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -652,6 +699,24 @@ function AdminEventos({ setToken }) {
                   />
                   <i><IoTicket /></i>
                 </div>
+
+
+                {/* 🔥 Si el usuario activó selección de asientos, mostramos sectores */}
+                  {evento.seleccionAsientos && (
+                    <div className="campoForm">
+                      <label>Sector Disponible</label>
+                      <select
+                        value={precio.sector || ""}
+                        onChange={(e) => actualizarSector(index, e.target.value)}
+                      >
+                        <option value="">Seleccionar sector</option>
+                        {sectores.map((sector) => (
+                          <option key={sector._id} value={sector._id}>{sector.nombreSector}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                 {index > 0 && <button type="button" onClick={() => eliminarPrecio(index)}><i><FaRegTrashCan /></i></button>}
               </div>
             ))}
@@ -668,7 +733,12 @@ function AdminEventos({ setToken }) {
             type="checkbox"
             name="seleccionAsientos"
             checked={evento.seleccionAsientos}
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange(e);
+              if (e.target.checked && evento.lugar) {
+                cargarSectores(evento.lugar); // 🔥 Cargar sectores sin guardar el evento
+              }
+            }}
           />
           <label>Permitir selección de asientos</label>
         </div>
