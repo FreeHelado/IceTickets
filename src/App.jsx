@@ -22,6 +22,7 @@ import AdminCategorias from "./admin/AdminCategorias";
 import AdminAsientosForm from "./admin/AdminAsientosForm"; 
 import AdminLugaresList from "./admin/AdminLugaresList";
 import AdminLugarForm from "./admin/AdminLugarForm";
+import AdminMapaAsientos from "./admin/AdminMapaAsientos";
 
 import Checkout from "./pages/Checkout"; 
 import MisTickets from "./pages/MisTickets"; 
@@ -82,6 +83,7 @@ function AppContent({ token, setToken, usuario }) {
         <Route path="/admin/categorias" element={token ? <AdminCategorias isAdmin={true} /> : <Navigate to="/login" />} />
         <Route path="/admin/mis-lugares" element={token ? <AdminLugaresList setToken={setToken} /> : <Navigate to="/login" />} />
         <Route path="/admin/asientos/editar/:id" element={<AdminAsientosForm />} /> 
+        <Route path="/admin/asientos/map/:id" element={<AdminMapaAsientos />} /> 
         <Route path="/admin/mis-lugares/crearlugar" element={token ? <AdminLugarForm setToken={setToken} /> : <Navigate to="/login" />} />
         <Route path="/admin/mis-lugares/editar/:id" element={token ? <AdminLugarForm setToken={setToken} /> : <Navigate to="/login" />} />
         

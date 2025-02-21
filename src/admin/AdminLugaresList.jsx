@@ -98,6 +98,10 @@ function AdminLugaresList() {
                     <i><MdOutlineEventSeat /></i>
                     <span>Sectores/Asientos</span>
                   </button>
+                  <button onClick={() => navigate(`/admin/asientos/map/${lugar._id}`)}>
+                    <i><MdOutlineEventSeat /></i>
+                    <span>Mapear Asientos</span>
+                  </button>
                   <button onClick={() => handleDelete(lugar._id)} className="eliminar">
                     <i><FaRegTrashCan /></i>
                     <span>Eliminar</span>

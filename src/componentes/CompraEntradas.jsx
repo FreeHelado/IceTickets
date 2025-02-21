@@ -32,38 +32,38 @@ function CompraEntradas({ precios, aforo, evento }) {
     }, []);
 
     const cerrarCarrito = () => {
-        if (!modalRef.current) return; // ⚠️ Evita errores si modalRef es null
+        if (!modalRef.current) return; 
 
         gsap.to(modalRef.current, {
-            bottom: "-100%", // 🔽 Baja el modal fuera de la pantalla
+            bottom: "-100%", 
             opacity: 0,
             duration: 0.4,
             ease: "power2.in",
             onComplete: () => {
-                modalRef.current.style.visibility = "hidden"; // Ocultamos el modal después de la animación
+                modalRef.current.style.visibility = "hidden";
             },
         });
     };
 
     const mostrarCarrito = () => {
-    if (!modalRef.current) return; // ⚠️ Evita errores si modalRef es null
+    if (!modalRef.current) return; 
 
-    modalRef.current.style.visibility = "visible"; // Asegura que sea visible antes de animar
+    modalRef.current.style.visibility = "visible";
 
         gsap.fromTo(
             modalRef.current,
             {
-                scale: 0.3, // 🌀 Empieza muy pequeño
-                bottom: "-100%", // 📍 Inicia desde abajo
+                scale: 0.3, 
+                bottom: "-100%",
                 opacity: 0,
-                transformOrigin: "bottom left", // 📌 Aparece desde la esquina inferior izquierda
+                transformOrigin: "bottom left",
             },
             {
-                scale: 1, // 🔥 Crece hasta su tamaño normal
-                bottom: "15px", // 📌 Se posiciona en su sitio
+                scale: 1, 
+                bottom: "15px",
                 opacity: 1,
                 duration: 0.8,
-                ease: "elastic.out(1, 0.6)", // 🏀 Rebote suave
+                ease: "elastic.out(1, 0.6)",
             }
         );
     };
@@ -283,17 +283,21 @@ function CompraEntradas({ precios, aforo, evento }) {
                 </div>
           </button>
 
-        {carrito.length > 0 && (             
+          {carrito.length > 0 && (        
+            <>
             <button className="boton-flotante" onClick={mostrarCarrito}>
                 {totalEntradasCarrito > 0 && (
-                    <span>{totalEntradasCarrito}</span>
-                )} 
-                <i><MdOutlineShoppingBag /></i>
-            </button>
-        )}
+                          <span>{totalEntradasCarrito}</span>
+                          
+                      )} 
+                      <i><MdOutlineShoppingBag /></i>
+                      <strong>Finaliza tu pedido</strong>
+                  </button>
+            </>  
+          )}
+   
 
-
-        {/* 🛒 Mostrar carrito */}
+       
         {carrito.length > 0 && (
             <div ref={modalRef} className="carrito">
                   <h3>Tickets en tu Carrito</h3>
@@ -333,7 +337,8 @@ function CompraEntradas({ precios, aforo, evento }) {
                     )}
                     
             </div>
-        )}
+          )}
+        
     </div>
   );
 }

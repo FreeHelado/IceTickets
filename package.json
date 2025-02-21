@@ -26,6 +26,7 @@
     "jodit-react": "^5.2.14",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
+    "konva": "^9.3.18",
     "mongoose": "^8.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
