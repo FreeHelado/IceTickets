@@ -6,7 +6,7 @@ import { FaRegCalendar } from "react-icons/fa";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
 
-function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categoria, lugar }) {
+function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categoria, lugar, estado = "proximo" }) {
   const [nombreLugar, setNombreLugar] = useState("Cargando...");
   const [localidadLugar, setLocalidadLugar] = useState("Cargando...");
   const [categoriaData, setCategoriaData] = useState(null); 
@@ -54,16 +54,22 @@ function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categori
   return (
       <div className="eventos__item">
       <Link to={`/evento/${_id}`}>
+          {["hoy", "mañana", "cancelado", "finalizado"].includes(estado) && (
+          <span className={`estado estado--${estado.toLowerCase()}`}>
+            {estado.toUpperCase()}
+          </span>
+          )}
       <figure>        
         <div className="tagFecha">
           <i><FaRegCalendar /></i>
           <span>{fechaFormateada} - {hora}</span>
         </div>
+
       <img src={`${config.BACKEND_URL}/img/eventos/${imagen}`} alt={`Imagen de ${nombre}`}/>
           </figure>
       </Link>
       <div className="eventos__item--info">
-        {/* 🔥 Mostrar etiqueta de AGOTADO si no hay más entradas */}
+        
         {todasAgotadas && <span className="agotado">AGOTADO</span>}
         <div className="tagCategoria" title={categoriaData?.nombre || "Cargando..."}>
             {categoriaData ? (
@@ -76,6 +82,10 @@ function EventoCard({ _id, nombre, fecha, hora, imagen, stock, precios, categori
             )}
         </div>
         <h2>{nombre}</h2>
+        
+        
+        
+
         <h4>{nombreLugar}, {localidadLugar}</h4>
           <Link to={`/evento/${_id}`}>
             <button disabled={todasAgotadas} className={todasAgotadas ? "agotadoBtn" : ""}>

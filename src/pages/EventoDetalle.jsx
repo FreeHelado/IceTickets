@@ -125,12 +125,18 @@ function EventoDetalle() {
           <figure className="evento__cont--info--img">
             <img src={`${config.BACKEND_URL}/img/eventos/${evento.imagen}`} alt={`Imagen de ${evento.nombre}`} />
             <div className="evento__cont--info--img--data">
+              {/* ✅ Mostrar estado del evento con estilos dinámicos */}
+              {["hoy", "cancelado", "finalizado", "liquidado"].includes(evento.estado) && (
+                <div className={`evento-estado evento-estado--${evento.estado.toLowerCase()}`}>
+                  {evento.estado.toUpperCase()}
+                </div>
+              )}
               <h3>{fechaFormateadaDetalle} - {evento.hora}</h3>
             </div>
           </figure>
           <h1>{evento.nombre}</h1>
           
-          {/* ✅ Mostrar nombre e ícono de la categoría */}
+          
           <div className="evento__cont--info--categoria">
             {categoria ? (
               <>
@@ -141,7 +147,11 @@ function EventoDetalle() {
               "Cargando..."
             )}
           </div>
+         
+          
+
           <div dangerouslySetInnerHTML={{ __html: evento.descripcion }} />
+
 
           
           <section className="evento__cont--info--ficha">
@@ -270,15 +280,26 @@ function EventoDetalle() {
         
         <div ref={lateralRef} className="evento__cont--lateral">
           {todasAgotadas ? (
-            <div className="agotado-box">
+            <div className="noDisponible">
               <h3>Entradas agotadas</h3>
               <p>Lo sentimos, todas las entradas han sido vendidas.</p>
             </div>
+          ) : /* 🔥 Si el evento está cancelado, finalizado o liquidado */
+          ["cancelado", "finalizado", "liquidado"].includes(evento.estado) ? (
+            <div className="noDisponible">
+                  
+              <h3>Este evento ya no está disponible</h3>
+              <div className="alert alert-warning">
+                {evento.estado === "cancelado" && "Este evento ha sido cancelado."}
+                {evento.estado === "finalizado" && "Este evento ya ha finalizado."}
+                {evento.estado === "liquidado" && "Este evento ha sido liquidado."}
+              </div>
+            </div>
           ) : (
             <CompraEntradas precios={evento.precios} aforo={evento.stock?.aforo} evento={{ _id: evento._id, ...evento, lugar }} />
-
           )}
-        </div>
+      </div>
+
 
         
  

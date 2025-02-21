@@ -32,72 +32,42 @@ function CompraEntradas({ precios, aforo, evento }) {
         }
     }, []);
 
-    useEffect(() => {
-    const updateCarritoPos = () => {
-        const esMobile = window.innerWidth < 768; // 🔥 Detectar si es mobile
+        const cerrarCarrito = () => {
+            if (!modalRef.current) return; // ⚠️ Evita errores si modalRef es null
 
-        gsap.set(modalRef.current, {
-            left: esMobile ? "0px" : "15px",
-            bottom: esMobile ? "auto" : "15px", // En mobile no debe estar en bottom
-            top: esMobile ? "-100%" : "auto", // 📌 En mobile, inicia fuera de la pantalla arriba
-            width: esMobile ? "100%" : "500px",
-            borderRadius: esMobile ? "0px" : "10px",
-        });
-    };
+            gsap.to(modalRef.current, {
+                bottom: "-100%", // 🔽 Baja el modal fuera de la pantalla
+                opacity: 0,
+                duration: 0.4,
+                ease: "power2.in",
+                onComplete: () => {
+                    modalRef.current.style.visibility = "hidden"; // Ocultamos el modal después de la animación
+                },
+            });
+        };
 
-    updateCarritoPos(); // Ejecutar una vez al inicio
-    window.addEventListener("resize", updateCarritoPos); // 🔥 Detecta cambios en tamaño
+        const mostrarCarrito = () => {
+        if (!modalRef.current) return; // ⚠️ Evita errores si modalRef es null
 
-    return () => {
-        window.removeEventListener("resize", updateCarritoPos); // Cleanup
-    };
-}, []);
+        modalRef.current.style.visibility = "visible"; // Asegura que sea visible antes de animar
 
-const cerrarCarrito = () => {
-    if (!modalRef.current) return; 
-
-    gsap.to(modalRef.current, {
-        top: "-100%", // 📌 En mobile se va hacia arriba
-        bottom: "auto",
-        opacity: 0,
-        duration: 0.4,
-        ease: "power2.in",
-        onComplete: () => {
-            modalRef.current.style.visibility = "hidden";
-        },
-    });
-};
-
-const mostrarCarrito = () => {
-    if (!modalRef.current) return; 
-
-    modalRef.current.style.visibility = "visible";
-
-    // 🔥 Detectar si es mobile o desktop
-    const esMobile = window.innerWidth <= 768;
-
-    gsap.fromTo(
-        modalRef.current,
-        {
-            scale: 0.3,
-            top: esMobile ? "-100%" : "auto",
-            bottom: esMobile ? "auto" : "-100%",
-            left: esMobile ? "0px" : "auto",
-            opacity: 0,
-            transformOrigin: esMobile ? "top center" : "bottom left",
-        },
-        {
-            scale: 1,
-            top: esMobile ? "0px" : "auto",
-            bottom: esMobile ? "auto" : "15px",
-            left: esMobile ? "0px" : "15px",
-            opacity: 1,
-            duration: 0.8,
-            ease: "elastic.out(1, 0.6)",
-        }
-    );
-};
-
+            gsap.fromTo(
+                modalRef.current,
+                {
+                    scale: 0.3, // 🌀 Empieza muy pequeño
+                    bottom: "-100%", // 📍 Inicia desde abajo
+                    opacity: 0,
+                    transformOrigin: "bottom left", // 📌 Aparece desde la esquina inferior izquierda
+                },
+                {
+                    scale: 1, // 🔥 Crece hasta su tamaño normal
+                    bottom: "15px", // 📌 Se posiciona en su sitio
+                    opacity: 1,
+                    duration: 0.8,
+                    ease: "elastic.out(1, 0.6)", // 🏀 Rebote suave
+                }
+            );
+        };
 
 
 
@@ -128,6 +98,13 @@ const mostrarCarrito = () => {
         localStorage.setItem("carrito", JSON.stringify(carrito));
     }, [carrito]);
 
+    useEffect(() => {
+    if (carrito.length > 0) {
+        mostrarCarrito();
+    }
+}, [carrito]); // 🔥 Se ejecuta cuando `carrito` cambia
+
+
     const aumentarCantidad = (nombre, disponibles) => {
         setCantidades((prev) => {
         const nuevaCantidad = prev[nombre] + 1;
@@ -154,56 +131,56 @@ const mostrarCarrito = () => {
     };
 
     const agregarAlCarrito = () => {
-        if (!evento._id) {  
-            console.error("💀 Error: El evento no tiene un ID válido", evento);
-            return;
-        }
+    if (!evento._id) {  
+        console.error("💀 Error: El evento no tiene un ID válido", evento);
+        return;
+    }
 
-        const nuevasEntradas = precios
-            .filter(precio => cantidades[precio.nombre] > 0)
-            .map(precio => ({
-                idPrecio: precio._id, 
-                nombre: precio.nombre,
-                cantidad: cantidades[precio.nombre],
-                monto: precio.monto,
-                subtotal: cantidades[precio.nombre] * precio.monto,
-                evento: { 
-                    id: evento._id || "", 
-                    nombre: evento.nombre || "Evento sin nombre",
-                    imagen: evento.imagen || "",
-                    fecha: evento.fecha || "",
-                    hora: evento.hora || "",
-                    lugar: evento.lugar.nombre || "Lugar no disponible",
-                    direccion: evento.lugar.direccion || "Dirección no disponible"
-                }
-            }));
-
-        if (nuevasEntradas.length === 0) {
-            Swal.fire({
-                title: "No hay entradas seleccionadas",
-                text: "Selecciona al menos una entrada antes de comprar.",
-                icon: "warning",
-                confirmButtonText: "Entendido",
-            });
-            return;
-        }
-
-        setCarrito(nuevasEntradas);
-        localStorage.setItem("evento", JSON.stringify({
-            id: evento._id,
-            nombre: evento.nombre,
-            imagen: evento.imagen,
-            fecha: evento.fecha,
-            hora: evento.hora,
-            lugar: evento.lugar?.nombre,
-            direccion: evento.lugar?.direccion,
-            logoLugar: evento.lugar?.logo || ""
+    const nuevasEntradas = precios
+        .filter(precio => cantidades[precio.nombre] > 0)
+        .map(precio => ({
+            idPrecio: precio._id, 
+            nombre: precio.nombre,
+            cantidad: cantidades[precio.nombre],
+            monto: precio.monto,
+            subtotal: cantidades[precio.nombre] * precio.monto,
+            evento: { 
+                id: evento._id || "", 
+                nombre: evento.nombre || "Evento sin nombre",
+                imagen: evento.imagen || "",
+                fecha: evento.fecha || "",
+                hora: evento.hora || "",
+                lugar: evento.lugar?.nombre || "Lugar no disponible",
+                direccion: evento.lugar?.direccion || "Dirección no disponible"
+            }
         }));
-        
-        localStorage.setItem("carrito", JSON.stringify(nuevasEntradas));
-        
-    mostrarCarrito();
+
+    if (nuevasEntradas.length === 0) {
+        Swal.fire({
+            title: "No hay entradas seleccionadas",
+            text: "Selecciona al menos una entrada antes de comprar.",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+        });
+        return;
+    }
+
+    setCarrito(nuevasEntradas);
+    localStorage.setItem("evento", JSON.stringify({
+        id: evento._id,
+        nombre: evento.nombre,
+        imagen: evento.imagen,
+        fecha: evento.fecha,
+        hora: evento.hora,
+        lugar: evento.lugar?.nombre,
+        direccion: evento.lugar?.direccion,
+        logoLugar: evento.lugar?.logo || ""
+    }));
+
+    localStorage.setItem("carrito", JSON.stringify(nuevasEntradas));
     };
+
+
     JSON.parse(localStorage.getItem("carrito"))
 
     const totalEntradasCarrito = carrito.reduce((acc, item) => acc + item.cantidad, 0);
@@ -315,6 +292,7 @@ const mostrarCarrito = () => {
    
 
        
+        {/* 🛒 Mostrar carrito */}
         {carrito.length > 0 && (
             <div ref={modalRef} className="carrito">
                   <h3>Tickets en tu Carrito</h3>
@@ -354,8 +332,7 @@ const mostrarCarrito = () => {
                     )}
                     
             </div>
-          )}
-        
+        )}
     </div>
   );
 }

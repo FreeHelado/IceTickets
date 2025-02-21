@@ -27,6 +27,47 @@
             }
         }
         
+        .estado {
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            border-radius: 10px;
+            display: flex;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 5;
+            &--proximo {
+                background-color: #007bff;
+                color: white;
+            }
+    
+            &--mañana {
+                background-color: #ffc107;
+                color: black;
+            }
+    
+            &--hoy {
+                background-color: $amarelo;
+                color: $colorPrimario;
+            }
+    
+            &--finalizado {
+                background-color: #6c757d;
+                color: white;
+            }
+    
+            &--cancelado {
+                background-color: #dc3545;
+                color: white;
+            }
+    
+            &--liquidado {
+                background-color: #17a2b8;
+                color: white;
+            }
+        }
+
         figure {
             overflow: hidden;
             height: 280px;
@@ -50,6 +91,8 @@
                 background-image: linear-gradient(to top, rgba(0, 0, 0, .75) 0%, rgba(0, 0, 0, 0) 100%);
                 z-index: 1;
             }
+
+            
 
             .tagFecha {
                 @include flex();
@@ -78,6 +121,7 @@
                 @include hover();
                 z-index: 0;
             }
+  
         }
 
         &--info {
@@ -142,6 +186,8 @@
             }
 
             
+
+
         }
 
         .tagCategoria {
