@@ -142,12 +142,12 @@
                         position: relative; 
                         
                         ////// guardar solucion para edicion ///
-                        // &.ocupado {
-                        //     background-color: $rojo;
-                        // }
-                        // &.libre {
-                        //     background-color: $verde;
-                        // }
+                        &.ocupado {
+                            background-color: $rojo;
+                        }
+                        &.libre {
+                            background-color: claro($verde, 20);
+                        }
                         button {
                             position: absolute;
                             top: -5px;

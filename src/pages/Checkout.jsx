@@ -136,6 +136,39 @@ function Checkout({ usuario }) {
     const navigate = useNavigate();
 
     const confirmarCompra = async () => {
+        const orden = {
+        comprador: {
+            nombre: comprador.nombre,
+            email: comprador.email,
+            telefono: comprador.telefono,
+        },
+        evento: {
+            id: evento.id || evento._id,
+            nombre: evento.nombre,
+            fecha: evento.fecha,
+            hora: evento.hora,
+            lugar: evento.lugar,
+            direccion: evento.direccion
+        },
+        tickets: formularios.map(ticket => ({
+            nombre: ticket.nombre,
+            email: ticket.email,
+            telefono: ticket.telefono,
+            documento: ticket.documento,
+            tipoEntrada: ticket.tipoEntrada,
+            idPrecio: ticket.idPrecio,  // ✅ Enviar `idPrecio`
+            monto: ticket.monto,
+            idVerificador: Math.random().toString(36).substr(2, 9),
+            sector: ticket.sector,
+            fila: ticket.fila,
+            asiento: ticket.asiento
+        })),
+        total: carrito.reduce((acc, item) => acc + item.subtotal, 0),
+        metodoPago: "Tarjeta",
+    };
+
+        console.log("🔥 Orden generada antes del envío:", JSON.stringify(orden, null, 2));
+
         try {
             const token = localStorage.getItem("token"); // 📌 Obtener token del usuario logueado
             if (!token) {
@@ -155,7 +188,6 @@ function Checkout({ usuario }) {
                     fecha: evento.fecha,
                     hora: evento.hora,
                     lugar: evento.lugar,
-                    imagen: evento.imagen,
                     direccion: evento.direccion
                 },
                 tickets: formularios.map(ticket => ({
@@ -164,16 +196,21 @@ function Checkout({ usuario }) {
                     telefono: ticket.telefono,
                     documento: ticket.documento,
                     tipoEntrada: ticket.tipoEntrada,
-                    idPrecio: ticket.idPrecio, // 🔥 Ahora enviamos el _id del precio también
+                    idPrecio: ticket.idPrecio,  // ✅ Enviar `idPrecio`
                     monto: ticket.monto,
-                    idVerificador: Math.random().toString(36).substr(2, 9) // 🔥 Código único
+                    idVerificador: Math.random().toString(36).substr(2, 9), // 🔥 Código único
+                    sector: ticket.sector,  // ✅ Agregado
+                    fila: ticket.fila,      // ✅ Agregado
+                    asiento: ticket.asiento // ✅ Agregado
                 })),
                 total: carrito.reduce((acc, item) => acc + item.subtotal, 0),
                 metodoPago: "Tarjeta",
             };
 
 
+
             const response = await fetch(`${config.BACKEND_URL}/api/ordenes`, {
+                
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

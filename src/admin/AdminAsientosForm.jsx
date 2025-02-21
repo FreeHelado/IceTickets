@@ -203,9 +203,9 @@ function AdminAsientosForm() {
                                         className={`asientos__item ${asiento.ocupado ? "ocupado" : "libre"}`}
                                     >
                                         <span>{asiento.nombreAsiento}</span>
-                                    
-                                        {asientoIndex === fila.asientos.length - 1 && (
-                                        <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>x</button>
+
+                                        {asientoIndex === fila.asientos.length - 1 && !asiento.ocupado && (
+                                            <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>x</button>
                                         )}
                                     </div>
                                 ))}
