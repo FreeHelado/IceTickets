@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import config from "../config";
 import Swal from "sweetalert2";
+import { Link } from "react-router-dom";
+import AdminTools from "./AdminTools";
 
 function AdminLugarForm() {
     const { id } = useParams();
@@ -191,6 +193,10 @@ function AdminLugarForm() {
 
                 <button type="submit" className="enviarEvento">{id ? "Guardar Cambios" : "Crear Lugar"}</button>
             </form>
+
+            <div className="adminPanel__cont--zona3 toolAdminFormularios">
+                <AdminTools />
+            </div>
         </main>
     );
 }

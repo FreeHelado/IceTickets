@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import config from "../config";
 import Swal from "sweetalert2";
 import { FaPlus } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import AdminTools from "./AdminTools";
 
 function AdminAsientosEvento() {
   const { id } = useParams(); // ID del evento
@@ -270,6 +272,11 @@ function AdminAsientosEvento() {
           <small>Libre</small>
         </div>
       </div>
+
+      <div className="adminPanel__cont--zona3 toolAdminFormularios">
+                <AdminTools />
+            </div>
+
     </main>
   );
 }

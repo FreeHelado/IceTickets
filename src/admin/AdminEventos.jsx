@@ -7,6 +7,8 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es";
+import AdminTools from "./AdminTools";
+import { Link } from "react-router-dom";
 
 /// iconos ////
 import { FaRegTrashCan, FaDog } from "react-icons/fa6";
@@ -1014,7 +1016,11 @@ function AdminEventos({ setToken }) {
         
 
         <button type="submit" className="enviarEvento">{id ? "Actualizar Evento" : "Guardar Evento"}</button>
-        </form>
+      </form>
+      
+      <div className="adminPanel__cont--zona3 toolAdminFormularios">
+            <AdminTools />
+      </div>
     </main>
   );
 }
