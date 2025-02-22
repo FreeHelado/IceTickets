@@ -49,22 +49,22 @@ function AdminAsientosEvento() {
   };
 
   const handleRemoveAsiento = (sectorIndex, filaIndex) => {
-      const updatedSectores = [...sectores];
-      const fila = updatedSectores[sectorIndex].filas[filaIndex];
+    const updatedSectores = [...sectores];
+    const fila = updatedSectores[sectorIndex].filas[filaIndex];
 
-      if (fila.asientos.length > 0) {
-          const ultimoAsiento = fila.asientos[fila.asientos.length - 1];
+    // Buscar el último asiento que esté libre
+    const ultimoLibreIndex = fila.asientos.map(a => a.ocupado).lastIndexOf(false);
 
-          // Verificar si el último asiento está ocupado
-          if (ultimoAsiento.ocupado) {
-              Swal.fire("Error", "No puedes eliminar un asiento que está ocupado.", "error");
-              return;
-          }
+    if (ultimoLibreIndex === -1) {
+      Swal.fire("Error", "No hay asientos libres para eliminar.", "error");
+      return;
+    }
 
-          fila.asientos.pop();
-          setSectores(updatedSectores);
-      }
+    // Eliminar el último asiento libre
+    fila.asientos.splice(ultimoLibreIndex, 1);
+    setSectores(updatedSectores);
   };
+
     
     const handleRemoveAllAsientos = (sectorIndex, filaIndex) => {
         const updatedSectores = [...sectores];
@@ -81,6 +81,15 @@ function AdminAsientosEvento() {
     };
 
   const handleRemoveFila = (sectorIndex, filaIndex) => {
+    const updatedSectores = [...sectores];
+    const fila = updatedSectores[sectorIndex].filas[filaIndex];
+
+    // Verificar si hay asientos ocupados
+    if (fila.asientos.some(asiento => asiento.ocupado)) {
+      Swal.fire("Error", "No puedes eliminar esta fila porque hay asientos ocupados.", "error");
+      return;
+    }
+
     Swal.fire({
       title: "¿Eliminar esta fila?",
       text: "Esto eliminará la fila y sus asientos.",
@@ -90,7 +99,6 @@ function AdminAsientosEvento() {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        const updatedSectores = [...sectores];
         updatedSectores[sectorIndex].filas.splice(filaIndex, 1);
         setSectores(updatedSectores);
         Swal.fire("Eliminado", "La fila ha sido eliminada.", "success");
@@ -98,7 +106,19 @@ function AdminAsientosEvento() {
     });
   };
 
+
   const handleRemoveSector = (sectorIndex) => {
+    const updatedSectores = [...sectores];
+    const sector = updatedSectores[sectorIndex];
+
+    // Verificar si hay asientos ocupados en alguna fila del sector
+    const hayAsientosOcupados = sector.filas.some(fila => fila.asientos.some(asiento => asiento.ocupado));
+
+    if (hayAsientosOcupados) {
+      Swal.fire("Error", "No puedes eliminar este sector porque hay asientos ocupados.", "error");
+      return;
+    }
+
     Swal.fire({
       title: "⚠️ ¿Estás seguro?",
       html: `<span>Se eliminarán todos los datos de este sector.</span><br/><br/>Escribe: <strong>eliminar-sector</strong>`,
@@ -113,13 +133,13 @@ function AdminAsientosEvento() {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        const updatedSectores = [...sectores];
         updatedSectores.splice(sectorIndex, 1);
         setSectores(updatedSectores);
         Swal.fire("Eliminado", "El sector ha sido eliminado.", "success");
       }
     });
   };
+
 
   const handleSave = async () => {
     try {
@@ -198,17 +218,20 @@ function AdminAsientosEvento() {
                   <div className="asientos__cont">
                     <h6>Asientos de la Fila: {fila.nombreFila}</h6>
                     <div className="asientos">
-                      {fila.asientos.map((asiento, asientoIndex) => (
-                        <div
-                          key={asientoIndex}
-                          className={`asientos__item ${asiento.ocupado ? "ocupado" : "libre"}`}
-                        >
-                          <span>{asiento.nombreAsiento}</span>
-                          {asientoIndex === fila.asientos.length - 1 && !asiento.ocupado && (
-                            <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>x</button>
-                          )}
-                        </div>
-                      ))}
+                      {fila.asientos.map((asiento, asientoIndex) => {
+                        // Encontrar el último asiento libre en la fila
+                        const ultimoLibreIndex = fila.asientos.map(a => a.ocupado).lastIndexOf(false);
+
+                        return (
+                          <div key={asientoIndex} className={`asientos__item ${asiento.ocupado ? "ocupado" : "libre"}`}>
+                            <span>{asiento.nombreAsiento}</span>
+                            {/* Mostrar el botón SOLO en el último asiento libre */}
+                            {asientoIndex === ultimoLibreIndex && (
+                              <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>x</button>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
 
                     <div className="asientos-tools">
