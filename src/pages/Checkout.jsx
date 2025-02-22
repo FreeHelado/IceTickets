@@ -1,7 +1,7 @@
 import config from "../config";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import esLocale from "date-fns/locale/es";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
@@ -9,37 +9,19 @@ import { useNavigate } from "react-router-dom";
 function Checkout({ usuario }) {
     const { state } = useLocation();
     const carritoGuardado = JSON.parse(localStorage.getItem("carrito") || "[]");
-
-    
-
-
-    // ✅ Evita la doble declaración, reasignando si state no tiene carrito
     const carrito = state?.carrito ?? carritoGuardado;
-
-    // 🛒 Extraer datos del usuario logueado
-    // Aseguramos que el usuario logueado sea el comprador
     const comprador = usuario || { nombre: "", email: "", telefono: "" };
-
-    // 🔥 Extraemos el evento directamente desde el carrito
     const evento = carrito.length > 0 ? carrito[0].evento : JSON.parse(localStorage.getItem("evento") || "{}");
-
     const logoLugar = evento.logoLugar || ""; // ✅ Extrae el logo del lugar
-
-
-    // 📅 Formatear fecha
     const fechaFormateada = evento?.fecha 
-    ? format(new Date(evento.fecha), "EEEE d 'de' MMMM yyyy", { locale: esLocale }) 
-    : "";
-
-
-    // ✅ Manejo seguro de lugar y dirección
+        ? format(new Date(evento.fecha), "EEEE d 'de' MMMM yyyy", { locale: esLocale }) 
+        : "";
     const lugar = evento?.lugar || "Lugar no disponible";
     const direccion = evento?.direccion || "Dirección no disponible";
-
+    const navigate = useNavigate();
     
     const [formularios, setFormularios] = useState(
         carrito.flatMap(item => 
-            
             Array(item.cantidad).fill().map(() => ({
                 nombre: "",
                 email: "",
@@ -54,11 +36,42 @@ function Checkout({ usuario }) {
             }))
         )
     );
+    const [ticketUsuario, setTicketUsuario] = useState(null);
+    const [filasPorSector, setFilasPorSector] = useState({});
+    
+    useEffect(() => {
+        carrito.forEach(item => {
+            if (item.sector) {
+                obtenerFilasPorSector(evento.id, item.sector);
+            }
+        }); 
+    }, [carrito, evento.id]);
+    
+    const obtenerFilasPorSector = async (eventoId, sectorId) => {
+        if (!sectorId) return;
+        try {
+            const response = await fetch(`${config.BACKEND_URL}/api/eventos/${eventoId}/sectores`);
+            if (!response.ok) throw new Error(`Error ${response.status}: No se encontró el sector`);
+            const sectores = await response.json();
+            const sectorEncontrado = sectores.find(s => s._id === sectorId);
+            if (sectorEncontrado) {
+                setFilasPorSector(prev => ({
+                    ...prev,
+                    [sectorId]: sectorEncontrado.filas || []
+                }));
+            }
+        } catch (error) {
+            console.error(`❌ Error al obtener filas del sector ${sectorId}:`, error);
+        }
+    };
 
-
-    const [ticketUsuario, setTicketUsuario] = useState(null); // Guardará el índice del ticket con los datos del comprador
-
-    //  Manejar cambios en los formularios
+    const handleFilaChange = (index, e) => {
+        const { value } = e.target;
+        setFormularios(prev => prev.map((form, i) =>
+            i === index ? { ...form, fila: value, asiento: "" } : form
+        ));
+    };
+    
     const handleInputChange = (index, e) => {
         const { name, value } = e.target;
         setFormularios(prev => prev.map((form, i) => 
@@ -66,163 +79,79 @@ function Checkout({ usuario }) {
         ));
     };
 
-    const handleFilaChange = (index, e) => {
-        const { value } = e.target;
-
-        setFormularios(prev => prev.map((form, i) =>
-            i === index ? { ...form, fila: value, asiento: "" } : form
-        ));
-    };
-
-    // 🚀 Manejo del checkbox "Es para mí"
     const handleEsParaMi = (index) => {
         setFormularios(prev => prev.map((form, i) => 
             i === index 
                 ? { ...form, nombre: comprador.nombre, email: comprador.email, telefono: comprador.telefono }
-                : (i === ticketUsuario ? { ...form, nombre: "", email: "", telefono: "" } : form) // Limpia el anterior
+                : (i === ticketUsuario ? { ...form, nombre: "", email: "", telefono: "" } : form)
         ));
         setTicketUsuario(index);
     };
 
-    const handleSectorChange = (index, e) => {
-        const { value } = e.target;
-
-        setFormularios(prev => prev.map((form, i) =>
-            i === index ? { ...form, sector: value, fila: "", asiento: "" } : form
-        ));
-    };
-
-
-    // 🚀 Cargar filas cuando llega el carrito
-    useEffect(() => {
-        
-        carrito.forEach(item => {
-            if (item.sector) {
-                obtenerFilasPorSector(item.sector);
-            }
-        });
-    }, [carrito]);
-
-
-    /// Obtener Filas de cada sector /// 
-    const [filasPorSector, setFilasPorSector] = useState({});
-    
-    const obtenerFilasPorSector = async (sectorId) => {
-        if (!sectorId) return;
-
-        try {
-            
-            const response = await fetch(`${config.BACKEND_URL}/api/lugares/sector/${sectorId}`);
-            if (!response.ok) throw new Error(`Error ${response.status}: No se encontró el sector`);
-
-            const sector = await response.json();
-
-            setFilasPorSector(prev => {
-                const nuevoEstado = {
-                    ...prev,
-                    [sectorId]: sector.filas || [] // 🔥 Guarda filas con el sector como key
-                };
-                console.log("📦 Estado actualizado de filasPorSector:", nuevoEstado);
-                return nuevoEstado;
-            });
-
-        } catch (error) {
-            console.error(`❌ Error al obtener filas del sector ${sectorId}:`, error);
-        }
-    };
-
-
-    /// POST de la compra
-    const navigate = useNavigate();
-
     const confirmarCompra = async () => {
-        const orden = {
-        comprador: {
-            nombre: comprador.nombre,
-            email: comprador.email,
-            telefono: comprador.telefono,
-        },
-        evento: {
-            id: evento.id || evento._id,
-            nombre: evento.nombre,
-            fecha: evento.fecha,
-            hora: evento.hora,
-            lugar: evento.lugar,
-            direccion: evento.direccion
-        },
-        tickets: formularios.map(ticket => ({
-            nombre: ticket.nombre,
-            email: ticket.email,
-            telefono: ticket.telefono,
-            documento: ticket.documento,
-            tipoEntrada: ticket.tipoEntrada,
-            idPrecio: ticket.idPrecio,  // ✅ Enviar `idPrecio`
-            monto: ticket.monto,
-            idVerificador: Math.random().toString(36).substr(2, 9),
-            sector: ticket.sector,
-            fila: ticket.fila,
-            asiento: ticket.asiento
-        })),
-        total: carrito.reduce((acc, item) => acc + item.subtotal, 0),
-        metodoPago: "Tarjeta",
-    };
+        // Verificar si algún asiento seleccionado ya está ocupado o se eligió más de una vez en el mismo checkout
+        const asientosSeleccionados = new Set();
+        const asientosDuplicados = formularios.some(ticket => {
+            const key = `${ticket.sector}-${ticket.fila}-${ticket.asiento}`;
+            if (asientosSeleccionados.has(key)) return true;
+            asientosSeleccionados.add(key);
+            return false;
+        });
 
-        console.log("🔥 Orden generada antes del envío:", JSON.stringify(orden, null, 2));
+        if (asientosDuplicados) {
+            Swal.fire({ title: "Error", text: "No puedes seleccionar el mismo asiento para más de un ticket.", icon: "error" });
+            return;
+        }
+
+        const orden = {
+            comprador: {
+                nombre: comprador.nombre,
+                email: comprador.email,
+                telefono: comprador.telefono,
+            },
+            evento: {
+                id: evento.id || evento._id,
+                nombre: evento.nombre,
+                fecha: evento.fecha,
+                hora: evento.hora,
+                lugar: evento.lugar,
+                direccion: evento.direccion
+            },
+            tickets: formularios.map(ticket => ({
+                nombre: ticket.nombre,
+                email: ticket.email,
+                telefono: ticket.telefono,
+                documento: ticket.documento,
+                tipoEntrada: ticket.tipoEntrada,
+                idPrecio: ticket.idPrecio,
+                monto: ticket.monto,
+                idVerificador: Math.random().toString(36).substr(2, 9),
+                sector: ticket.sector,
+                fila: ticket.fila,
+                asiento: ticket.asiento
+            })),
+            total: carrito.reduce((acc, item) => acc + item.subtotal, 0),
+            metodoPago: "Tarjeta",
+        };
 
         try {
-            const token = localStorage.getItem("token"); // 📌 Obtener token del usuario logueado
+            const token = localStorage.getItem("token");
             if (!token) {
                 Swal.fire({ title: "Error", text: "Usuario no autenticado", icon: "error" });
                 return;
             }
             
-            const orden = {
-                comprador: {
-                    nombre: comprador.nombre,
-                    email: comprador.email,
-                    telefono: comprador.telefono,
-                },
-                evento: {
-                    id: evento.id || evento._id, // 🛠️ Asegurar que haya un ID
-                    nombre: evento.nombre,
-                    fecha: evento.fecha,
-                    hora: evento.hora,
-                    lugar: evento.lugar,
-                    direccion: evento.direccion
-                },
-                tickets: formularios.map(ticket => ({
-                    nombre: ticket.nombre,
-                    email: ticket.email,
-                    telefono: ticket.telefono,
-                    documento: ticket.documento,
-                    tipoEntrada: ticket.tipoEntrada,
-                    idPrecio: ticket.idPrecio,  // ✅ Enviar `idPrecio`
-                    monto: ticket.monto,
-                    idVerificador: Math.random().toString(36).substr(2, 9), // 🔥 Código único
-                    sector: ticket.sector,  // ✅ Agregado
-                    fila: ticket.fila,      // ✅ Agregado
-                    asiento: ticket.asiento // ✅ Agregado
-                })),
-                total: carrito.reduce((acc, item) => acc + item.subtotal, 0),
-                metodoPago: "Tarjeta",
-            };
-
-
-
             const response = await fetch(`${config.BACKEND_URL}/api/ordenes`, {
-                
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: token, // 🔥 Mandar token en el header
+                    Authorization: token,
                 },
                 body: JSON.stringify(orden),
             });
 
             const data = await response.json();
-
             if (response.ok) {
-                // ✅ Borrar carrito del localStorage cuando la compra sea exitosa
                 localStorage.removeItem("carrito");
                 await Swal.fire({
                     title: "Éxito",
@@ -230,8 +159,7 @@ function Checkout({ usuario }) {
                     icon: "success",
                     confirmButtonText: "Aceptar"
                 });
-
-                navigate("/"); // ✅ Redirige a la home después de aceptar
+                navigate("/");
             } else {
                 Swal.fire({ title: "Error", text: data.message || "Hubo un error", icon: "error" });
             }
@@ -240,21 +168,6 @@ function Checkout({ usuario }) {
             Swal.fire({ title: "Error", text: "No se pudo procesar la compra", icon: "error" });
         }
     };
-
-
-
-
-
-    useEffect(() => {
-        // 🔹 Guardar en localStorage para persistencia
-        if (evento) localStorage.setItem("evento", JSON.stringify(evento));
-        if (carrito.length > 0) localStorage.setItem("carrito", JSON.stringify(carrito));
-    }, [evento, carrito]);
-
-    if (!evento || !evento.nombre) {
-        return <h2>No hay evento seleccionado</h2>;
-    }
-
 
 
     return (
@@ -297,9 +210,7 @@ function Checkout({ usuario }) {
                 </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); confirmarCompra(); }}>
-                
-                
+            <form onSubmit={(e) => { e.preventDefault(); confirmarCompra(); }}>   
                 <div className="pasoCheckOut">
                     <div className="pasoCheckOut__tit">
                         <span>1</span>
@@ -345,26 +256,24 @@ function Checkout({ usuario }) {
                                     <input type="text" name="documento" placeholder="Documento de Identidad" value={form.documento} onChange={(e) => handleInputChange(index, e)} required />
                                 </div>
 
-                                {form.sector && Array.isArray(filasPorSector[form.sector]) && filasPorSector[form.sector].length > 0 && (
-                                    <div className="entradasForm__item--campo">
-                                        <label htmlFor="fila">Fila</label>
-                                        <select
-                                            name="fila"
-                                            value={form.fila || ""}
-                                            onChange={(e) => handleFilaChange(index, e)}
-                                            required
-                                        >
-                                            <option value="">Selecciona una fila</option>
-                                            {filasPorSector[form.sector].map((fila) => (
-                                                <option key={fila._id} value={fila.nombreFila}>
-                                                    {fila.nombreFila}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
+                                <div className="entradasForm__item--campo">
+                                    <label htmlFor="fila">Fila</label>
+                                    <select
+                                        name="fila"
+                                        value={form.fila || ""}
+                                        onChange={(e) => handleFilaChange(index, e)}
+                                        required
+                                    >
+                                        <option value="">Selecciona una fila</option>
+                                        {filasPorSector[form.sector]?.map((fila) => (
+                                            <option key={fila._id} value={fila.nombreFila}>
+                                                {fila.nombreFila}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                                {form.fila && filasPorSector[form.sector]?.some(f => f.nombreFila === form.fila) && (
+                                {form.fila && (
                                     <div className="entradasForm__item--campo">
                                         <label htmlFor="asiento">Asiento</label>
                                         <select

@@ -322,3 +322,31 @@ button {
         }
     }
 }
+
+.refeAsientos {
+    position: fixed;
+    left: 25px;
+    bottom: 25px;
+    @include flex();
+
+    .asientos__item {
+            width: fit-content;
+            @include flex(10px);
+            padding: 10px 15px;
+            border-radius: 10px;
+            background-color: claro($colorSecundario, 10%);
+            color: #fff;
+            position: relative;
+    
+            ////// guardar solucion para edicion ///
+            &.ocupado {
+                background-color: $rojo;
+            }
+    
+            &.libre {
+                background-color: claro($verde, 20);
+                color: oscuro($verde, 20);
+            }
+        }
+   
+}

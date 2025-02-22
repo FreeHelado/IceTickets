@@ -49,21 +49,36 @@ function AdminAsientosEvento() {
   };
 
   const handleRemoveAsiento = (sectorIndex, filaIndex) => {
-    const updatedSectores = [...sectores];
-    const fila = updatedSectores[sectorIndex].filas[filaIndex];
+      const updatedSectores = [...sectores];
+      const fila = updatedSectores[sectorIndex].filas[filaIndex];
 
-    if (fila.asientos.length > 0) {
-      fila.asientos.pop();
-      setSectores(updatedSectores);
-    }
-    };
+      if (fila.asientos.length > 0) {
+          const ultimoAsiento = fila.asientos[fila.asientos.length - 1];
+
+          // Verificar si el último asiento está ocupado
+          if (ultimoAsiento.ocupado) {
+              Swal.fire("Error", "No puedes eliminar un asiento que está ocupado.", "error");
+              return;
+          }
+
+          fila.asientos.pop();
+          setSectores(updatedSectores);
+      }
+  };
     
     const handleRemoveAllAsientos = (sectorIndex, filaIndex) => {
         const updatedSectores = [...sectores];
-        updatedSectores[sectorIndex].filas[filaIndex].asientos = []; // 🔥 Borra todos los asientos
+        const fila = updatedSectores[sectorIndex].filas[filaIndex];
+
+        // Verificar si hay asientos ocupados
+        if (fila.asientos.some(asiento => asiento.ocupado)) {
+            Swal.fire("Error", "No puedes eliminar todos los asientos porque hay asientos ocupados.", "error");
+            return;
+        }
+
+        fila.asientos = [];
         setSectores(updatedSectores);
     };
-
 
   const handleRemoveFila = (sectorIndex, filaIndex) => {
     Swal.fire({
@@ -224,6 +239,14 @@ function AdminAsientosEvento() {
         <span> Agregar Sector</span>
       </button>
       <button onClick={handleSave} className="enviarCambios">Guardar Cambios</button>
+      <div className="refeAsientos">
+        <div className="asientos__item ocupado">
+          <small>Ocupado</small>
+        </div>
+        <div className="asientos__item libre">
+          <small>Libre</small>
+        </div>
+      </div>
     </main>
   );
 }
