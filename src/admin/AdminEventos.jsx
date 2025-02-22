@@ -221,6 +221,7 @@ function AdminEventos({ setToken }) {
       try {
         const response = await fetch(`${config.BACKEND_URL}/api/eventos/${id}`);
         const data = await response.json();
+        console.log("📌 Datos del evento:", data); // 👀 Verificar qué devuelve el backend
         if (!data) return;
 
         // ✅ Cargar emails de sociosProductores en la lista
@@ -273,12 +274,29 @@ function AdminEventos({ setToken }) {
             transporte: data.infoAdicional?.transporte || ""
           }
         });
+        // ✅ Usamos la nueva ruta para obtener solo el email
+        if (data.vendedor) {
+          try {
+            console.log(`🔍 Buscando email del vendedor en: ${config.BACKEND_URL}/api/usuarios/${data.vendedor}/email`);
+            
+            const resVendedor = await fetch(`${config.BACKEND_URL}/api/usuarios/${data.vendedor}/email`);
+            const vendedorData = await resVendedor.json();
+
+
+            setVendedorEmail(vendedorData.email || "Email no disponible");
+          } catch (error) {
+            console.error("❌ Error al obtener el email del vendedor:", error);
+            setVendedorEmail("Email no disponible"); // ✅ Para evitar que quede vacío
+          }
+        }
+
       } catch (error) {
         console.error("❌ Error al cargar el evento:", error);
       }
     };
 
     if (id) fetchEvento();
+
   }, [id]);
 
   const handleFileChange = (e) => {

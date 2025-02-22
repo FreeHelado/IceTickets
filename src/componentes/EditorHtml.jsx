@@ -23,8 +23,9 @@ const EditorDescripcion = ({ evento, setEvento }) => {
       <label htmlFor="descripcion">Descripción del Evento</label>
       <JoditEditor
         ref={editor}
+        value={evento.descripcion} // ✅ Ahora el editor inicia con la descripción actual
         config={config}
-        onBlur={(newContent) => setEvento((prev) => ({ ...prev, descripcion: newContent }))} // 🔥 Solo actualiza el estado cuando se pierde el foco
+        onChange={(newContent) => setEvento((prev) => ({ ...prev, descripcion: newContent }))} // ✅ Actualiza en cada cambio
       />
     </div>
   );
