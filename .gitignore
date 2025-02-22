@@ -1,4 +1,4 @@
-# Logs
+# Logs y caché
 logs
 *.log
 npm-debug.log*
@@ -7,20 +7,37 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node modules (Frontend y Backend)
 node_modules
-/backend
+backend/node_modules
+
+# Builds y distribuciones
 dist
 dist-ssr
+backend/dist
+
+# Archivos sensibles
 *.local
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+backend/.env
+
+# Archivos innecesarios
+.DS_Store
+Thumbs.db
+
+# Directorios específicos del frontend/backend
 public/img/eventos/
 public/img/lugares/
 
-# Editor directories and files
+# Configuración de editores
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
