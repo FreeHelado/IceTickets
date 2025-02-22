@@ -7,7 +7,10 @@ import { FaPlus } from "react-icons/fa";
 function AdminAsientosForm() {
   const { id } = useParams(); // ID del lugar
   const navigate = useNavigate();
-  const [sectores, setSectores] = useState([]);
+const [sectores, setSectores] = useState([]);
+    
+    
+
 
   useEffect(() => {
     const fetchSectores = async () => {

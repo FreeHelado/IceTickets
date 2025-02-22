@@ -113,6 +113,10 @@ function AdminEventosList() {
                       <i><FaChartLine /></i>
                       <span>Ventas</span>
                     </Link>
+                    <Link to={`/admin/evento/asientos/${evento._id}`}>
+                      <i><FaRegPenToSquare /></i>
+                      <span>Editar Asientos</span>
+                    </Link>
 
                     <div onClick={() => handleDelete(evento._id)} className="borrarEvento">
                         <i><FaRegTrashCan /></i>

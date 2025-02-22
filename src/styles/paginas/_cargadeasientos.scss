@@ -147,6 +147,7 @@
                         }
                         &.libre {
                             background-color: claro($verde, 20);
+                            color: oscuro($verde, 20);
                         }
                         button {
                             position: absolute;
