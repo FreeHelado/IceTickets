@@ -38,7 +38,7 @@
             }
     
             &--data {
-                @include flexColumn(15px);
+                @include flexColumn(10px);
                 position: absolute;
                 bottom: 0px;
                 left: 0px;
@@ -49,7 +49,7 @@
                 width: 100%;
     
                 &--titulo {
-                    @include flexColumn(4px);
+                    @include flexColumn(0px);
     
                     span {
                         font-size: 18px;
@@ -69,12 +69,12 @@
                         padding: 10px;
     
                         i {
-                            font-size: 20px;
+                            font-size: 18px;
                         }
 
                         span {
                             font-weight: 500;
-                            font-size: 14px;
+                            font-size: 13px;
                         }
     
                         &:hover {

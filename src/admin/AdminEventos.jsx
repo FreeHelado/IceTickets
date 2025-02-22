@@ -32,6 +32,7 @@ function AdminEventos({ setToken }) {
     categoria: "",
     publico: false,
     seleccionAsientos: false,
+    sectores: [],  // 🔥 Ahora siempre existe como array
     tags: {
       todoPublico: false,
       noMenores: false,
@@ -199,30 +200,13 @@ function AdminEventos({ setToken }) {
       .catch((error) => console.error("❌ Error al obtener categorías:", error));
   }, []);
 
-  // ✅ Estado para almacenar los sectores del lugar seleccionado
-  const [sectores, setSectores] = useState([]);
 
-  const cargarSectores = async (idLugar) => {
-    if (!idLugar) return;
-
-    try {
-      const response = await fetch(`${config.BACKEND_URL}/api/lugares/${idLugar}`);
-      const data = await response.json();
-      if (data.sectores) {
-        setSectores(data.sectores); // Guardamos los sectores disponibles
-      }
-    } catch (error) {
-      console.error("❌ Error al cargar sectores:", error);
-    }
-  };
-
-  // ✅ Solo llamamos `cargarSectores` cuando cambia `evento.lugar`
+ 
   useEffect(() => {
     if (evento.lugar && lugares.length > 0) {
       const lugarEncontrado = lugares.find((l) => l._id === evento.lugar);
       if (lugarEncontrado) {
         setBusquedaLugar(lugarEncontrado.nombre); // 🔥 Mostrar el nombre en el input
-        cargarSectores(evento.lugar); // Cargar sectores del lugar
       }
     }
   }, [evento.lugar, lugares]);
@@ -267,6 +251,7 @@ function AdminEventos({ setToken }) {
           vendedor: data.vendedor || "",
           publico: data.publico || false,
           seleccionAsientos: data.seleccionAsientos || false,
+          sectores: data.sectores || [],  // 🔥 Aseguramos que los sectores vengan del backend
           tags: {
             todoPublico: data.tags?.todoPublico || false,
             noMenores: data.tags?.noMenores || false,
@@ -404,7 +389,6 @@ function AdminEventos({ setToken }) {
     setBusquedaLugar(lugar.nombre); // Mostrar el nombre en el input
     setEvento((prev) => ({ ...prev, lugar: lugar._id })); // Guardar el ID en el evento
     setFiltroLugares([]); // Ocultar lista de opciones
-    cargarSectores(lugar._id); // Cargar sectores del lugar seleccionado
   };
 
 
@@ -442,47 +426,48 @@ function AdminEventos({ setToken }) {
 
     // ✅ Construir el objeto `evento` con la nueva estructura
     const eventoData = {
-    nombre: evento.nombre,
-    fecha: evento.fecha.toISOString(),
-    hora: evento.hora,
-    descripcion: evento.descripcion,
-    stock: {
-      aforo: evento.stock.aforo,
-      vendidas: evento.stock.vendidas || 0,
-    },
-    estado: evento.estado,
-    imagen: imageName,
-    precios: evento.precios.map((precio) => ({
-      nombre: precio.nombre,
-      monto: precio.monto,
-      disponibles: precio.disponibles,
-      sector: precio.sector || null, // 🔥 Guardamos el sector seleccionado
-    })),
-    categoria: evento.categoria,
-    lugar: evento.lugar,
-    sociosProductoresEmails: sociosEmails,
-    publico: evento.publico,
-    seleccionAsientos: evento.seleccionAsientos,
-    tags: evento.tags || {
-      todoPublico: false,
-      noMenores: false,
-      ventaComida: false,
-      ventaBebida: false,
-      petFriendly: false,
-      accesible: false,
-      aireLibre: false,
-    },
+      nombre: evento.nombre,
+      fecha: evento.fecha.toISOString(),
+      hora: evento.hora,
+      descripcion: evento.descripcion,
+      stock: {
+        aforo: evento.stock.aforo,
+        vendidas: evento.stock.vendidas || 0,
+      },
+      estado: evento.estado,
+      imagen: imageName,
+      precios: evento.precios.map((precio) => ({
+        nombre: precio.nombre,
+        monto: precio.monto,
+        disponibles: precio.disponibles,
+        sector: precio.sector || null, // 🔥 Guardamos el sector seleccionado
+      })),
+      sectores: evento.sectores || [],  // 🔥 Aseguramos que los sectores del evento se guarden
+      categoria: evento.categoria,
+      lugar: evento.lugar,
+      sociosProductoresEmails: sociosEmails,
+      publico: evento.publico,
+      seleccionAsientos: evento.seleccionAsientos,
+      tags: evento.tags || {
+        todoPublico: false,
+        noMenores: false,
+        ventaComida: false,
+        ventaBebida: false,
+        petFriendly: false,
+        accesible: false,
+        aireLibre: false,
+      },
 
-    infoAdicional: evento.infoAdicional || {
-      edadMinima: "",
-      menoresGratis: "",
-      elementosProhibidos: "",
-      terminosCondiciones: "",
-      horaApertura: "",
-      estacionamiento: "",
-      transporte: "",
-    },
-  };
+      infoAdicional: evento.infoAdicional || {
+        edadMinima: "",
+        menoresGratis: "",
+        elementosProhibidos: "",
+        terminosCondiciones: "",
+        horaApertura: "",
+        estacionamiento: "",
+        transporte: "",
+      },
+    };
 
 
     try {
@@ -671,13 +656,18 @@ function AdminEventos({ setToken }) {
             checked={evento.seleccionAsientos}
             onChange={(e) => {
               handleChange(e);
-              if (e.target.checked && evento.lugar) {
-                cargarSectores(evento.lugar); // 🔥 Cargar sectores sin guardar el evento
-              }
             }}
           />
           <label>Permitir selección de asientos</label>
         </div>
+        
+        {evento.seleccionAsientos && (evento.sectores?.length === 0) && (
+            <div className="alert alert-warning">
+              ⚠️ No hay sectores configurados aún. Guarda el evento y luego edita los asientos en 
+            "Administrar Asientos" desde el panel de eventos.
+            </div>
+          )}
+
         
         
 
@@ -720,21 +710,27 @@ function AdminEventos({ setToken }) {
                 </div>
 
 
-                {/* 🔥 Si el usuario activó selección de asientos, mostramos sectores */}
                 {evento.seleccionAsientos && (
-                  <div className="campoForm">
-                    <label>Sector Disponible</label>
-                    <select
-                      value={precio.sector || ""}
-                      onChange={(e) => actualizarSector(index, e.target.value)}
-                    >
-                      <option value="">Seleccionar sector</option>
-                      {sectores.map((sector) => (
-                        <option key={sector._id} value={sector._id}>{sector.nombreSector}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+                <div className="campoForm">
+                  <label>Sector Disponible</label>
+                  <select
+                    value={precio.sector || ""}
+                    onChange={(e) => actualizarSector(index, e.target.value)}
+                  >
+                    <option value="">Seleccionar sector</option>
+                    {evento.sectores?.length > 0 ? (
+                      evento.sectores.map((sector) => (
+                        <option key={sector._id} value={sector._id}>
+                          {sector.nombreSector}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="" disabled>No hay sectores disponibles</option>
+                    )}
+                  </select>
+                </div>
+              )}
+
 
                 {index > 0 && <button type="button" onClick={() => eliminarPrecio(index)}><i><FaRegTrashCan /></i></button>}
               </div>

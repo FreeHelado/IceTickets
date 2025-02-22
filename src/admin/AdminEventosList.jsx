@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es"; // Para formato en español
 import AdminTools from "./AdminTools";
+import { MdOutlineEventSeat } from "react-icons/md";
 
 function AdminEventosList() {
   const [eventos, setEventos] = useState([]);
@@ -103,19 +104,19 @@ function AdminEventosList() {
                     
                     <Link to={`/evento/${evento._id}`} target="_blank" rel="noopener noreferrer">
                       <i><FaRegEye /></i>
-                      <span>Ir al Evento</span>
+                      <span>Ver</span>
                     </Link>
                     <Link to={`/admin/evento/editar/${evento._id}`}>
                       <i><FaRegPenToSquare /></i>
-                      <span>Editar Evento</span>
+                      <span>Editar</span>
+                    </Link>
+                    <Link to={`/admin/evento/asientos/${evento._id}`}>
+                      <i><MdOutlineEventSeat /></i>
+                      <span>Asientos</span>
                     </Link>
                     <Link to={`/admin/evento/ordenes/${evento._id}`}>
                       <i><FaChartLine /></i>
                       <span>Ventas</span>
-                    </Link>
-                    <Link to={`/admin/evento/asientos/${evento._id}`}>
-                      <i><FaRegPenToSquare /></i>
-                      <span>Editar Asientos</span>
                     </Link>
 
                     <div onClick={() => handleDelete(evento._id)} className="borrarEvento">
