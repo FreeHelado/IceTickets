@@ -996,6 +996,7 @@ function AdminEventos({ setToken }) {
             <div className="alert alert-warning">Solo el vendedor {vendedorEmail} puede modificar los socios productores</div>
           )}
 
+            {sociosEmails.length > 0 && (
             <div className="listadoSocios">
               <h5>Socios:</h5>
               {sociosEmails.map(email => (
@@ -1007,6 +1008,7 @@ function AdminEventos({ setToken }) {
                 </span>
               ))}
             </div>
+            )}
         </div>
 
         

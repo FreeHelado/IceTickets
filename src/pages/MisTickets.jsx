@@ -10,6 +10,10 @@ function MisTickets() {
     const [tickets, setTickets] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [loadingPDF, setLoadingPDF] = useState({}); // 🔥 Estado para el botón de carga
+    const [sectores, setSectores] = useState({});
+
+
+
 
     useEffect(() => {
         const cargarTickets = async () => {
@@ -36,6 +40,35 @@ function MisTickets() {
 
         cargarTickets();
     }, []);
+
+    useEffect(() => {
+        const obtenerSectores = async () => {
+            const nuevosSectores = {}; // Objeto para guardar los sectores obtenidos
+
+            for (const ticket of tickets) {
+                if (ticket.sector && !sectores[ticket.sector]) { // Si el sector no está ya en el estado
+                    try {
+                        const response = await fetch(`${config.BACKEND_URL}/api/eventos/${ticket.evento.id}/sectores/${ticket.sector}`);
+                        if (!response.ok) throw new Error("No se pudo obtener el sector");
+
+                        const data = await response.json();
+                        nuevosSectores[ticket.sector] = data.nombre;
+                    } catch (error) {
+                        console.error("❌ Error al obtener sector:", error);
+                        nuevosSectores[ticket.sector] = "Sector desconocido";
+                    }
+                }
+            }
+
+            // Actualizar estado solo si hay nuevos sectores
+            setSectores(prev => ({ ...prev, ...nuevosSectores }));
+        };
+
+        if (tickets.length > 0) obtenerSectores();
+        
+        console.log("📌 Tickets cargados:", tickets);
+
+    }, [tickets]);
 
     const convertImageToBase64 = async (url) => {
         return new Promise((resolve, reject) => {
@@ -167,7 +200,10 @@ function MisTickets() {
                                         <h2> ${ticket.monto}</h2>
                                     </div>
                                     <div className="misTickets__cont--card--data--body--ficha">
-                                    
+                                    {ticket.sector && <span><strong>Sector:</strong> {sectores[ticket.sector] || "Cargando..."}</span>}
+
+                                        {ticket.fila && <span><strong>Fila:</strong> {ticket.fila}</span>}
+                                        {ticket.asiento && <span><strong>Asiento:</strong> {ticket.asiento}</span>}
                                     <span><strong>Nombre:</strong> {ticket.nombre}</span>
                                     <span><strong>Email:</strong> {ticket.email}</span>
                                     <span><strong>Teléfono:</strong> {ticket.telefono}</span>
