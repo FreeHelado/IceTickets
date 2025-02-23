@@ -5,6 +5,9 @@ import Swal from "sweetalert2";
 import { FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import AdminTools from "./AdminTools";
+import { MdOutlineDoNotDisturb, MdCheckCircle } from "react-icons/md";
+
+
 
 function AdminAsientosEvento() {
   const { id } = useParams(); // ID del evento
@@ -142,6 +145,82 @@ function AdminAsientosEvento() {
     });
   };
 
+  const toggleDisponibilidad = async (sectorIndex, filaIndex = null, asientoIndex = null) => {
+    const updatedSectores = [...sectores];
+
+    if (asientoIndex !== null) {
+      // 🔥 Alternar disponibilidad del asiento (Solo si está libre)
+      const asiento = updatedSectores[sectorIndex].filas[filaIndex].asientos[asientoIndex];
+      if (!asiento.ocupado) {
+        asiento.disponible = !asiento.disponible;
+      } else {
+        Swal.fire("Error", "No puedes deshabilitar un asiento ocupado", "error");
+        return;
+      }
+    } else if (filaIndex !== null) {
+      // 🔥 Alternar disponibilidad de la fila y afectar todos los asientos dentro de la fila
+      const fila = updatedSectores[sectorIndex].filas[filaIndex];
+      fila.disponible = !fila.disponible;
+      fila.asientos.forEach((asiento) => {
+        if (!asiento.ocupado) {
+          asiento.disponible = fila.disponible;
+        }
+      });
+    } else {
+      // 🔥 Alternar disponibilidad del sector y afectar todas las filas y asientos dentro del sector
+      const sector = updatedSectores[sectorIndex];
+      sector.disponible = !sector.disponible;
+      sector.filas.forEach((fila) => {
+        fila.disponible = sector.disponible;
+        fila.asientos.forEach((asiento) => {
+          if (!asiento.ocupado) {
+            asiento.disponible = sector.disponible;
+          }
+        });
+      });
+    }
+
+    setSectores(updatedSectores);
+
+    // 🔥 Guardar en backend
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        Swal.fire("Error", "No tienes permiso para esta acción", "error");
+        return;
+      }
+
+      let url = `${config.BACKEND_URL}/api/eventos/${id}/sectores/${updatedSectores[sectorIndex]._id}`;
+
+      if (filaIndex !== null) {
+        url += `/filas/${updatedSectores[sectorIndex].filas[filaIndex]._id}`;
+      }
+
+      if (asientoIndex !== null) {
+        url += `/asientos/${updatedSectores[sectorIndex].filas[filaIndex].asientos[asientoIndex]._id}`;
+      }
+
+      url += `/toggle-disponible`; // 🔥 Solo agregamos `toggle-disponible` una vez
+
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
+
+      if (!response.ok) throw new Error("Error al cambiar la disponibilidad");
+
+      Swal.fire("Éxito", "Disponibilidad actualizada", "success");
+    } catch (error) {
+      console.error("❌ Error al cambiar disponibilidad:", error);
+      Swal.fire("Error", "No se pudo actualizar la disponibilidad", "error");
+    }
+  };
+
+
 
   const handleSave = async () => {
     try {
@@ -161,7 +240,7 @@ function AdminAsientosEvento() {
       });
 
       const data = await response.json();
-      console.log("📌 Respuesta del servidor:", data);
+      
 
       if (response.ok) {
         Swal.fire("Éxito", "Sectores actualizados", "success");
@@ -179,9 +258,19 @@ function AdminAsientosEvento() {
     <main className="adminPanel admin-eventos selecAcientos">
       <h2>Editar Sectores y Asientos del Evento</h2>
       {sectores.map((sector, sectorIndex) => (
-        <div key={sectorIndex} className="sector">
+         <div key={sectorIndex} className="sector">
+
+          {/* 🔥 Si el sector está deshabilitado, mostramos el cartel en el centro */}
+          {!sector.disponible && (
+            <div className="cartel-sector-deshabilitado">
+              <i><MdOutlineDoNotDisturb /></i>
+              <span>Sector Deshabilitado para este Evento</span>
+            </div>
+          )}
+
+
           <h3>Sector: {sector.nombreSector}</h3>
-          <div className="sectorBox">
+          <div className={`sectorBox ${!sector.disponible ? "sector-deshabilitado" : ""}`}>
             <div className="campoForm">
               <label>Nombre del sector</label>
               <input
@@ -193,62 +282,93 @@ function AdminAsientosEvento() {
                   setSectores(updatedSectores);
                 }}
                 placeholder="Nombre del sector"
+                disabled={!sector.disponible} // 🔥 Bloquea edición si está deshabilitado
               />
             </div>
 
             <div className="filas">
               {sector.filas.map((fila, filaIndex) => (
-                <div key={filaIndex} className="filas__item">
-                  <h4>Fila: {fila.nombreFila}</h4>
-                  <div className="campoForm">
-                    <label>Nombre de la fila</label>
-                    <input
-                      type="text"
-                      value={fila.nombreFila}
-                      onChange={(e) => {
-                        const updatedSectores = [...sectores];
-                        updatedSectores[sectorIndex].filas[filaIndex].nombreFila = e.target.value;
-                        setSectores(updatedSectores);
-                      }}
-                      placeholder="Nombre de la fila"
-                    />
-                    <button onClick={() => handleRemoveFila(sectorIndex, filaIndex)} className="borrarFila">
-                      <span>X</span>
-                    </button>
-                  </div>
+                <>
+                    
+                    <div key={filaIndex} className={`filas__item ${!fila.disponible ? "fila-deshabilitada" : ""}`}>
 
-                  <div className="asientos__cont">
-                    <h6>Asientos de la Fila: {fila.nombreFila}</h6>
-                    <div className="asientos">
-                      {fila.asientos.map((asiento, asientoIndex) => {
-                        // Encontrar el último asiento libre en la fila
-                        const ultimoLibreIndex = fila.asientos.map(a => a.ocupado).lastIndexOf(false);
+                      {/* 🔥 Si la fila está deshabilitada, mostramos el cartel con un botón para habilitarla */}
+                      {!fila.disponible && (
+                        <div className="cartel-fila-deshabilitada">
+                          <i><MdOutlineDoNotDisturb /></i>
+                          <span>Fila Deshabilitada</span>
+                          <button onClick={() => toggleDisponibilidad(sectorIndex, filaIndex)} className="btn-habilitar-fila">
+                           /  Habilitar
+                          </button>
+                        </div>
+                      )}
 
-                        return (
-                          <div key={asientoIndex} className={`asientos__item ${asiento.ocupado ? "ocupado" : "libre"}`}>
-                            <span>{asiento.nombreAsiento}</span>
-                            {/* Mostrar el botón SOLO en el último asiento libre */}
-                            {asientoIndex === ultimoLibreIndex && (
-                              <button onClick={() => handleRemoveAsiento(sectorIndex, filaIndex)}>x</button>
-                            )}
-                          </div>
-                        );
-                      })}
+
+
+
+                      <h4>Fila: {fila.nombreFila}</h4>
+                      <div className="campoForm">
+                        <label>Nombre de la fila</label>
+                        <input
+                          type="text"
+                          value={fila.nombreFila}
+                          onChange={(e) => {
+                            const updatedSectores = [...sectores];
+                            updatedSectores[sectorIndex].filas[filaIndex].nombreFila = e.target.value;
+                            setSectores(updatedSectores);
+                          }}
+                          placeholder="Nombre de la fila"
+                          disabled={!fila.disponible} // 🔥 Bloquea edición si está deshabilitado
+                        />
+                        
+                        {/* 🔥 Botón para deshabilitar fila */}
+                        <button onClick={() => toggleDisponibilidad(sectorIndex, filaIndex)} className="borrarFila">
+                          <span>Deshabilitar toda la Fila</span>
+                        </button>
+                      </div>
+
+
+                      <div className="asientos__cont">
+                        <h6>Asientos de la Fila: {fila.nombreFila}</h6>
+                        <div className="asientos">
+                          {fila.asientos.map((asiento, asientoIndex) => (
+                            <div key={asientoIndex} className={`asientos__item ${asiento.ocupado ? "ocupado" : "libre"} ${!asiento.disponible ? "asiento-deshabilitado" : ""}`}>
+                              <span>{asiento.nombreAsiento}</span>
+                              
+                              {/* 🔥 Botón de "X" para deshabilitar solo asientos libres */}
+                              {!asiento.ocupado && (
+                                <button onClick={() => toggleDisponibilidad(sectorIndex, filaIndex, asientoIndex)}>
+                                  <i><MdOutlineDoNotDisturb /></i>
+                                </button>
+                              )}
+
+                              {/* 🔥 Botón de "X" para deshabilitar/habilitar solo asientos libres */}
+                              {!asiento.ocupado && (
+                                <button 
+                                  onClick={() => toggleDisponibilidad(sectorIndex, filaIndex, asientoIndex)}
+                                  className={`btn-toggle-asiento ${!asiento.disponible ? "habilitar" : "deshabilitar"}`}
+                                >
+                                  {!asiento.disponible ? <i> <MdCheckCircle /></i> : <MdOutlineDoNotDisturb />}
+                                </button>
+                              )}
+
+
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="asientos-tools">
+                          <span>Agregar asientos: </span>
+                          <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 1)}>+ 1</button>
+                          <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 10)}>+ 10</button>
+                                  <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 50)}>+ 50</button>
+                                  
+
+                        </div>
+                      </div>
                     </div>
-
-                    <div className="asientos-tools">
-                      <span>Agregar asientos: </span>
-                      <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 1)}>+ 1</button>
-                      <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 10)}>+ 10</button>
-                              <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 50)}>+ 50</button>
-                              <button onClick={() => handleRemoveAllAsientos(sectorIndex, filaIndex)} className="eliminar">
-  Borrar todos los asientos
-</button>
-
-                    </div>
-                  </div>
-                </div>
-              ))}
+                </>  
+                ))}
 
               <button onClick={() => handleAddFila(sectorIndex)}>
                 <i><FaPlus /></i>
@@ -256,7 +376,14 @@ function AdminAsientosEvento() {
               </button>
             </div>
           </div>
-          <button onClick={() => handleRemoveSector(sectorIndex)} className="borrarSector">Borrar Sector</button>
+          {/* 🔥 Botón para deshabilitar sector */}
+          <button 
+            onClick={() => toggleDisponibilidad(sectorIndex)} 
+            className="borrarSector"
+          >
+            {sector.disponible ? "Deshabilitar Sector" : "Habilitar Sector"}
+          </button>
+
         </div>
       ))}
       <button onClick={handleAddSector} className="agregarSector">
@@ -270,6 +397,9 @@ function AdminAsientosEvento() {
         </div>
         <div className="asientos__item libre">
           <small>Libre</small>
+        </div>
+        <div className="asientos__item deshabilitado">
+          <small>Deshabilitado</small>
         </div>
       </div>
 

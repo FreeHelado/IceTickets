@@ -53,17 +53,27 @@ function Checkout({ usuario }) {
             const response = await fetch(`${config.BACKEND_URL}/api/eventos/${eventoId}/sectores`);
             if (!response.ok) throw new Error(`Error ${response.status}: No se encontró el sector`);
             const sectores = await response.json();
+
+            // 🔥 Buscar el sector específico por su ID
             const sectorEncontrado = sectores.find(s => s._id === sectorId);
+            
             if (sectorEncontrado) {
+                const filasDisponibles = sectorEncontrado.filas.filter(fila => fila.disponible); // 🔥 Filtramos solo filas disponibles
+
+                console.log(`📌 Filas disponibles para sector ${sectorId}:`, filasDisponibles);
+
                 setFilasPorSector(prev => ({
                     ...prev,
-                    [sectorId]: sectorEncontrado.filas || []
+                    [sectorId]: filasDisponibles || [] // 🔥 Guardamos solo las filas habilitadas
                 }));
+            } else {
+                console.warn(`⚠️ No se encontró el sector con ID ${sectorId}`);
             }
         } catch (error) {
             console.error(`❌ Error al obtener filas del sector ${sectorId}:`, error);
         }
     };
+
 
     const handleFilaChange = (index, e) => {
         const { value } = e.target;
@@ -256,6 +266,8 @@ function Checkout({ usuario }) {
                                     <input type="text" name="documento" placeholder="Documento de Identidad" value={form.documento} onChange={(e) => handleInputChange(index, e)} required />
                                 </div>
 
+                                {/* 🔥 Solo mostramos el select de Fila si hay un sector asignado */}
+                                {form.sector && (
                                 <div className="entradasForm__item--campo">
                                     <label htmlFor="fila">Fila</label>
                                     <select
@@ -265,13 +277,18 @@ function Checkout({ usuario }) {
                                         required
                                     >
                                         <option value="">Selecciona una fila</option>
-                                        {filasPorSector[form.sector]?.map((fila) => (
-                                            <option key={fila._id} value={fila.nombreFila}>
-                                                {fila.nombreFila}
-                                            </option>
-                                        ))}
+                                        {filasPorSector[form.sector]
+                                            ?.filter(fila => fila.disponible) // 🔥 Solo filas disponibles
+                                            .map((fila) => (
+                                                <option key={fila._id} value={fila.nombreFila}>
+                                                    {fila.nombreFila}
+                                                </option>
+                                            ))}
                                     </select>
                                 </div>
+                                )}
+
+
 
                                 {form.fila && (
                                     <div className="entradasForm__item--campo">
@@ -285,7 +302,7 @@ function Checkout({ usuario }) {
                                             <option value="">Selecciona un asiento</option>
                                             {filasPorSector[form.sector]
                                                 .find(f => f.nombreFila === form.fila)?.asientos
-                                                .filter(asiento => !asiento.ocupado)
+                                                .filter(asiento => asiento.disponible && !asiento.ocupado) // 🔥 Solo asientos habilitados y libres
                                                 .map(asiento => (
                                                     <option key={asiento._id} value={asiento.nombreAsiento}>
                                                         {asiento.nombreAsiento}
@@ -294,6 +311,7 @@ function Checkout({ usuario }) {
                                         </select>
                                     </div>
                                 )}
+
 
                             </div>
                         ))}
