@@ -193,6 +193,21 @@
                     }
                 }
                 
+                button {
+                    &.elegir-asientos {
+                        background-color: #fff;
+                        padding: 10px;
+                        border-radius: 6px;
+                        color: $colorPrimario;
+                        justify-content: center;
+                        span {
+                            font-size: 14px;
+                        }
+                        i {
+                            font-size: 24px;
+                        }
+                    }
+                }
                 
                 &--campo {
                     @include flexColumn(5px);

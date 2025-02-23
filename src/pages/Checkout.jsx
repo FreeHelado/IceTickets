@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import esLocale from "date-fns/locale/es";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import { MdOutlineEventSeat } from "react-icons/md";
 
 function Checkout({ usuario }) {
     const { state } = useLocation();
@@ -38,6 +39,14 @@ function Checkout({ usuario }) {
     );
     const [ticketUsuario, setTicketUsuario] = useState(null);
     const [filasPorSector, setFilasPorSector] = useState({});
+    const [modalOpen, setModalOpen] = useState(null);
+    const [asientos, setAsientos] = useState([]);
+    const [sectores, setSectores] = useState([]);
+    const [mapaImagen, setMapaImagen] = useState(null);
+    const [asientosDelSector, setAsientosDelSector] = useState([]);
+    const [asientoSeleccionado, setAsientoSeleccionado] = useState(null);
+
+
     
     useEffect(() => {
         carrito.forEach(item => {
@@ -75,6 +84,81 @@ function Checkout({ usuario }) {
     };
 
 
+    useEffect(() => {
+        const obtenerSectores = async () => {
+            try {
+                const response = await fetch(`${config.BACKEND_URL}/api/eventos/${evento.id}/sectores`);
+                if (!response.ok) throw new Error("Error obteniendo sectores");
+                const data = await response.json();
+                
+                console.log("📌 Sectores obtenidos:", data); // 🔥 Verifica que llega data
+                
+                setSectores(data); // ✅ Guardamos los sectores en el estado
+            } catch (error) {
+                console.error("❌ Error obteniendo sectores:", error);
+            }
+        };
+
+        if (evento.id) obtenerSectores();
+    }, [evento.id]);
+
+
+    useEffect(() => {
+        const obtenerMapaLugar = async () => {
+        try {
+        const eventoId = JSON.parse(localStorage.getItem("evento"))?.id;
+
+        if (!eventoId) {
+            console.error("❌ No hay ID de evento en el storage");
+            return;
+        }
+
+        // 🔍 1️⃣ Buscar el evento en la base de datos
+        const responseEvento = await fetch(`${config.BACKEND_URL}/api/eventos/${eventoId}`);
+        if (!responseEvento.ok) throw new Error("Error obteniendo el evento");
+        const eventoData = await responseEvento.json();
+        const lugarId = eventoData.lugar;
+
+        if (!lugarId) {
+            console.error("❌ El evento no tiene un lugar asignado.");
+            return;
+        }
+
+        // 🔍 2️⃣ Buscar el lugar en la base de datos para obtener la imagen del mapa
+        const responseLugar = await fetch(`${config.BACKEND_URL}/api/lugares/${lugarId}`);
+        if (!responseLugar.ok) throw new Error("Error obteniendo el lugar");
+        const lugarData = await responseLugar.json();
+
+        if (!lugarData.mapaImagen) {
+            console.warn("⚠️ El lugar no tiene una imagen de mapa.");
+            return;
+        }
+
+        // ✅ Guardamos la URL de la imagen
+        setMapaImagen(`${config.BACKEND_URL}/img/lugares/${lugarData.mapaImagen}`);
+        
+        } catch (error) {
+        console.error("❌ Error obteniendo el mapa del lugar:", error);
+        }
+    };
+
+    obtenerMapaLugar();
+    }, []);
+
+    useEffect(() => {
+        if (modalOpen !== null && sectores.length > 0) {
+            const sectorId = formularios[modalOpen]?.sector;
+            if (sectorId) {
+                const nuevosAsientos = obtenerAsientosDelSector(sectorId);
+                setAsientos(nuevosAsientos);
+                console.log("📌 Asientos cargados al abrir el modal:", nuevosAsientos);
+            }
+        }
+    }, [modalOpen, sectores]); // ✅ Se ejecuta cuando `modalOpen` o `sectores` cambia.
+
+
+
+
     const handleFilaChange = (index, e) => {
         const { value } = e.target;
         setFormularios(prev => prev.map((form, i) =>
@@ -97,6 +181,68 @@ function Checkout({ usuario }) {
         ));
         setTicketUsuario(index);
     };
+
+
+    const obtenerAsientosDelSector = (sectorId) => {
+        if (!sectores || sectores.length === 0) {
+            console.warn("⚠️ Sectores aún no están cargados");
+            return [];
+        }
+
+        const sectorEncontrado = sectores.find(s => s._id === sectorId);
+
+        if (!sectorEncontrado) {
+            console.warn(`⚠️ No se encontró el sector con ID: ${sectorId}`);
+            return [];
+        }
+
+        const asientosDisponibles = sectorEncontrado.filas.flatMap(fila => fila.asientos)
+            .filter(asiento => asiento.disponible && !asiento.ocupado);
+
+        console.log(`📌 Asientos obtenidos para el sector ${sectorId}:`, asientosDisponibles);
+
+        return asientosDisponibles;
+    };
+
+
+
+    const handleClickEnMapa = (asiento) => {
+    if (!asiento || asiento.ocupado) return; // Evita errores y bloquea ocupados
+
+    console.log("🪑 Asiento seleccionado correctamente:", asiento); 
+
+    setAsientoSeleccionado(asiento); // ✅ Guardamos el asiento en estado global
+
+    setFormularios(prev =>
+        prev.map((form, i) =>
+            i === modalOpen
+                ? {
+                      ...form,
+                      fila: asiento.fila || "", // ✅ Carga la fila en el formulario
+                      asiento: asiento.nombreAsiento, // ✅ Carga el asiento en el formulario
+                  }
+                : form
+        )
+    );
+
+    // ✅ Actualizar el estado de los asientos para reflejar la selección
+    setAsientos(prev =>
+        prev.map(a => ({
+            ...a,
+            seleccionado: a._id === asiento._id, // Solo este asiento se marca como seleccionado
+        }))
+    );
+};
+
+
+
+
+
+
+
+
+
+
 
     const confirmarCompra = async () => {
         // Verificar si algún asiento seleccionado ya está ocupado o se eligió más de una vez en el mismo checkout
@@ -274,7 +420,7 @@ function Checkout({ usuario }) {
                                         name="fila"
                                         value={form.fila || ""}
                                         onChange={(e) => handleFilaChange(index, e)}
-                                        required
+                                        // required
                                     >
                                         <option value="">Selecciona una fila</option>
                                         {filasPorSector[form.sector]
@@ -288,30 +434,129 @@ function Checkout({ usuario }) {
                                 </div>
                                 )}
 
-
-
                                 {form.fila && (
-                                    <div className="entradasForm__item--campo">
-                                        <label htmlFor="asiento">Asiento</label>
-                                        <select
-                                            name="asiento"
-                                            value={form.asiento || ""}
-                                            onChange={(e) => handleInputChange(index, e)}
-                                            required
-                                        >
-                                            <option value="">Selecciona un asiento</option>
-                                            {filasPorSector[form.sector]
-                                                .find(f => f.nombreFila === form.fila)?.asientos
-                                                .filter(asiento => asiento.disponible && !asiento.ocupado) // 🔥 Solo asientos habilitados y libres
-                                                .map(asiento => (
-                                                    <option key={asiento._id} value={asiento.nombreAsiento}>
-                                                        {asiento.nombreAsiento}
-                                                    </option>
-                                                ))}
-                                        </select>
-                                    </div>
+    <div className="entradasForm__item--campo">
+        <label htmlFor="asiento">Asiento</label>
+        <select
+            name="asiento"
+            value={form.asiento || ""}
+            onChange={(e) => handleInputChange(index, e)}
+            // required
+        >
+            <option value="">Selecciona un asiento</option>
+            {filasPorSector[form.sector]
+                ?.find(f => f.nombreFila === form.fila)?.asientos
+                .filter(asiento => asiento.disponible && !asiento.ocupado) // 🔥 Solo asientos libres
+                .map(asiento => (
+                    <option key={asiento._id} value={asiento.nombreAsiento}>
+                        {asiento.nombreAsiento}
+                    </option>
+                ))}
+        </select>
+    </div>
+)}
+
+
+                                {form.sector && (
+                                    <button type="button" onClick={() => setModalOpen(index)} className="elegir-asientos">
+                                        <i><MdOutlineEventSeat/></i>
+                                        <span>Elegir Asientos</span>
+                                    </button>
                                 )}
 
+                                {modalOpen !== null && mapaImagen && (
+                                        
+                                        <div className="modal-mapa">
+                                        <div className="modal-mapa__content">
+                                                <div className="modal-mapa__content--header">
+                                                    <h3>Selecciona un asiento en el mapa</h3>                                   
+                                                    <button className="cerrar-modal" onClick={() => setModalOpen(null)}>X</button>
+                                                </div>
+
+                                                <div className="modal-mapa__content--mapa">
+                                                        <svg
+                                                        viewBox="0 0 800 800"
+                                                        width="100%"
+                                                        height="100%"
+                                                        onClick={handleClickEnMapa}
+                                                        >
+                                                        {/* 🔥 Imagen del mapa */}
+                                                        <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
+
+                                                        {/* 🔥 Dibujar los asientos */}
+                                                        {asientos.length > 0 ? (
+                                                        <>
+                                                            {console.log("📌 Asientos disponibles:", asientos)} {/* 🔥 Aquí */}
+                                                            {console.log("📌 Asientos en estado:", asientos)}
+                                                                {asientos.map((asiento, index) => (
+
+                                                            
+                                                             <circle
+                                                                key={index}
+                                                                cx={(asiento.coordenadas?.x || 0) + 15} // Ajuste horizontal
+                                                                cy={(asiento.coordenadas?.y || 0) + 15} // Ajuste vertical
+                                                                r="10" // Radio del círculo
+                                                                fill={
+                                                                    asientoSeleccionado?._id === asiento._id 
+                                                                        ? "blue" // 🔥 Azul si está seleccionado
+                                                                        : asiento.ocupado
+                                                                        ? "red"  // 🔥 Rojo si está ocupado
+                                                                        : "yellow" // 🔥 Amarillo si está disponible
+                                                                }
+                                                                stroke="black"
+                                                                opacity="1"
+                                                                strokeWidth="1"
+                                                                onClick={() => handleClickEnMapa(asiento)} // ✅ Ahora se pasa el asiento correctamente
+                                                                style={{ cursor: "pointer" }}
+                                                            />
+
+
+
+
+                                                            ))}
+                                                        </>
+                                                        ) : (
+                                                        <p>No hay asientos disponibles</p>
+                                                        )}
+
+
+                                                        </svg>
+                                            </div>
+                                            
+                                            <button
+                                                type="button"
+                                                className="confirmar-asiento"
+                                                onClick={() => {
+                                                    if (!asientoSeleccionado) {
+                                                        Swal.fire("Error", "Selecciona un asiento antes de confirmar", "error");
+                                                        return;
+                                                    }
+
+                                                    console.log("✅ Asiento confirmado:", asientoSeleccionado);
+
+                                                    setModalOpen(null); // ✅ Cierra el modal solo si hay un asiento seleccionado
+                                                }}
+                                            >
+                                                Confirmar Selección
+                                            </button>
+
+
+
+
+
+                                            </div>
+                                        </div>
+                                        )}
+
+                                
+                                    {modalOpen !== null && !mapaImagen && (
+                                        <div className="modal-mapa">
+                                            <div className="modal-mapa-content">
+                                            <h3>No hay mapa disponible para este evento</h3>
+                                            <button className="cerrar-modal" onClick={() => setModalOpen(null)}>Cerrar</button>
+                                            </div>
+                                        </div>
+                                    )}
 
                             </div>
                         ))}
