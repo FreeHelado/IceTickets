@@ -26,7 +26,7 @@
 
 main {
     padding-top: 100px !important;
-    
+    position: relative;
     @include mobile(){
         padding-top: 0px !important;
         margin-top: -25px;

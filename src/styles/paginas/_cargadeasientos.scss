@@ -144,10 +144,12 @@
                         ////// guardar solucion para edicion ///
                         &.ocupado {
                             background-color: $rojo;
+                            opacity: .5;
                         }
                         &.libre {
-                            background-color: claro($verde, 20);
+                            background-color: #fff;
                             color: oscuro($verde, 20);
+                            font-weight: 600;
                         }
                         button {
                             position: absolute;
@@ -341,11 +343,13 @@ button {
             ////// guardar solucion para edicion ///
             &.ocupado {
                 background-color: $rojo;
+                opacity: .5;
             }
     
             &.libre {
-                background-color: claro($verde, 20);
+                background-color: #fff;
                 color: oscuro($verde, 20);
+                font-weight: 600;
             }
         }
    

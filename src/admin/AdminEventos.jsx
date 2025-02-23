@@ -68,6 +68,7 @@ function AdminEventos({ setToken }) {
   const [vendedorEmail, setVendedorEmail] = useState(""); // ✅ Guardamos el email del vendedor
   const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
   const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertimos el string a booleano
+  const [sectoresEvento, setSectoresEvento] = useState([]);
 
 
   const navigate = useNavigate();
@@ -302,19 +303,19 @@ function AdminEventos({ setToken }) {
   }, [id]);
 
   const handleFileChange = (e) => {
-  const file = e.target.files[0];
-  setImagenSeleccionada(file);    
-    
-  if (file) {
-    setCargandoImagen(true); // ✅ Mostramos el spinner
+    const file = e.target.files[0];
+    setImagenSeleccionada(file);    
+      
+    if (file) {
+      setCargandoImagen(true); // ✅ Mostramos el spinner
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImagenPreview(reader.result);
-      setCargandoImagen(false); // ✅ Ocultamos el spinner cuando la imagen se lee
-    };
-    reader.readAsDataURL(file);
-  }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagenPreview(reader.result);
+        setCargandoImagen(false); // ✅ Ocultamos el spinner cuando la imagen se lee
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   ///// actualizar sector handlesector
@@ -405,12 +406,30 @@ function AdminEventos({ setToken }) {
 
 
 
+
   const handleSeleccionLugar = (lugar) => {
     setBusquedaLugar(lugar.nombre); // Mostrar el nombre en el input
     setEvento((prev) => ({ ...prev, lugar: lugar._id })); // Guardar el ID en el evento
     setFiltroLugares([]); // Ocultar lista de opciones
   };
 
+  ////NUEVO EXTRAEMOS SECTTORE SDEL LUGAR
+  const handleLugarChange = async (lugarId) => {
+      setLugarSeleccionado(lugarId); // Guardamos el lugar seleccionado
+
+      try {
+          const response = await fetch(`${config.BACKEND_URL}/api/lugares/${lugarId}`);
+          if (!response.ok) throw new Error("Error obteniendo sectores del lugar");
+          const data = await response.json();
+
+          if (data.sectores.length > 0) {
+              setSectoresEvento(data.sectores); // Cargamos los sectores del lugar
+          }
+      } catch (error) {
+          console.error("❌ Error al cargar sectores del lugar:", error);
+          Swal.fire("Error", "No se pudieron cargar los sectores del lugar", "error");
+      }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -684,7 +703,7 @@ function AdminEventos({ setToken }) {
         {evento.seleccionAsientos && (evento.sectores?.length === 0) && (
             <div className="alert alert-warning">
               ⚠️ No hay sectores configurados aún. Guarda el evento y luego edita los asientos en 
-            "Administrar Asientos" desde el panel de eventos.
+            "Administrar Asientos" desde el panel de eventos. Por defecto tendrás la configuración de asientos definida en el lugar del evento, pero podrás manipularla.
             </div>
           )}
 

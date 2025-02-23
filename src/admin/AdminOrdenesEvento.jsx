@@ -7,6 +7,7 @@ import AdminTicketsEvento from "./AdminTicketsEvento";
 import Swal from "sweetalert2";
 import { format, parseISO } from "date-fns";
 import esLocale from "date-fns/locale/es"; // Para formato en español
+import AdminTools from "./AdminTools";
 
 function AdminOrdenesEvento() {
     const { idEvento } = useParams();
@@ -211,7 +212,9 @@ function AdminOrdenesEvento() {
 
             </section>
         
-
+<div className="adminPanel__cont--zona3">
+          <AdminTools />
+        </div>
 
         </main>
     );
