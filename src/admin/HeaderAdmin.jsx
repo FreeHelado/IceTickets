@@ -44,7 +44,7 @@ function HeaderAdmin({ token }) {
 
 
   return (
-    <header className={isScrolled ? "scroll" : ""}>
+    <header className={isScrolled ? "scrollAdmin" : ""}>
       <div className="header__logo">
         <Link to={`/admin`}>
           <i><FaIceCream /></i>

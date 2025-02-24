@@ -9,8 +9,12 @@ function AdminTicketsEvento() {
     const { idEvento } = useParams();
     const [tickets, setTickets] = useState([]);
     const [cargando, setCargando] = useState(true);
-    const [busqueda, setBusqueda] = useState(""); // 🔍 Estado del buscador
-    const [filtro, setFiltro] = useState("todos"); // ✅ Estado para toggle
+    const [busqueda, setBusqueda] = useState(""); // 🔍 Buscador
+    const [filtro, setFiltro] = useState("todos"); // ✅ Estado de filtro: "todos", "usados", "no-usados"
+    const [paginaActual, setPaginaActual] = useState(1);
+    const ticketsPorPagina = 100; // 📌 Cantidad de tickets por página
+    const [evento, setEvento] = useState(null); // ✅ Agregar esta línea antes de usar setEvento
+
 
     useEffect(() => {
         const cargarTickets = async () => {
@@ -26,6 +30,15 @@ function AdminTicketsEvento() {
                 }
 
                 const data = await response.json();
+
+                // 📌 Guardamos la info del evento en el estado
+                setEvento({
+                    nombre: data.evento.nombre,
+                    fecha: data.evento.fecha,
+                    lugar: data.evento.lugar,
+                    imagen: data.evento.imagen, // 📷 Imagen del evento
+                });
+
 
                 // 📌 Extraer todos los tickets de todas las órdenes en un solo array
                 const todosLosTickets = data.ordenes.flatMap(orden => orden.tickets.map(ticket => ({
@@ -47,8 +60,12 @@ function AdminTicketsEvento() {
         cargarTickets();
     }, [idEvento]);
 
-    
-     // 🔍 Filtrar tickets según búsqueda y estado de usados/no usados
+    // 📌 Contadores de tickets según estado
+    const totalTickets = tickets.length;
+    const totalUsados = tickets.filter(ticket => ticket.usado).length;
+    const totalNoUsados = tickets.filter(ticket => !ticket.usado).length;
+
+    // 🔍 Filtrar tickets según búsqueda y estado de usados/no usados
     const ticketsFiltrados = tickets.filter(ticket =>
         (ticket.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
         ticket.documento?.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -56,51 +73,69 @@ function AdminTicketsEvento() {
         (filtro === "todos" || (filtro === "usados" && ticket.usado) || (filtro === "no-usados" && !ticket.usado))
     );
 
+    // 📌 Calcular los tickets a mostrar en la página actual
+    const indiceInicio = (paginaActual - 1) * ticketsPorPagina;
+    const indiceFin = indiceInicio + ticketsPorPagina;
+    const ticketsPaginados = ticketsFiltrados.slice(indiceInicio, indiceFin);
+
+    // 📌 Calcular el total de páginas
+    const totalPaginas = Math.ceil(ticketsFiltrados.length / ticketsPorPagina);
+
+    // 📌 Funciones para cambiar de página
+    const paginaAnterior = () => {
+        if (paginaActual > 1) setPaginaActual(paginaActual - 1);
+    };
+
+    const paginaSiguiente = () => {
+        if (paginaActual < totalPaginas) setPaginaActual(paginaActual + 1);
+    };
+
     if (cargando) return <p>Cargando tickets...</p>;
     if (tickets.length === 0) return <p>No hay tickets registrados aún.</p>;
 
     return (
         <main className="adminPanel">
-            <h2>Tickets para el Evento</h2>
-
+            <h2>Tickets para {evento.nombre}</h2>
+            <h3>{new Date(evento.fecha).toLocaleDateString()} - {evento.lugar}</h3>
+   
             <div className="buscadorAdmin">
-                {/* 🔍 Buscador */}
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre, documento, email o teléfono"
-                    value={busqueda}
-                    onChange={(e) => setBusqueda(e.target.value)}
-                    className="buscador-input"
-                />
+
+            <input
+                type="text"
+                placeholder="Buscar por nombre, documento o email"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                className="buscador-input"
+            />
             </div>
 
-             {/* 🎟 Filtros de tickets */}
-                <div className="filtrosTickets">
-                    <button 
-                        onClick={() => setFiltro("todos")} 
-                        className={filtro === "todos" ? "activo" : ""}
-                    >
-                        Todos
-                    </button>
-                    <button 
-                        onClick={() => setFiltro("usados")} 
-                        className={filtro === "usados" ? "activo" : ""}
-                    >
-                        Usados
-                    </button>
-                    <button 
-                        onClick={() => setFiltro("no-usados")} 
-                        className={filtro === "no-usados" ? "activo" : ""}
-                    >
-                        No Usados
-                    </button>
-                </div>
-
+            
+            <div className="filtrosTickets">
+                <button 
+                    onClick={() => setFiltro("todos")} 
+                    className={filtro === "todos" ? "activo" : ""}
+                >
+                    Todos ({totalTickets})
+                </button>
+                <button 
+                    onClick={() => setFiltro("usados")} 
+                    className={filtro === "usados" ? "activo" : ""}
+                >
+                    Usados ({totalUsados})
+                </button>
+                <button 
+                    onClick={() => setFiltro("no-usados")} 
+                    className={filtro === "no-usados" ? "activo" : ""}
+                >
+                    No Usados ({totalNoUsados})
+                </button>
+            </div>
+            
             <div className="ticketsEventos">
-                {ticketsFiltrados.length === 0 ? (
+                {ticketsPaginados.length === 0 ? (
                     <p>No se encontraron resultados</p>
                 ) : (
-                    ticketsFiltrados.map((ticket, index) => (
+                    ticketsPaginados.map((ticket, index) => (
                         <div className="ticketsEventos__item" key={index}>
                             <div className="ticketsEventos__item--qr">
                                 <QRCodeCanvas 
@@ -115,7 +150,6 @@ function AdminTicketsEvento() {
                                 <span>{ticket.nombre}</span>
                                 <span>{ticket.email}</span>
                                 <span>{ticket.telefono}</span>
-                                <span>{ticket.documento}</span>
                                 <span>{new Date(ticket.fechaCompra).toLocaleDateString()}</span> 
                             </div>
                             <div className="ticketsEventos__item--detalle"> 
@@ -130,6 +164,17 @@ function AdminTicketsEvento() {
                         </div>
                     ))
                 )}
+            </div>
+
+            {/* 🔹 Paginación */}
+            <div className="paginacion">
+                <button onClick={paginaAnterior} disabled={paginaActual === 1}>
+                    ⬅ Anterior
+                </button>
+                <span>Página {paginaActual} de {totalPaginas}</span>
+                <button onClick={paginaSiguiente} disabled={paginaActual === totalPaginas}>
+                    Siguiente ➡
+                </button>
             </div>
 
             <div className="adminPanel__cont--zona3">

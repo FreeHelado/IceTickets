@@ -15,9 +15,15 @@ header {
             background-color: color-opacity($colorBg, .8);
             backdrop-filter: blur(5px);
             border-bottom: 1px solid claro($colorPrimario, 2);
+        }
         
+        &.scrollAdmin {
+            background-color: color-opacity($colorSecundario, .8);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid claro($colorSecundario, 10);
         }
     }
+
     @include mobile() {
         z-index: 2;
         @include flex();

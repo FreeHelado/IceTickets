@@ -262,12 +262,28 @@
     width: 100%;
     input {
         width: 100%;
-        background-color: claro($colorSecundario, 05);
+        background-color: transparent;
         height: 60px;
         color: #fff;
         border-color: #ffffff44;
         border-width: 2px;
         border-radius: 60px;
+        padding-inline: 30px;
+    }
+}
+
+.paginacion {
+    @include flex(25px);
+    width: 100%;
+    justify-content: center;
+    padding-block: 15px 50px;
+
+    button {
+        @include hover();
+        cursor: pointer;
+        &:hover {
+            opacity: .75;
+        }
     }
 }
 
