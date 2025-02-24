@@ -1,0 +1,194 @@
+.porteros {
+    max-width: 1400px;
+    margin: 0 auto;
+    
+    &__cont {   
+
+            &--bg { 
+                margin: 0;
+                @include flex();
+                justify-content: center;
+                @include hover();
+                position: relative;
+                background-color: $colorBg;
+                z-index: 0;
+                overflow: hidden;
+                border-radius: 40px;
+
+                @include mobile(){
+                    border-radius: 0;
+                }
+                
+                @include desktop(){
+                    box-shadow: 0px 0px 100px color-opacity($colorTag, 0.7);
+                }
+
+               
+        
+                &::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 50%;
+                    background-image: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, .9) 50%, rgba(0, 0, 0, .4) 90%, rgba(0, 0, 0, 0) 100%);
+                    z-index: 1;
+                }
+        
+                img {
+                    &.evento-img {
+
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        z-index: 0;
+                        opacity: .4;
+    
+                        @include mobile {
+                            height: 100vh;
+                        }
+                    }
+                }
+
+                &--tit {
+                    @include flexColumn();
+                    position: absolute;
+                    top: 15px;
+                    left: 15px;
+
+                    &--logo {
+                        @include flex();
+                        h1 {
+                            font-size: 24px;
+                        }
+                        i {
+                            font-size: 30px;
+                        }
+                    }
+                    h2 {
+
+                    }
+                }
+        
+                &--data {
+                    position: absolute;
+                    bottom: 30px;
+                    left: 20px;
+                    z-index: 2;
+                    @include flex();
+        
+                    @include mobile() {
+                        bottom: 25px;
+                    }
+        
+                    img {
+                        border-radius: 15px;
+                        overflow: hidden;
+                        width: 100px;
+                    }
+
+                    &--info {
+                        @include flexColumn(5px);
+                    }
+        
+        
+                    h3 {
+                        font-size: 24px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+        
+                        @include mobile() {
+                            font-size: 14px;
+                        }
+                    }
+        
+                    .evento-estado {
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        padding: 8px 15px;
+                        border-radius: 5px;
+                        display: inline-block;
+                        margin: 10px 0;
+                        font-size: 14px;
+                    }
+        
+        
+                    .evento-estado--proximo {
+                        background-color: $verde;
+                        color: white;
+                    }
+        
+                    .evento-estado--mañana {
+                        background-color: $amarelo;
+                        color: $colorPrimario;
+                    }
+        
+                    .evento-estado--hoy {
+                        background-color: $colorTagDestacado;
+                        color: white;
+                    }
+        
+                    .evento-estado--finalizado {
+                        background-color: #6c757d;
+                        color: white;
+                    }
+        
+                    .evento-estado--cancelado {
+                        background-color: $rojo;
+                        color: white;
+                    }
+        
+                    .evento-estado--liquidado {
+                        background-color: #17a2b8;
+                        color: white;
+                    }
+                }
+
+                &--form {
+                    @include flexColumn(15px);
+                    align-items: center;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    padding-inline: 15px;
+                    width:50%;
+                    z-index: 50;
+
+                    @include mobile(){
+                        width: 100%;
+                    }
+
+                    h2 {
+                        font-weight: 400;
+                    }
+                    &--input {
+                        position: relative;
+                        width: 100%;
+                        input {
+                            border-radius: 12px;
+                            border-color: $colorTagDestacado;
+                            height: 70px;
+                            font-size: 24px;
+                        }
+                        button {
+                            position: absolute;
+                            right: 15px;
+                            bottom: 15px;
+                            background-color: transparent !important;
+                            padding: 0;
+                            i {
+                                font-size: 40px;
+                            }
+                        }
+
+                    }
+                    button {
+                        background-color: $colorTagDestacado;
+                    }
+                }
+            }
+        }
+        
+}

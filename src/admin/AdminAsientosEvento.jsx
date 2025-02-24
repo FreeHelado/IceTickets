@@ -357,14 +357,14 @@ function AdminAsientosEvento() {
                           ))}
                         </div>
 
-                        <div className="asientos-tools">
+                        {/* <div className="asientos-tools">
                           <span>Agregar asientos: </span>
                           <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 1)}>+ 1</button>
                           <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 10)}>+ 10</button>
                                   <button onClick={() => handleAddAsiento(sectorIndex, filaIndex, 50)}>+ 50</button>
                                   
 
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                 </>  

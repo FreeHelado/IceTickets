@@ -23,6 +23,7 @@
     "express": "^4.21.2",
     "gsap": "^3.12.7",
     "html2canvas": "^1.4.1",
+    "html5-qrcode": "^2.3.8",
     "jodit-react": "^5.2.14",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",

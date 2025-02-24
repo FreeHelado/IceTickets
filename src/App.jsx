@@ -71,7 +71,7 @@ function AppContent({ token, setToken, usuario }) {
   return (
     <>
       {/* 🔥 No mostramos ningún header si estamos en /login */}
-      {location.pathname !== "/login" && location.pathname !== "/register" && location.pathname !== "/verificar" && (esRutaAdmin ? <HeaderAdmin token={token} /> : <Header token={token} />)}
+      {location.pathname !== "/login" && location.pathname !== "/register" && location.pathname !== "/verificar"  && location.pathname !== "/validar-tickets" && (esRutaAdmin ? <HeaderAdmin token={token} /> : <Header token={token} />)}
 
       <Routes>
         <Route path="/" element={<Eventos />} /> {/* Página principal con los eventos */}
