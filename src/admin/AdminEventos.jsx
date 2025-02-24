@@ -12,15 +12,17 @@ import { Link } from "react-router-dom";
 
 /// iconos ////
 import { FaRegTrashCan, FaDog } from "react-icons/fa6";
-import { FaHamburger, FaAccessibleIcon, FaSun } from "react-icons/fa";
+import { FaHamburger, FaAccessibleIcon, FaSun, FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdFamilyRestroom, MdOutlineAttachMoney } from "react-icons/md";
 import { TbRating18Plus } from "react-icons/tb";
 import { BiSolidDrink } from "react-icons/bi";
 import { IoTicket } from "react-icons/io5";
 
 
+
 function AdminEventos({ setToken }) {
   const { id } = useParams(); // ✅ Capturar ID si estamos en edición
+  const generarNumeroEvento = () => Math.floor(100000 + Math.random() * 900000);
   const [evento, setEvento] = useState({
     nombre: "",
     fecha: "",
@@ -34,7 +36,11 @@ function AdminEventos({ setToken }) {
     categoria: "",
     publico: false,
     seleccionAsientos: false,
-    sectores: [],  // 🔥 Ahora siempre existe como array
+    sectores: [],
+    controlPuerta: {
+      numeroEvento: id ? "" : generarNumeroEvento(), // 🔥 Si es nuevo, genera el número
+      clave: "",
+    },
     tags: {
       todoPublico: false,
       noMenores: false,
@@ -69,6 +75,7 @@ function AdminEventos({ setToken }) {
   const userId = localStorage.getItem("userId"); // 🔥 Obtenemos el ID del usuario autenticado
   const isAdmin = localStorage.getItem("isAdmin") === "true"; // Convertimos el string a booleano
   const [sectoresEvento, setSectoresEvento] = useState([]);
+  const[mostrarClave, setMostrarClave] = useState(false);
 
 
   const navigate = useNavigate();
@@ -116,6 +123,8 @@ function AdminEventos({ setToken }) {
         return;
       }
 
+      console.log("📌 Evento cargado desde el backend:", data); // 🔥 Debug
+
       setEvento({
         nombre: data.nombre || "",
         fecha: data.fecha ? parseISO(data.fecha) : null,
@@ -140,6 +149,7 @@ function AdminEventos({ setToken }) {
         vendedor: data.vendedor || "",
         publico: data.publico ?? false,
         seleccionAsientos: data.seleccionAsientos ?? false,
+        sectores: data.sectores || [],
         tags: {
           todoPublico: data.tags?.todoPublico ?? false,
           noMenores: data.tags?.noMenores ?? false,
@@ -159,6 +169,10 @@ function AdminEventos({ setToken }) {
           horaApertura: data.infoAdicional?.horaApertura || "",
           estacionamiento: data.infoAdicional?.estacionamiento || "",
           transporte: data.infoAdicional?.transporte || "",
+        },
+        controlPuerta: {
+          numeroEvento: data.controlPuerta?.numeroEvento || (id ? "" : generarNumeroEvento()), // ✅ Mantiene el número si ya existe
+          clave: data.controlPuerta?.clave || "",
         },
       });
 
@@ -255,7 +269,7 @@ function AdminEventos({ setToken }) {
           vendedor: data.vendedor || "",
           publico: data.publico || false,
           seleccionAsientos: data.seleccionAsientos || false,
-          sectores: data.sectores || [],  // 🔥 Aseguramos que los sectores vengan del backend
+          sectores: data.sectores || [],
           tags: {
             todoPublico: data.tags?.todoPublico || false,
             noMenores: data.tags?.noMenores || false,
@@ -275,7 +289,12 @@ function AdminEventos({ setToken }) {
             horaApertura: data.infoAdicional?.horaApertura || "",
             estacionamiento: data.infoAdicional?.estacionamiento || "",
             transporte: data.infoAdicional?.transporte || ""
-          }
+          },
+          controlPuerta: {
+            numeroEvento: data.controlPuerta?.numeroEvento || "",
+            clave: data.controlPuerta?.clave || ""
+          },
+         
         });
         // ✅ Usamos la nueva ruta para obtener solo el email
         if (data.vendedor) {
@@ -364,6 +383,19 @@ function AdminEventos({ setToken }) {
   const eliminarEmail = (email) => {
     setSociosEmails(sociosEmails.filter(e => e !== email));
   };
+
+  // ✅ Manejar cambios en `controlPuerta`
+  const handleControlChange = (e) => {
+    const { name, value } = e.target;
+    setEvento(prev => ({
+      ...prev,
+      controlPuerta: { 
+        ...prev.controlPuerta, 
+        [name]: value // ✅ Actualiza solo el campo modificado
+      }
+    }));
+  };
+
 
   const handleChange = (e) => {
   const { name, value, type, checked } = e.target;
@@ -481,7 +513,8 @@ function AdminEventos({ setToken }) {
         disponibles: precio.disponibles,
         sector: precio.sector || null, // 🔥 Guardamos el sector seleccionado
       })),
-      sectores: evento.sectores || [],  // 🔥 Aseguramos que los sectores del evento se guarden
+      sectores: evento.sectores || [],
+      controlPuerta: evento.controlPuerta.numeroEvento && evento.controlPuerta.clave ? evento.controlPuerta : undefined,
       categoria: evento.categoria,
       lugar: evento.lugar,
       sociosProductoresEmails: sociosEmails,
@@ -561,6 +594,11 @@ function AdminEventos({ setToken }) {
               horaApertura: "",
               estacionamiento: "",
               transporte: ""
+            },
+            // ✅ Agregamos `controlPuerta` con valores iniciales vacíos
+            controlPuerta: {
+              numeroEvento: "",
+              clave: ""
             }
         });
 
@@ -1031,6 +1069,53 @@ function AdminEventos({ setToken }) {
             </div>
             )}
         </div>
+
+        <hr/>
+        
+        <div className="controlCont">
+          <h3>Control de Acceso (Portero)</h3>
+          
+          <div className="grupoCampos">
+
+            <div className="campoForm">
+              <label htmlFor="numeroEvento">Número de Control del Evento</label>
+              <input 
+                type="text" 
+                name="numeroEvento" 
+                value={evento.controlPuerta?.numeroEvento} 
+                onChange={handleControlChange} 
+                required
+                placeholder="Número único para este evento"
+                disabled={id ? true : false} // 🔥 Se deshabilita si es edición
+              />
+            </div>
+
+            <div className="campoForm">
+            <label htmlFor="clave">Clave de Acceso</label>
+            <div className="inputConIcono">
+              <input 
+                type={mostrarClave ? "text" : "password"}  // 🔥 Cambia entre 'text' y 'password'
+                name="clave" 
+                value={evento.controlPuerta?.clave} 
+                onChange={handleControlChange} 
+                required
+                placeholder="Clave para los porteros"
+              />
+              <button 
+                type="button" 
+                className="toggleClave" 
+                onClick={() => setMostrarClave(!mostrarClave)}
+                > <i>
+                    
+                {mostrarClave ? <FaEye /> : <FaEyeSlash />}  {/* 👁️ Cambia el ícono */}
+              </i>
+              </button>
+            </div>
+          </div>
+          </div>
+
+        </div>
+
 
         
 

@@ -25,6 +25,21 @@
                 font-weight: 500;
             }
 
+            .inputConIcono {
+                position: relative;
+                button {
+                    position: absolute;
+                    bottom: 15px;
+                    background-color: transparent;
+                    padding: 0;
+                    right: 15px;
+                    cursor: pointer;
+                    i {
+                        font-size: 24px;
+                    }
+                }
+            }
+
             .autocomplete-list {
                 background-color: $colorSecundario;
                 position: absolute;
@@ -126,6 +141,10 @@
         .imgPrev {
             border-radius: 10px;
             overflow: hidden;
+        }
+
+        .controlCont {
+            @include flexColumn(15px);
         }
 
         .grupoCampos {

@@ -145,6 +145,12 @@ function Login({ setToken }) {
           Si aún no tienes cuenta, <strong onClick={() => navigate("/register")}>puedes crearla aquí</strong>
         </span>
       </div>
+
+      
+      <div className="" onClick={() => navigate("/portero")}>
+        Acceso a Portero
+      </div>
+
     </main>
   );
 }
