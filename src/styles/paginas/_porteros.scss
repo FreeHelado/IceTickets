@@ -20,7 +20,7 @@
                 }
                 
                 @include desktop(){
-                    box-shadow: 0px 0px 100px color-opacity($colorTag, 0.7);
+                    box-shadow: 0px 0px 100px color-opacity($colorTag, 0.4);
                 }
 
                
@@ -188,6 +188,43 @@
                         background-color: $colorTagDestacado;
                     }
                 }
+            }
+    }
+
+        &__login {
+            @include cuerpo(750px);
+            background-color: $colorPrimarioClaro;
+            @extend .caja;
+            box-shadow: 0px 0px 50px color-opacity($colorSecundario, 0.8);
+            padding: 50px;
+            @include flexColumn(15px);
+            align-items: center;
+
+            i {
+                font-size: 40px;
+            }
+
+            form {
+                @include flexColumn();
+                width: 100%;
+
+                .campoForm {
+                    width: 100%;
+                }
+
+                                button {
+                                    width: 100%;
+                                    background-color: $colorTagDestacado;
+                                    font-size: 22px;
+                                    border-radius: 10px;
+                                    cursor: pointer;
+                                    @include hover();
+                
+                                    &:hover {
+                                        background-color: $colorTag;
+                                        box-shadow: 0 0 50px 0 color-opacity($colorTagDestacado, .5);
+                                    }
+                                }
             }
         }
         

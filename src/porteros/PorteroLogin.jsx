@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import config from "../config";
+import { FaIceCream, FaTicketSimple, FaFire, FaUser, FaPowerOff } from "react-icons/fa6";
 
 function PorteroLogin() {
   const [numeroEvento, setNumeroEvento] = useState("");
@@ -51,33 +52,36 @@ function PorteroLogin() {
   };
 
   return (
-    <main className="adminPanel portero-login">
-      <h2>Acceso para Control de Tickets</h2>
-      <form onSubmit={handleLogin}>
-        <div className="campoForm">
-          <label>Número de Evento</label>
-          <input
-            type="number"
-            value={numeroEvento}
-            onChange={(e) => setNumeroEvento(e.target.value)}
-            required
-            placeholder="Ej: 123456"
-          />
-        </div>
+    <main className="porteros">
+      <div className="porteros__login">
+     <i><FaIceCream /></i>
+        <h3>Acceso para Control de Tickets</h3>
+        <form onSubmit={handleLogin}>
+          <div className="campoForm">
+            <label>Número de Evento</label>
+            <input
+              type="number"
+              value={numeroEvento}
+              onChange={(e) => setNumeroEvento(e.target.value)}
+              required
+              placeholder="Ej: 123456"
+            />
+          </div>
 
-        <div className="campoForm">
-          <label>Clave</label>
-          <input
-            type="password"
-            value={clave}
-            onChange={(e) => setClave(e.target.value)}
-            required
-            placeholder="Ingresa la clave"
-          />
-        </div>
+          <div className="campoForm">
+            <label>Clave</label>
+            <input
+              type="password"
+              value={clave}
+              onChange={(e) => setClave(e.target.value)}
+              required
+              placeholder="Ingresa la clave"
+            />
+          </div>
 
-        <button type="submit" className="btn-entrada">Ingresar</button>
-      </form>
+          <button type="submit" className="btn-entrada">Ingresar</button>
+        </form>
+      </div>
     </main>
   );
 }
