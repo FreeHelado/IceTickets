@@ -256,3 +256,108 @@
         }
     }
 }
+
+.buscadorAdmin {
+    @include flex();
+    width: 100%;
+    input {
+        width: 100%;
+        background-color: claro($colorSecundario, 05);
+        height: 60px;
+        color: #fff;
+        border-color: #ffffff44;
+        border-width: 2px;
+        border-radius: 60px;
+    }
+}
+
+.filtrosTickets {
+    @include flex();
+    border-radius: 60px;
+    border: 2px solid #ffffff44;
+    padding: 5px;
+
+    button {
+        background-color: transparent;
+        padding: 10px 20px;
+        border-radius: 60px;
+        cursor: pointer;
+        &:hover {
+            opacity: .75;
+        }
+        &.activo {
+            background-color: $colorTagDestacado;
+        }
+    }
+}
+
+.ticketsEventos {
+    @include grid(2);
+    gap: 15px;
+    width: 100%;
+    
+    &__item {
+        @extend .caja;
+        background-color: claro($colorSecundario, 8);
+        border-style: dashed;
+        border-color: claro($colorSecundario, 50);
+        @include flex(15px);
+        width: 100%;
+        position: relative;
+        padding: 30px 20px;
+        border-radius: 10px;
+
+        .tagUsado {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            @include flex();
+            justify-content: center;
+            background-color: $amarelo;
+            color: $colorPrimario;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 5px;
+            border-radius: 5px;
+
+            &.usado {
+                background-color: $rojo;
+                color: #fff;
+            }
+        }
+
+        &--qr {
+            @include flexColumn(5px);
+
+            canvas {
+                max-width: 100px;
+                max-height: 100px;
+            }
+        }
+
+
+        &--info {
+            @include flexColumn(5px);
+            span {
+                padding: 0;
+                margin: 0;
+                line-height: 1;
+            }
+        }
+
+        &--detalle {
+            margin-left: auto;
+            @include flexColumn(5px);
+            span {
+                padding: 0;
+                margin: 0;
+                line-height: 1;
+            }
+            strong {
+                font-size: 20px;
+                font-weight: 600;
+            }
+        }
+    }
+
+}
