@@ -51,7 +51,7 @@ function PorteroLogin() {
   };
 
   return (
-    <main className="portero-login">
+    <main className="adminPanel portero-login">
       <h2>Acceso para Control de Tickets</h2>
       <form onSubmit={handleLogin}>
         <div className="campoForm">

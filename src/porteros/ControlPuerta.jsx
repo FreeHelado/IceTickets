@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import config from "../config";
 import Swal from "sweetalert2";
 
+
 function ValidacionPortero() {
   const [codigoTicket, setCodigoTicket] = useState("");
   const [numeroEvento, setNumeroEvento] = useState("");
@@ -10,17 +11,22 @@ function ValidacionPortero() {
     const [error, setError] = useState(null);
     const [evento, setEvento] = useState(null); // 🔥 Definir el estado de evento
 
-    // ✅ Cargar el evento desde localStorage al iniciar
+  // ✅ Cargar el evento desde localStorage al iniciar
   useEffect(() => {
     const eventoGuardado = localStorage.getItem("eventoPortero");
     if (eventoGuardado) {
-      setEvento(JSON.parse(eventoGuardado)); // 🔥 Guardar el evento en el estado
+      try {
+        setEvento(JSON.parse(eventoGuardado));
+      } catch (error) {
+        Swal.fire("Error", "Datos del evento corruptos. Intenta iniciar sesión de nuevo.", "error");
+      }
     } else {
       Swal.fire("Error", "No tienes un evento seleccionado", "error");
     }
   }, []);
+
     
-  const buscarTicket = async () => {
+const buscarTicket = async () => {
   setError(null);
   setTicketData(null);
 
@@ -29,61 +35,107 @@ function ValidacionPortero() {
     return;
   }
 
+  if (!evento) {
+    Swal.fire("Error", "No tienes un evento seleccionado", "error");
+    return;
+  }
+
+  console.log("📩 Enviando a backend:", {
+    idVerificador: codigoTicket,
+    eventoId: evento.id,
+  });
+
   try {
     const response = await fetch(`${config.BACKEND_URL}/api/tickets/validar`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ idVerificador: codigoTicket }),
+      body: JSON.stringify({
+        idVerificador: codigoTicket,
+        eventoId: evento.id,
+      }),
     });
 
-    const contentType = response.headers.get("content-type");
+    console.log("📌 Respuesta sin procesar:", response);
 
-    if (!contentType || !contentType.includes("application/json")) {
-      throw new Error("El servidor no devolvió JSON. Verifica la API.");
-    }
-
-    const data = await response.json();
-
-    console.log("📌 Respuesta del backend:", data); // 🔍 Depuración
+    // 🔥 Intentamos obtener JSON, si no es JSON manejamos el error
+    const textResponse = await response.text();
+    console.log("📌 Respuesta en texto:", textResponse);
 
     if (!response.ok) {
-      throw new Error(data.message || "Error en la validación");
+      let errorMessage = "Error desconocido";
+      try {
+        const errorData = JSON.parse(textResponse);
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        errorMessage = textResponse; // Si no es JSON, mostramos el texto crudo
+      }
+      
+      throw new Error(errorMessage);
     }
+
+    const data = JSON.parse(textResponse);
+    console.log("📌 Respuesta JSON:", data);
 
     setTicketData(data);
   } catch (err) {
-    console.error("❌ Error en la validación:", err);
+    console.error("❌ Error en la validación:", err.message);
+
+    // ✅ Mostramos el mensaje de error bien formateado en pantalla
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: err.message, // 🔥 Ahora solo muestra el mensaje sin el JSON
+    });
+
     setError(err.message);
   }
 };
 
 
-  const validarAcceso = async () => {
-    if (!ticketData || !evento) return;
 
-    try {
-      const response = await fetch(
-        `${config.BACKEND_URL}/api/tickets/marcar-usado/${ticketData.ticket.idVerificador}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ numeroEvento: evento.numeroEvento, clave: evento.clave }),
-        }
-      );
+const validarAcceso = async () => {
+  if (!ticketData || !evento) {
+    console.log("❌ ERROR: ticketData o evento están vacíos.");
+    return;
+  }
 
-      const data = await response.json();
+  console.log("📩 Enviando validación con:", {
+    idVerificador: ticketData.ticket.idVerificador,
+    eventoId: evento.id,  // 🔥 Solo enviamos el ID del evento
+  });
 
-      if (!response.ok) {
-        throw new Error(data.message || "No se pudo marcar como usado");
+  try {
+    const response = await fetch(
+      `${config.BACKEND_URL}/api/tickets/marcar-usado/${ticketData.ticket.idVerificador}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventoId: evento.id,  // 🔥 Solo enviamos el ID del evento
+        }),
       }
+    );
 
-      Swal.fire("Acceso Validado", "El ticket ha sido marcado como usado", "success");
-      setTicketData(null);
-      setCodigoTicket("");
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
+    const data = await response.json();
+    console.log("📌 Respuesta del backend:", data);
+
+    if (!response.ok) {
+      throw new Error(data.message || "No se pudo marcar como usado");
     }
-  };
+
+    Swal.fire("Acceso Validado", "El ticket ha sido marcado como usado", "success");
+    setTicketData(null);
+    setCodigoTicket("");
+  } catch (err) {
+    Swal.fire("Error", err.message, "error");
+  }
+};
+
+
+
+
+
+
 
 
   return (
