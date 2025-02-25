@@ -215,24 +215,57 @@ function Checkout({ usuario }) {
 
 
     const handleClickEnMapa = (asiento) => {
-        if (!asiento || asiento.ocupado) return; // 🔴 Bloqueamos los ocupados
+    if (!asiento || asiento.ocupado) return; // 🔴 Bloqueamos los ocupados
 
-            console.log("🪑 Asiento seleccionado correctamente:", asiento);
+    console.log("🪑 Asiento seleccionado correctamente:", asiento);
 
-            // 🔥 Actualizamos el estado de TODOS los asientos
-            setAsientos(prevAsientos =>
-                prevAsientos.map(a => ({
-                    ...a,
-                    seleccionado: a._id === asiento._id, // ✅ Solo este asiento se marca como seleccionado
-                }))
-            );
+    // 🔥 Buscar la fila a la que pertenece el asiento
+    const filaEncontrada = sectores
+        .flatMap(sector => sector.filas) // 🔥 Tomamos todas las filas de todos los sectores
+        .find(fila => fila.asientos.some(a => a._id === asiento._id)); // 🔥 Buscamos la fila del asiento
 
-            setAsientoSeleccionado(asiento); // ✅ Guardamos el seleccionado
+    if (!filaEncontrada) {
+        console.warn("⚠️ No se encontró la fila del asiento seleccionado.");
+        return;
+    }
 
-            // 🔥 FORZAMOS UN RE-RENDER en React (truco ninja)
-            setAsientos(prevAsientos => [...prevAsientos]); // 💥 Esto obliga a React a redibujar
-        };
+    console.log("📌 Fila encontrada:", filaEncontrada.nombreFila);
 
+    // 🔥 Actualizamos el estado de TODOS los asientos para reflejar la selección
+    setAsientos(prevAsientos =>
+        prevAsientos.map(a => ({
+            ...a,
+            seleccionado: a._id === asiento._id, // ✅ Solo este asiento se marca como seleccionado
+        }))
+    );
+
+    setAsientoSeleccionado(asiento); // ✅ Guardamos el asiento seleccionado
+
+    // 🔥 Actualizamos el formulario correspondiente con el asiento y su fila
+    setFormularios(prev =>
+        prev.map((form, i) =>
+            i === modalOpen
+                ? { ...form, fila: filaEncontrada.nombreFila, asiento: asiento.nombreAsiento }
+                : form
+        )
+    );
+
+    // 🔥 FORZAMOS UN RE-RENDER en React
+    setAsientos(prevAsientos => [...prevAsientos]); // 💥 Esto obliga a React a redibujar
+};
+
+
+const handleConfirmarAsiento = () => {
+    if (!asientoSeleccionado) {
+        Swal.fire("Error", "Selecciona un asiento antes de confirmar", "error");
+        return;
+    }
+
+    console.log("✅ Asiento confirmado:", asientoSeleccionado);
+
+    // 🔥 Cerramos el modal
+    setModalOpen(null);
+};
 
 
 
@@ -430,34 +463,44 @@ function Checkout({ usuario }) {
                                 )}
 
                                 {form.fila && (
-    <div className="entradasForm__item--campo">
-        <label htmlFor="asiento">Asiento</label>
-        <select
-            name="asiento"
-            value={form.asiento || ""}
-            onChange={(e) => handleInputChange(index, e)}
-            // required
-        >
-            <option value="">Selecciona un asiento</option>
-            {filasPorSector[form.sector]
-                ?.find(f => f.nombreFila === form.fila)?.asientos
-                .filter(asiento => asiento.disponible && !asiento.ocupado) // 🔥 Solo asientos libres
-                .map(asiento => (
-                    <option key={asiento._id} value={asiento.nombreAsiento}>
-                        {asiento.nombreAsiento}
-                    </option>
-                ))}
-        </select>
-    </div>
-)}
+                                        <div className="entradasForm__item--campo">
+                                            <label htmlFor="asiento">Asiento</label>
+                                            <select
+                                                name="asiento"
+                                                value={form.asiento || ""}
+                                                onChange={(e) => handleInputChange(index, e)}
+                                                // required
+                                            >
+                                                <option value="">Selecciona un asiento</option>
+                                                {filasPorSector[form.sector]
+                                                    ?.find(f => f.nombreFila === form.fila)?.asientos
+                                                    .filter(asiento => asiento.disponible && !asiento.ocupado) // 🔥 Solo asientos libres
+                                                    .map(asiento => (
+                                                        <option key={asiento._id} value={asiento.nombreAsiento}>
+                                                            {asiento.nombreAsiento}
+                                                        </option>
+                                                    ))}
+                                            </select>
+                                        </div>
+                                    )}
 
 
                                 {form.sector && (
-                                    <button type="button" onClick={() => setModalOpen(index)} className="elegir-asientos">
-                                        <i><MdOutlineEventSeat/></i>
-                                        <span>Elegir Asientos</span>
-                                    </button>
+                                    <>
+                                        <button type="button" onClick={() => setModalOpen(index)} className="elegir-asientos">
+                                            <i><MdOutlineEventSeat/></i>
+                                            <span>Elegir Asientos</span>
+                                        </button>
+
+                                        {/* 🔥 Mostrar selección solo si hay asiento elegido */}
+                                        {form.asiento && (
+                                            <small>
+                                                Fila: {form.fila}, Asiento: {form.asiento}
+                                            </small>
+                                        )}
+                                    </>
                                 )}
+
 
                                 {modalOpen !== null && mapaImagen && (
                                         
@@ -469,7 +512,7 @@ function Checkout({ usuario }) {
                                                 </div>
 
                                                 <div className="modal-mapa__content--mapa">
-                                                <svg viewBox="0 0 800 800" width="100%" height="100%">
+                                                <svg viewBox="0 0 680 680" width="100%" height="100%">
                                                     {/* 🔥 Imagen de fondo */}
                                                     <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
 
@@ -526,19 +569,11 @@ function Checkout({ usuario }) {
                                             <button
                                                 type="button"
                                                 className="confirmar-asiento"
-                                                onClick={() => {
-                                                    if (!asientoSeleccionado) {
-                                                        Swal.fire("Error", "Selecciona un asiento antes de confirmar", "error");
-                                                        return;
-                                                    }
-
-                                                    console.log("✅ Asiento confirmado:", asientoSeleccionado);
-
-                                                    setModalOpen(null); // ✅ Cierra el modal solo si hay un asiento seleccionado
-                                                }}
+                                                onClick={handleConfirmarAsiento}
                                             >
                                                 Confirmar Selección
                                             </button>
+
 
 
 

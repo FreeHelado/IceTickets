@@ -171,7 +171,7 @@ function AdminMapaAsientos() {
       
       <div className="mapa">
         <svg
-          viewBox="0 0 800 800"
+          viewBox="0 0 675 675"
           width="100%"
           height="100%"
           onClick={(e) => {
@@ -202,11 +202,11 @@ function AdminMapaAsientos() {
 
           {/* 🔥 Dibujar la grilla en el mapa */}
           <g>
-            {[...Array(Math.floor(800 / 25) + 1)].map((_, i) => (
-              <line key={`v-${i}`} x1={i * 25} y1="0" x2={i * 25} y2="800" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="0.5" />
+            {[...Array(Math.floor(675 / 25) + 1)].map((_, i) => (
+              <line key={`v-${i}`} x1={i * 25} y1="0" x2={i * 25} y2="675" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="0.5" />
             ))}
-            {[...Array(Math.floor(800 / 25) + 1)].map((_, i) => (
-              <line key={`h-${i}`} x1="0" y1={i * 25} x2="800" y2={i * 25} stroke="rgba(255, 255, 255, 0.3)" strokeWidth="0.5" />
+            {[...Array(Math.floor(675 / 25) + 1)].map((_, i) => (
+              <line key={`h-${i}`} x1="0" y1={i * 25} x2="675" y2={i * 25} stroke="rgba(255, 255, 255, 0.3)" strokeWidth="0.5" />
             ))}
           </g>
           
