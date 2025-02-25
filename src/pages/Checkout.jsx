@@ -46,8 +46,7 @@ function Checkout({ usuario }) {
     const [asientosDelSector, setAsientosDelSector] = useState([]);
     const [asientoSeleccionado, setAsientoSeleccionado] = useState(null);
 
-   const DURACION_TIEMPO = 600; // ⏳ 10 minutos en segundos
-
+    const DURACION_TIEMPO = 600; // ⏳ 10 minutos en segundos
     const [timeLeft, setTimeLeft] = useState(() => {
         const tiempoGuardado = localStorage.getItem("checkoutTime");
         
@@ -70,7 +69,52 @@ function Checkout({ usuario }) {
         return DURACION_TIEMPO;
     });
 
-    
+    useEffect(() => {
+        if (timeLeft <= 0) {
+            Swal.fire({
+                title: "Tiempo agotado",
+                text: "Tu reserva ha expirado. Volverás al detalle del evento.",
+                icon: "warning",
+                confirmButtonText: "Entendido",
+                timer: 5000,
+                timerProgressBar: true,
+            }).then(() => {
+                localStorage.removeItem("carrito");
+                localStorage.removeItem("evento");
+                localStorage.removeItem("cantidades");
+                localStorage.removeItem("checkoutTime"); 
+                localStorage.removeItem("ultimoEventoId"); // 🚀 Limpiamos el evento también
+
+                navigate(`/evento/${evento.id || evento._id}`);
+            });
+        }
+
+        const timer = setInterval(() => {
+            setTimeLeft(prevTime => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLeft, navigate, evento.id]);
+
+    useEffect(() => {
+        const obtenerSectores = async () => {
+            try {
+                const response = await fetch(`${config.BACKEND_URL}/api/eventos/${evento.id}/sectores`);
+                if (!response.ok) throw new Error("Error obteniendo sectores");
+                const data = await response.json();
+                
+               
+                
+                setSectores(data); // ✅ Guardamos los sectores en el estado
+            } catch (error) {
+                console.error("❌ Error obteniendo sectores:", error);
+            }
+        };
+
+        if (evento.id) obtenerSectores();
+    }, [evento.id]);
+
+
     useEffect(() => {
         carrito.forEach(item => {
             if (item.sector) {
@@ -92,7 +136,6 @@ function Checkout({ usuario }) {
             if (sectorEncontrado) {
                 const filasDisponibles = sectorEncontrado.filas.filter(fila => fila.disponible); // 🔥 Filtramos solo filas disponibles
 
-                console.log(`📌 Filas disponibles para sector ${sectorId}:`, filasDisponibles);
 
                 setFilasPorSector(prev => ({
                     ...prev,
@@ -107,28 +150,7 @@ function Checkout({ usuario }) {
     };
 
     useEffect(() => {
-    console.log("📌 Estado actualizado de asientos:", asientos);
-}, [asientos]);
-
-
-
-    useEffect(() => {
-        const obtenerSectores = async () => {
-            try {
-                const response = await fetch(`${config.BACKEND_URL}/api/eventos/${evento.id}/sectores`);
-                if (!response.ok) throw new Error("Error obteniendo sectores");
-                const data = await response.json();
-                
-                console.log("📌 Sectores obtenidos:", data); // 🔥 Verifica que llega data
-                
-                setSectores(data); // ✅ Guardamos los sectores en el estado
-            } catch (error) {
-                console.error("❌ Error obteniendo sectores:", error);
-            }
-        };
-
-        if (evento.id) obtenerSectores();
-    }, [evento.id]);
+    }, [asientos]);
 
 
     useEffect(() => {
@@ -179,43 +201,45 @@ function Checkout({ usuario }) {
             if (sectorId) {
                 const nuevosAsientos = obtenerAsientosDelSector(sectorId);
                 setAsientos(nuevosAsientos);
-                console.log("📌 Asientos cargados al abrir el modal:", nuevosAsientos);
+                
             }
         }
     }, [modalOpen, sectores]); // ✅ Se ejecuta cuando `modalOpen` o `sectores` cambia.
 
+    useEffect(() => {
+    if (!evento?.id) return;
 
-     useEffect(() => {
-        if (timeLeft <= 0) {
-            Swal.fire({
-                title: "Tiempo agotado",
-                text: "Tu reserva ha expirado. Volverás al detalle del evento.",
-                icon: "warning",
-                confirmButtonText: "Entendido",
-                timer: 5000,
-                timerProgressBar: true,
-            }).then(() => {
-                localStorage.removeItem("carrito");
-                localStorage.removeItem("evento");
-                localStorage.removeItem("cantidades");
-                localStorage.removeItem("checkoutTime"); 
-                localStorage.removeItem("ultimoEventoId"); // 🚀 Limpiamos el evento también
+        const actualizarAsientos = async () => {
+            try {
+                const response = await fetch(`${config.BACKEND_URL}/api/eventos/${evento.id}/sectores`);
+                const data = await response.json();
+                setSectores(data);
 
-                navigate(`/evento/${evento.id || evento._id}`);
-            });
-        }
+                // 🔥 Si hay un sector seleccionado, actualizamos los asientos visibles
+                if (modalOpen !== null) {
+                    const sectorId = formularios[modalOpen]?.sector;
+                    if (sectorId) {
+                        const sectorActualizado = data.find(s => s._id === sectorId);
+                        if (sectorActualizado) {
+                            const nuevosAsientos = sectorActualizado.filas.flatMap(fila => fila.asientos);
+                            setAsientos(nuevosAsientos);
+                        }
+                    }
+                }
 
-        const timer = setInterval(() => {
-            setTimeLeft(prevTime => prevTime - 1);
-        }, 1000);
+            } catch (error) {
+                console.error("❌ Error obteniendo sectores:", error);
+            }
+        };
 
-        return () => clearInterval(timer);
-    }, [timeLeft, navigate, evento.id]);
+        const interval = setInterval(actualizarAsientos, 5000); // 🔥 Llama a la API cada 5 segundos
+
+        return () => clearInterval(interval); // ✅ Detiene el intervalo cuando el componente se desmonta
+    }, [evento.id, modalOpen]); // ✅ Se ejecuta si cambia el evento o se abre el modal de selección de asientos
 
     // ⏳ Convertir `timeLeft` a minutos y segundos
     const minutos = Math.floor(timeLeft / 60);
     const segundos = timeLeft % 60;
-
 
     const handleFilaChange = (index, e) => {
         const { value } = e.target;
@@ -240,7 +264,6 @@ function Checkout({ usuario }) {
         setTicketUsuario(index);
     };
 
-
     const obtenerAsientosDelSector = (sectorId) => {
         if (!sectores || sectores.length === 0) {
             console.warn("⚠️ Sectores aún no están cargados");
@@ -260,70 +283,151 @@ function Checkout({ usuario }) {
                 seleccionado: false // 🔥 Agregamos la propiedad desde el principio
             }))
         );
-
-        console.log(`📌 Asientos obtenidos para el sector ${sectorId}:`, asientosTotales);
-
         return asientosTotales; 
+    };
+
+    const reservarAsiento = async (asiento) => {
+        try {
+            if (!evento || !usuario) {
+                Swal.fire("Error", "No se pudo identificar el evento o el usuario", "error");
+                return;
+            }
+
+            const response = await fetch(`${config.BACKEND_URL}/api/eventos/${evento.id}/reservar-asiento`, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    Authorization: localStorage.getItem("token") // 🔥 Enviamos el token del usuario
+                },
+                body: JSON.stringify({
+                    sectorId: formularios[modalOpen]?.sector,
+                    fila: formularios[modalOpen]?.fila,
+                    asiento: asiento.nombreAsiento,
+                    usuarioId: usuario._id
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Error reservando el asiento");
+
+            console.log("✅ Asiento reservado:", data.asiento);
+
+            // 🔥 Actualizamos el estado de los asientos sin refrescar la página
+            setAsientos(prevAsientos =>
+                prevAsientos.map(a => ({
+                    ...a,
+                    reservado: a.nombreAsiento === data.asiento.nombreAsiento ? true : a.reservado,
+                    usuarioReserva: a.nombreAsiento === data.asiento.nombreAsiento ? usuario._id : a.usuarioReserva
+                }))
+            );
+
+            // ✅ Guardamos el asiento seleccionado
+            setAsientoSeleccionado(data.asiento);
+
+            Swal.fire("Reserva confirmada", "Tienes 10 minutos para finalizar la compra", "success");
+
+        } catch (error) {
+            Swal.fire("Error", error.message, "error");
+        }
     };
 
 
     const handleClickEnMapa = (asiento) => {
-    if (!asiento || asiento.ocupado) return; // 🔴 Bloqueamos los ocupados
+        if (!asiento || asiento.ocupado || asiento.reservado) return; // 🔴 Bloqueamos si ya está reservado
 
-    console.log("🪑 Asiento seleccionado correctamente:", asiento);
+        console.log("🪑 Asiento seleccionado correctamente:", asiento);
 
-    // 🔥 Buscar la fila a la que pertenece el asiento
-    const filaEncontrada = sectores
-        .flatMap(sector => sector.filas) // 🔥 Tomamos todas las filas de todos los sectores
-        .find(fila => fila.asientos.some(a => a._id === asiento._id)); // 🔥 Buscamos la fila del asiento
+        let filaEncontrada = null;
+        let sectorEncontrado = null;
 
-    if (!filaEncontrada) {
-        console.warn("⚠️ No se encontró la fila del asiento seleccionado.");
-        return;
+        sectores.forEach(sector => {
+            const fila = sector.filas.find(fila => fila.asientos.some(a => a._id === asiento._id));
+            if (fila) {
+                filaEncontrada = fila;
+                sectorEncontrado = sector;
+            }
+        });
+
+        if (!filaEncontrada || !sectorEncontrado) {
+            console.warn("⚠️ No se encontró la fila o el sector del asiento seleccionado.");
+            return;
+        }
+
+        // 🔥 DESRESERVAR ASIENTO ANTERIOR
+        const asientoAnterior = formularios[modalOpen]?.asiento;
+        if (asientoAnterior && asientoAnterior !== asiento.nombreAsiento) {
+            console.log(`🔄 Intentando liberar asiento anterior: ${asientoAnterior}`);
+            liberarAsiento(asientoAnterior, formularios[modalOpen]?.fila, formularios[modalOpen]?.sector);
+        }
+
+        // 🔥 ACTUALIZAR FORMULARIO
+        setFormularios(prev =>
+            prev.map((form, i) =>
+                i === modalOpen
+                    ? { ...form, fila: filaEncontrada.nombreFila, asiento: asiento.nombreAsiento, sector: sectorEncontrado._id }
+                    : form
+            )
+        );
+
+        setAsientoSeleccionado(asiento);
+        reservarAsiento(asiento);
+    };
+
+
+
+    const liberarAsiento = async (asientoNombre, fila, sectorId) => {
+    try {
+        if (!evento || !usuario) return;
+
+        console.log(`🚀 Enviando petición para liberar asiento ${asientoNombre}`);
+
+        const response = await fetch(`${config.BACKEND_URL}/api/eventos/${evento.id}/liberar-asiento`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                Authorization: localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+                sectorId,
+                fila,
+                asiento: asientoNombre,
+                usuarioId: usuario._id
+            })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Error liberando el asiento");
+
+        console.log("✅ Asiento liberado en backend:", data);
+
+        // 🔥 ACTUALIZAR ESTADO LOCALMENTE
+        setAsientos(prevAsientos =>
+            prevAsientos.map(a => ({
+                ...a,
+                reservado: a.nombreAsiento === asientoNombre ? false : a.reservado,
+                usuarioReserva: a.nombreAsiento === asientoNombre ? null : a.usuarioReserva
+            }))
+        );
+
+    } catch (error) {
+        console.error("❌ Error liberando asiento:", error);
     }
-
-    console.log("📌 Fila encontrada:", filaEncontrada.nombreFila);
-
-    // 🔥 Actualizamos el estado de TODOS los asientos para reflejar la selección
-    setAsientos(prevAsientos =>
-        prevAsientos.map(a => ({
-            ...a,
-            seleccionado: a._id === asiento._id, // ✅ Solo este asiento se marca como seleccionado
-        }))
-    );
-
-    setAsientoSeleccionado(asiento); // ✅ Guardamos el asiento seleccionado
-
-    // 🔥 Actualizamos el formulario correspondiente con el asiento y su fila
-    setFormularios(prev =>
-        prev.map((form, i) =>
-            i === modalOpen
-                ? { ...form, fila: filaEncontrada.nombreFila, asiento: asiento.nombreAsiento }
-                : form
-        )
-    );
-
-    // 🔥 FORZAMOS UN RE-RENDER en React
-    setAsientos(prevAsientos => [...prevAsientos]); // 💥 Esto obliga a React a redibujar
 };
 
 
-const handleConfirmarAsiento = () => {
-    if (!asientoSeleccionado) {
-        Swal.fire("Error", "Selecciona un asiento antes de confirmar", "error");
-        return;
-    }
 
-    console.log("✅ Asiento confirmado:", asientoSeleccionado);
+    const handleConfirmarAsiento = () => {
+        if (!asientoSeleccionado) {
+            Swal.fire("Error", "Selecciona un asiento antes de confirmar", "error");
+            return;
+        }
 
-    // 🔥 Cerramos el modal
-    setModalOpen(null);
-};
+        console.log("✅ Asiento confirmado:", asientoSeleccionado);
 
-
-
-
-
+        // 🔥 Cerramos el modal
+        setModalOpen(null);
+    };
+    
 
     const confirmarCompra = async () => {
         // Verificar si algún asiento seleccionado ya está ocupado o se eligió más de una vez en el mismo checkout
@@ -581,9 +685,16 @@ const handleConfirmarAsiento = () => {
                                                 </div>
 
                                                 <div className="modal-mapa__content--mapa">
+                                                <div className="refeAsientos">
+                                                    <span className="dispo">Disponible</span>
+                                                    <span className="ocu">Ocupado</span>
+                                                    <span className="rese">Reservado (⌛10min)</span>
+                                                </div>
                                                 <svg viewBox="0 0 675 675" width="100%" height="100%">
                                                     {/* 🔥 Imagen de fondo */}
                                                     <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
+
+                                                   
 
                                                     {/* 🔥 Dibujar los asientos como DIVS en foreignObject */}
                                                     {/* 🔥 Dibujar los asientos como DIVS en foreignObject */}
@@ -613,14 +724,12 @@ const handleConfirmarAsiento = () => {
                         borderRadius: "5px",
                         backgroundColor: asiento.seleccionado
                             ? "yellow"  // si está seleccionado
+                            : asiento.reservado
+                            ? "#ff9800" // 🟠 Reservado
                             : asiento.ocupado
                             ? "#9f0d3e"   // si está ocupado
                             : "#e8e7f1", // si está disponible
-                        opacity: asiento.seleccionado
-                            ? "1"  // si está seleccionado
-                            : asiento.ocupado
-                            ? ".5"   // si está ocupado
-                            : "1", // si está disponible
+                        opacity: asiento.ocupado || asiento.reservado ? ".5" : "1",
                         border: "1px solid #2c2948",
                         color: "#2c2948",
                         fontSize: "10px",

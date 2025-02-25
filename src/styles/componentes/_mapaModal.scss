@@ -33,6 +33,38 @@
     
         &--mapa {
             width: 100%;
+            position: relative;
+
+            .refeAsientos {
+                position: absolute;
+                bottom: 20px;
+                right: 10px;
+                @include flexColumn(5px);
+                align-items: flex-end;
+                span {
+                    font-size: 11px;
+                    color: $colorPrimario;
+                    background-color: #fff;
+                    padding: 5px;
+                    border-radius: 5px;
+                    &.dispo {
+                        background-color: #e8e7f1;
+                    }
+                    &.noDispo {
+                        background-color: #9f0d3e;
+
+                    }
+                    &.ocu {
+                        background-color: #9f0d3e;
+                        opacity: .5;
+                    }
+                    &.rese {
+                        background-color: #ff9800;
+                        opacity: .5;
+                    }
+                }
+            }
+
             svg {
                 width: 675px;
                 border-radius: 15px;
