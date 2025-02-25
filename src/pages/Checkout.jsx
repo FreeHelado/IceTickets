@@ -483,41 +483,48 @@ function Checkout({ usuario }) {
                                                         {/* 🔥 Imagen del mapa */}
                                                         <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
 
-                                                        {/* 🔥 Dibujar los asientos */}
-                                                        {asientos.length > 0 ? (
-                                                        <>
-                                                            {console.log("📌 Asientos disponibles:", asientos)} {/* 🔥 Aquí */}
-                                                            {console.log("📌 Asientos en estado:", asientos)}
-                                                                {asientos.map((asiento, index) => (
-
-                                                            
-                                                             <circle
-                                                                key={index}
-                                                                cx={(asiento.coordenadas?.x || 0) + 15} // Ajuste horizontal
-                                                                cy={(asiento.coordenadas?.y || 0) + 15} // Ajuste vertical
-                                                                r="10" // Radio del círculo
-                                                                fill={
-                                                                    asientoSeleccionado?._id === asiento._id 
-                                                                        ? "blue" // 🔥 Azul si está seleccionado
-                                                                        : asiento.ocupado
-                                                                        ? "red"  // 🔥 Rojo si está ocupado
-                                                                        : "yellow" // 🔥 Amarillo si está disponible
-                                                                }
-                                                                stroke="black"
-                                                                opacity="1"
-                                                                strokeWidth="1"
-                                                                onClick={() => handleClickEnMapa(asiento)} // ✅ Ahora se pasa el asiento correctamente
-                                                                style={{ cursor: "pointer" }}
-                                                            />
-
-
-
-
-                                                            ))}
-                                                        </>
-                                                        ) : (
-                                                        <p>No hay asientos disponibles</p>
-                                                        )}
+                                                        {/* 🔥 Dibujar los asientos con el mismo path del editor */}
+{asientos.length > 0 ? (
+  <>
+    {asientos.map((asiento, index) => (
+      <g
+        key={index}
+        transform={`translate(${asiento.coordenadas?.x || 0}, ${asiento.coordenadas?.y || 0})`}
+        onClick={() => handleClickEnMapa(asiento)} // ✅ Ahora se pasa el asiento correctamente
+        style={{ cursor: "pointer" }}
+      >
+        <path
+           d="M3.9,18.6v3.9c0,1.5,1.4,2.8,3,2.8h10.9c1.7,0,3-1.3,3-2.8v-3.9c2.2-0.3,3.9-2.2,3.9-4.5V4.5  
+  c0-2.5-2-4.5-4.4-4.5H4.4C2,0,0,2,0,4.5v9.6C0,16.5,1.7,18.3,3.9,18.6z"
+          fill={
+            asientoSeleccionado?._id === asiento._id 
+              ? "blue" // 🔥 Azul si está seleccionado
+              : asiento.ocupado
+              ? "red"  // 🔥 Rojo si está ocupado
+              : "yellow" // 🔥 Amarillo si está disponible
+          }
+          stroke="black"
+          strokeWidth="1"
+          opacity="1"
+        />
+        
+        {/* 🔤 Nombre del asiento */}
+        <text
+          x="12"
+          y="16"
+          fontSize="10px"
+          fontFamily="Arial, sans-serif"
+          fill="black"
+          textAnchor="middle"
+        >
+          {asiento.nombreAsiento}
+        </text>
+      </g>
+    ))}
+  </>
+) : (
+  <p>No hay asientos disponibles</p>
+)}
 
 
                                                         </svg>

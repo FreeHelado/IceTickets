@@ -65,73 +65,71 @@ function AdminMapaAsientos() {
   };
   
   const handleMapearAsiento = async (x, y) => {
-      if (!selectedAsiento) return;
+    if (!selectedAsiento) return;
 
-      try {
+    // 🔥 Ajustamos la coordenada a la grilla 15x15
+    const gridSize = 25;
+    const gridX = Math.round(x / gridSize) * gridSize;
+    const gridY = Math.round(y / gridSize) * gridSize;
+
+    try {
         console.log("📌 Antes de eliminar:", rectangles);
 
-          // 🔄 1️⃣ Eliminar el asiento anterior si ya existía en la lista
-          setRectangles(prev => {
-            const actualizados = prev.filter(rect => rect.asiento !== selectedAsiento.nombre);
-            console.log("🗑 Eliminado asiento anterior:", actualizados);
-              return actualizados;
-          });
+        // 🔄 1️⃣ Eliminar el asiento anterior si ya existía en la lista
+        setRectangles(prev => prev.filter(rect => rect.asiento !== selectedAsiento.nombre));
 
-          const response = await fetch(`${config.BACKEND_URL}/api/lugares/${id}/sectores/${selectedAsiento.sectorId}/filas/${selectedAsiento.filaId}/asientos/${selectedAsiento.id}/mapeo`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ x, y }),
-          });
-          
-          const data = await response.json();
-          if (response.ok) {
+        const response = await fetch(`${config.BACKEND_URL}/api/lugares/${id}/sectores/${selectedAsiento.sectorId}/filas/${selectedAsiento.filaId}/asientos/${selectedAsiento.id}/mapeo`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ x: gridX, y: gridY }), // 🔥 Guardamos las coordenadas ajustadas
+        });
+
+        const data = await response.json();
+        if (response.ok) {
             console.log("🔥 Asiento mapeado correctamente", data);
 
-            // 🔥 2️⃣ Agregar el nuevo asiento con la nueva posición
-            setRectangles(prev => {
-                  const nuevoEstado = [...prev, { x, y, asiento: selectedAsiento.nombre }];
-                  console.log("🆕 Nuevo estado de rectangles:", nuevoEstado);
-                  return nuevoEstado;
-              });
+            // 🔥 2️⃣ Agregar el nuevo asiento con la nueva posición ajustada
+            setRectangles(prev => [...prev, { x: gridX, y: gridY, asiento: selectedAsiento.nombre }]);
 
-              // 🔄 3️⃣ Actualizar el estado de `asientoEstados`
-              setAsientoEstados(prev => ({
-                  ...prev,
-                  [selectedAsiento.id]: "mapeado"
-              }));
+            // 🔄 3️⃣ Actualizar el estado de `asientoEstados`
+            setAsientoEstados(prev => ({
+                ...prev,
+                [selectedAsiento.id]: "mapeado"
+            }));
 
-              // 🔥 4️⃣ Actualizar el estado de `lugar`
-              setLugar(prevLugar => ({
-                  ...prevLugar,
-                  sectores: prevLugar.sectores.map(sector =>
-                      sector._id === selectedAsiento.sectorId
-                          ? {
-                              ...sector,
-                              filas: sector.filas.map(fila =>
-                                  fila._id === selectedAsiento.filaId
-                                      ? {
-                                          ...fila,
-                                          asientos: fila.asientos.map(asiento =>
-                                              asiento._id === selectedAsiento.id
-                                                  ? { ...asiento, coordenadas: { x, y } }
-                                                  : asiento
-                                          )
-                                      }
-                                      : fila
-                              )
-                          }
-                          : sector
-                  )
-                }));
+            // 🔥 4️⃣ Actualizar el estado de `lugar`
+            setLugar(prevLugar => ({
+                ...prevLugar,
+                sectores: prevLugar.sectores.map(sector =>
+                    sector._id === selectedAsiento.sectorId
+                        ? {
+                            ...sector,
+                            filas: sector.filas.map(fila =>
+                                fila._id === selectedAsiento.filaId
+                                    ? {
+                                        ...fila,
+                                        asientos: fila.asientos.map(asiento =>
+                                            asiento._id === selectedAsiento.id
+                                                ? { ...asiento, coordenadas: { x: gridX, y: gridY } }
+                                                : asiento
+                                        )
+                                    }
+                                    : fila
+                            )
+                        }
+                        : sector
+                )
+            }));
 
-              setSelectedAsiento(null);
-          } else {
-              console.error("❌ Error al mapear:", data);
-          }
-      } catch (error) {
-          console.error("❌ Error en el servidor:", error);
-      }
-  };
+            setSelectedAsiento(null);
+        } else {
+            console.error("❌ Error al mapear:", data);
+        }
+    } catch (error) {
+        console.error("❌ Error en el servidor:", error);
+    }
+};
+
   
   const navigate = useNavigate(); // 🔄 Instancia de navegación
   const handleGuardarMapa = async () => {
@@ -193,16 +191,31 @@ function AdminMapaAsientos() {
             }
           }}
         >
+          
+
+
+
 
 
           {/* 🔥 Imagen de fondo del mapa */}
           <image x="0" y="0" width="100%" height="100%" href={`${config.BACKEND_URL}/img/lugares/${lugar.mapaImagen}`} />
 
+          {/* 🔥 Dibujar la grilla en el mapa */}
+          <g>
+            {[...Array(Math.floor(800 / 25) + 1)].map((_, i) => (
+              <line key={`v-${i}`} x1={i * 25} y1="0" x2={i * 25} y2="800" stroke="rgba(255, 255, 255, 0.3)" strokeWidth="0.5" />
+            ))}
+            {[...Array(Math.floor(800 / 25) + 1)].map((_, i) => (
+              <line key={`h-${i}`} x1="0" y1={i * 25} x2="800" y2={i * 25} stroke="rgba(255, 255, 255, 0.3)" strokeWidth="0.5" />
+            ))}
+          </g>
+          
           {/* 🔥 Dibujar rectángulos en el mapa */}
           {rectangles.map((rect, index) => (
             <g key={index} transform={`translate(${rect.x}, ${rect.y})`}>
               <path
-                d="M20.8,6.7V2.8c0-1.5-1.4-2.8-3-2.8H6.9c-1.7,0-3,1.3-3,2.8v3.9C1.7,7,0,8.9,0,11.2v9.6c0,2.5,2,4.5,4.4,4.5  h15.9c2.4,0,4.4-2,4.4-4.5v-9.6C24.7,8.8,23,7,20.8,6.7z"
+                 d="M3.9,18.6v3.9c0,1.5,1.4,2.8,3,2.8h10.9c1.7,0,3-1.3,3-2.8v-3.9c2.2-0.3,3.9-2.2,3.9-4.5V4.5  
+  c0-2.5-2-4.5-4.4-4.5H4.4C2,0,0,2,0,4.5v9.6C0,16.5,1.7,18.3,3.9,18.6z"
                 fill="yellow"
                 opacity="0.5"
                 stroke="black"
