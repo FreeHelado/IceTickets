@@ -9,48 +9,30 @@ const router = express.Router();
 // 🎟 Validar Ticket y Marcar como Usado
 ===================================== */
 router.post("/validar", async (req, res) => {
-    try {
-        console.log("📩 Body recibido:", req.body);
-        
-        const { idVerificador, eventoId } = req.body;
+  try {
+    const { idVerificador, eventoId } = req.body;
 
-        if (!idVerificador || !eventoId) {
-            return res.status(400).json({ message: "⚠️ Se requiere el ID del ticket y el ID del evento." });
-        }
+    console.log("📥 Backend recibió:", { idVerificador, eventoId });
 
-        console.log(`🔍 Buscando ticket con ID: ${idVerificador} en el evento: ${eventoId}`);
-
-        // 🔥 Buscar la orden que contenga este ticket Y pertenezca al evento correcto
-        const orden = await Orden.findOne({
-            "evento.id": eventoId,
-            "tickets": { $elemMatch: { idVerificador: idVerificador } }  // 🔥 Ahora buscamos dentro del array correctamente
-        });
-
-        if (!orden) {
-            console.log("❌ Ticket no encontrado en este evento.");
-            return res.status(404).json({ message: "🚫 Ticket no encontrado en este evento." });
-        }
-
-        console.log("📌 Orden encontrada:", orden._id);
-
-        // 🔍 Buscar el ticket dentro de la orden
-        const ticket = orden.tickets.find(t => t.idVerificador === idVerificador);
-        if (!ticket) {
-            console.log("❌ Ticket no encontrado dentro de la orden.");
-            return res.status(404).json({ message: "🚫 Ticket no encontrado dentro de la orden." });
-        }
-
-        console.log("📌 Ticket encontrado:", ticket);
-
-        res.status(200).json({ message: "✅ Ticket válido.", ticket, evento: orden.evento });
-
-    } catch (error) {
-        console.error("❌ Error al validar ticket:", error);
-        res.status(500).json({ message: "Error en el servidor." });
+    if (!idVerificador || !eventoId) {
+      return res.status(400).json({ message: "⚠️ Se requiere el ID del ticket y el ID del evento." });
     }
+
+    const ticket = await Ticket.findOne({ idVerificador, eventoId });
+
+    if (!ticket) {
+      console.log("❌ Ticket no encontrado para el evento:", eventoId);
+      return res.status(404).json({ message: "Ticket no encontrado o no pertenece a este evento" });
+    }
+
+    console.log("✅ Ticket encontrado:", ticket);
+    res.json({ ticket });
+
+  } catch (error) {
+    console.error("❌ Error en la validación:", error);
+    res.status(500).json({ message: "Error en el servidor" });
+  }
 });
-
-
 
 /* =====================================
 // 🎟 Marcar Ticket como Usado
@@ -102,10 +84,6 @@ router.put("/marcar-usado/:idVerificador", async (req, res) => {
         res.status(500).json({ message: "Error en el servidor." });
     }
 });
-
-
-
-
 
 /* =====================================
 // 🎟 Obtener todos los tickets de un evento

@@ -7,7 +7,7 @@ import Evento from "./models/Evento.js";
 =========================== */
 // Cron job: Ejecuta la actualización todos los días a las 00:00
 cron.schedule("0 0 * * *", async () => {
-  console.log("⏳ Actualizando estados de eventos...");
+  
 
   try {
     const eventos = await Evento.find({ estado: { $ne: "cancelado" } });
@@ -30,11 +30,11 @@ cron.schedule("0 0 * * *", async () => {
       if (evento.estado !== nuevoEstado) {
         evento.estado = nuevoEstado;
         await evento.save();
-        console.log(`✅ Evento "${evento.nombre}" actualizado a "${nuevoEstado}"`);
+        
       }
     }
 
-    console.log("✅ Estados de eventos actualizados correctamente.");
+   
   } catch (error) {
     console.error("❌ Error al actualizar estados de eventos:", error);
   }
@@ -45,7 +45,7 @@ cron.schedule("0 0 * * *", async () => {
   ⏳ Se ejecuta CADA 60 SEGUNDOS
 =========================== */
 cron.schedule("*/1 * * * *", async () => { // 🔥 Ejecuta cada minuto
-    console.log("🔄 Revisando asientos reservados vencidos...");
+    // console.log("🔄 Revisando asientos reservados vencidos...");
 
     try {
         const eventos = await Evento.find();
@@ -56,16 +56,16 @@ cron.schedule("*/1 * * * *", async () => { // 🔥 Ejecuta cada minuto
             evento.sectores.forEach(sector => {
                 sector.filas.forEach(fila => {
                     fila.asientos.forEach(asiento => {
-                        console.log(`🔍 Asiento: ${asiento.nombreAsiento}, Reservado: ${asiento.reservado}, Expira: ${asiento.expiracionReserva}`);
+                        // console.log(`🔍 Asiento: ${asiento.nombreAsiento}, Reservado: ${asiento.reservado}, Expira: ${asiento.expiracionReserva}`);
 
                         if (asiento.reservado && asiento.expiracionReserva) {
                             const tiempoExpiracion = new Date(asiento.expiracionReserva);
                             const ahora = new Date();
 
-                            console.log(`⏳ Comparando ${tiempoExpiracion} con ${ahora}`);
+                            // console.log(`⏳ Comparando ${tiempoExpiracion} con ${ahora}`);
 
                             if (tiempoExpiracion < ahora) {
-                                console.log(`🛑 Liberando asiento ${asiento.nombreAsiento} en evento ${evento.nombre}`);
+                                // console.log(`🛑 Liberando asiento ${asiento.nombreAsiento} en evento ${evento.nombre}`);
                                 asiento.reservado = false;
                                 asiento.usuarioReserva = null;
                                 asiento.expiracionReserva = null;
@@ -78,7 +78,7 @@ cron.schedule("*/1 * * * *", async () => { // 🔥 Ejecuta cada minuto
 
             if (cambios) {
                 await evento.save();
-                //console.log(`✅ Asientos liberados en evento: ${evento.nombre}`);
+                // //console.log(`✅ Asientos liberados en evento: ${evento.nombre}`);
             }
         }
     } catch (error) {

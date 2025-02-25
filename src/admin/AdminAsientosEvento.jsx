@@ -223,6 +223,7 @@ function AdminAsientosEvento() {
 
 
   const handleSave = async () => {
+    console.log("📤 Enviando sectores:", sectores);
     try {
       const token = localStorage.getItem("token");
       if (!token) {

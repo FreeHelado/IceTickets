@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 // 💺 Estructura de Asientos (Modificada con coordenadas)
 const asientoSchema = new mongoose.Schema({
   nombreAsiento: { type: String, required: true },
-  disponible: { type: Boolean, default: true },
   ocupado: { type: Boolean, default: false },
   reservado: { type: Boolean, default: false }, // 🔥 Si el asiento ya existe, se asume `false`
   usuarioReserva: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },

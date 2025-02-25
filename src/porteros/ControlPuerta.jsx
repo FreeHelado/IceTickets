@@ -18,32 +18,58 @@ function ValidacionPortero() {
 
   // ✅ Cargar el evento desde localStorage al iniciar
   useEffect(() => {
-    const eventoGuardado = localStorage.getItem("evento");
+  const eventoGuardado = localStorage.getItem("eventoPortero");
 
-    if (eventoGuardado) {
-      try {
-        const eventoData = JSON.parse(eventoGuardado);
-        console.log("📌 Datos del evento cargados desde localStorage:", eventoData);
-        
-        // ✅ Guardamos los datos del evento en el estado
-        setEvento({
-          id: eventoData.id,
-          nombre: eventoData.nombre,
-          imagen: eventoData.imagen,  // 📷 Imagen del evento
-          fecha: eventoData.fecha,
-          hora: eventoData.hora,
-          lugar: eventoData.lugar,
-          direccion: eventoData.direccion,
-          logoLugar: eventoData.logoLugar, // 🏟 Logo del lugar
+  if (eventoGuardado) {
+    try {
+      const eventoData = JSON.parse(eventoGuardado);
+      console.log("✅ Evento cargado desde localStorage:", eventoData);
+
+      // 🔥 Primero obtenemos los datos del evento desde el backend
+      fetch(`${config.BACKEND_URL}/api/eventos/${eventoData.id}`)
+        .then((res) => res.json())
+        .then((eventoCompleto) => {
+          console.log("📌 Evento completo obtenido del backend:", eventoCompleto);
+
+          // ✅ Guardamos el evento con el ID correcto
+          setEvento((prevEvento) => ({
+            ...prevEvento,
+            ...eventoCompleto,
+            _id: eventoCompleto._id, // 🔥 Asegurar que el ID está bien guardado
+          }));
+
+          // 🔥 Luego obtenemos los datos del lugar
+          return fetch(`${config.BACKEND_URL}/api/lugares/${eventoCompleto.lugar}`);
+        })
+        .then((res) => res.json())
+        .then((lugarData) => {
+          console.log("📌 Datos del lugar obtenidos:", lugarData);
+          setEvento((prevEvento) => ({
+            ...prevEvento,
+            lugarNombre: lugarData.nombre,
+            lugarImagen: lugarData.logo, // 🔥 Esto es la imagen del lugar
+            direccion: lugarData.direccion,
+          }));
+        })
+        .catch((err) => {
+          console.error("❌ Error al obtener el evento o el lugar:", err);
+          Swal.fire("Error", "No se pudo obtener la información del evento o del lugar.", "error");
         });
-        
-      } catch (error) {
-        Swal.fire("Error", "Datos del evento corruptos. Intenta iniciar sesión de nuevo.", "error");
-      }
-    } else {
-      Swal.fire("Error", "No tienes un evento seleccionado", "error");
+
+    } catch (error) {
+      console.error("❌ Error al parsear el evento:", error);
+      Swal.fire("Error", "Datos del evento corruptos. Intenta iniciar sesión de nuevo.", "error");
     }
-  }, []);
+  } else {
+    Swal.fire("Error", "No tienes un evento seleccionado", "error");
+  }
+}, []);
+
+
+
+
+
+
 
   const iniciarEscaneo = () => {
     Swal.fire({
@@ -79,129 +105,101 @@ function ValidacionPortero() {
 
     
  const buscarTicket = async () => {
-  setError(null);
-  setTicketData(null);
+    setError(null);
+    setTicketData(null);
 
-  if (!codigoTicket.trim()) {
-    Swal.fire("Error", "Ingrese un código de ticket", "error");
-    return;
-  }
-
-  if (!evento) {
-    Swal.fire("Error", "No tienes un evento seleccionado", "error");
-    return;
-  }
-
-  console.log("📩 Enviando a backend:", {
-    idVerificador: codigoTicket,
-    eventoId: evento.id,
-  });
-
-  try {
-    const response = await fetch(`${config.BACKEND_URL}/api/tickets/validar`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        idVerificador: codigoTicket,
-        eventoId: evento.id,
-      }),
-    });
-
-    const data = await response.json();
-    console.log("📌 Respuesta JSON del ticket:", data);
-
-    if (!response.ok) {
-      throw new Error(data.message || "Error en la validación");
+    if (!codigoTicket.trim()) {
+      Swal.fire("Error", "Ingrese un código de ticket", "error");
+      return;
     }
 
-    // ✅ 🔥 DEPURAMOS EL SECTOR
-    console.log("📌 Ticket recibido, sector:", data.ticket.sector);
-
-    // 🔥 Si el ticket tiene un sector válido, buscamos su nombre en la API
-    if (data.ticket.sector && data.ticket.sector !== "undefined" && data.ticket.sector.trim() !== "") {
-      try {
-        console.log("📡 Buscando nombre del sector con ID:", data.ticket.sector);
-        const sectorResponse = await fetch(`${config.BACKEND_URL}/api/lugares/sector/${data.ticket.sector}`);
-        if (!sectorResponse.ok) throw new Error("No se pudo obtener el sector");
-
-        const sectorData = await sectorResponse.json();
-        data.ticket.sectorNombre = sectorData.nombre || "Sector sin nombre"; // ✅ Guardamos el nombre
-        console.log("✅ Nombre del sector encontrado:", data.ticket.sectorNombre);
-      } catch (error) {
-        console.error("❌ Error al obtener sector:", error);
-        data.ticket.sectorNombre = "Sector desconocido"; // 🚨 Fallback
-      }
-    } else {
-      data.ticket.sectorNombre = "Sin sector"; // 🚨 Si el sector es vacío, no hacemos la petición
-      console.log("⚠️ No hay sector en este ticket.");
+    if (!evento || !evento._id) { // ✅ Asegurarnos de que `evento._id` exista antes de buscar
+      console.log("🚨 `evento` aún no está disponible o falta el ID:", evento);
+      Swal.fire("Error", "No tienes un evento seleccionado", "error");
+      return;
     }
 
-    setTicketData(data);
+    console.log("📤 Buscando tickets del evento con ID:", evento._id);
 
-    // ✅ 🔥 Mostrar los datos del ticket en un SweetAlert
-    Swal.fire({
-      title: data.ticket.usado ? "🎟 Ticket Usado" : "Bienvenido",
-      html: `
-        <p><strong>Nombre:</strong> ${data.ticket.nombre || "No disponible"}</p>
-        <p><strong>Email:</strong> ${data.ticket.email || "No disponible"}</p>
-        <p><strong>Documento:</strong> ${data.ticket.documento || "No disponible"}</p>
-        <p><strong>Tipo de Entrada:</strong> ${data.ticket.tipoEntrada || "No disponible"}</p>
-        ${data.ticket.sector ? `<p><strong>Sector:</strong> ${data.ticket.sectorNombre}</p>` : ""}
-        ${data.ticket.fila ? `<p><strong>Fila:</strong> ${data.ticket.fila}</p>` : ""}
-        ${data.ticket.asiento ? `<p><strong>Asiento:</strong> ${data.ticket.asiento}</p>` : ""}
-        ${data.ticket.usado ? `<p class="usado">⚠️ Este ticket ya fue usado</p>` : ""}
-      `,
-      icon: data.ticket.usado ? "warning" : "success",
-      showCancelButton: !data.ticket.usado,
-      confirmButtonText: data.ticket.usado ? "Cerrar" : "✅ Validar Acceso",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        validarAcceso();
+    try {
+      const response = await fetch(`${config.BACKEND_URL}/api/tickets/tickets-evento/${evento._id}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Error en la validación");
       }
-    });
 
-  } catch (err) {
-    console.error("❌ Error en la validación:", err.message);
+      console.log("📌 Tickets del evento recibidos:", data.tickets);
 
-    // ✅ Mostrar el error bien formateado en SweetAlert
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: err.message,
-    });
+      const ticketEncontrado = data.tickets.find(ticket => ticket.idVerificador === codigoTicket);
 
-    setError(err.message);
-  }
+      if (!ticketEncontrado) {
+        throw new Error("❌ Este ticket no pertenece a este evento.");
+      }
+
+      console.log("✅ Ticket encontrado:", ticketEncontrado);
+      setTicketData(ticketEncontrado);
+
+      Swal.fire({
+        title: "✅ Ticket válido",
+        html: `
+          <p><strong>Nombre:</strong> ${ticketEncontrado.nombre || "No disponible"}</p>
+          <p><strong>Email:</strong> ${ticketEncontrado.email || "No disponible"}</p>
+          <p><strong>Documento:</strong> ${ticketEncontrado.documento || "No disponible"}</p>
+          <p><strong>Tipo de Entrada:</strong> ${ticketEncontrado.tipoEntrada || "No disponible"}</p>
+          ${ticketEncontrado.sector ? `<p><strong>Sector:</strong> ${ticketEncontrado.sector}</p>` : ""}
+          ${ticketEncontrado.fila ? `<p><strong>Fila:</strong> ${ticketEncontrado.fila}</p>` : ""}
+          ${ticketEncontrado.asiento ? `<p><strong>Asiento:</strong> ${ticketEncontrado.asiento}</p>` : ""}
+          ${ticketEncontrado.usado ? `<p class="usado">⚠️ Este ticket ya fue usado</p>` : ""}
+        `,
+        icon: ticketEncontrado.usado ? "warning" : "success",
+        showCancelButton: !ticketEncontrado.usado,
+        confirmButtonText: ticketEncontrado.usado ? "Cerrar" : "✅ Validar Acceso",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          validarAcceso();
+        }
+      });
+
+    } catch (err) {
+      console.error("❌ Error en la validación:", err.message);
+
+      Swal.fire({
+        icon: "error",
+        title: "Ticket no válido",
+        text: err.message,
+        showCancelButton: true,
+        confirmButtonText: "Intentar de nuevo",
+        cancelButtonText: "Cerrar",
+      });
+
+      setError(err.message);
+    }
 };
 
 
 
 
+
   const validarAcceso = async () => {
-    if (!ticketData || !evento) {
-      console.log("❌ ERROR: ticketData o evento están vacíos.");
-      return;
-    }
+    if (!ticketData || !evento) return;
 
     console.log("📩 Enviando validación con:", {
-      idVerificador: ticketData.ticket.idVerificador,
-      eventoId: evento.id,  // 🔥 Solo enviamos el ID del evento
+      idVerificador: ticketData.idVerificador, // ✅ TicketData ya es el ticket
+      eventoId: evento._id,  // ✅ Enviar evento._id en lugar de numeroEvento
     });
 
     try {
       const response = await fetch(
-        `${config.BACKEND_URL}/api/tickets/marcar-usado/${ticketData.ticket.idVerificador}`,
+        `${config.BACKEND_URL}/api/tickets/marcar-usado/${ticketData.idVerificador}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            eventoId: evento.id,  // 🔥 Solo enviamos el ID del evento
-          }),
+          body: JSON.stringify({ eventoId: evento._id }), // ✅ Mandamos `eventoId`
         }
       );
 
       const data = await response.json();
-      console.log("📌 Respuesta del backend:", data);
 
       if (!response.ok) {
         throw new Error(data.message || "No se pudo marcar como usado");
@@ -210,10 +208,13 @@ function ValidacionPortero() {
       Swal.fire("Acceso Validado", "El ticket ha sido marcado como usado", "success");
       setTicketData(null);
       setCodigoTicket("");
+
     } catch (err) {
+      console.error("❌ Error en la validación:", err.message);
       Swal.fire("Error", err.message, "error");
     }
-  };
+};
+
 
 
 
@@ -230,11 +231,14 @@ function ValidacionPortero() {
            
             
             <div className="porteros__cont--bg--data">
-              {evento.logoLugar && <img src={`${config.BACKEND_URL}/img/lugares/${evento.logoLugar}`} alt="Logo del Lugar" className="logo-lugar" />}
+              {evento.lugarImagen && (
+                <img src={`${config.BACKEND_URL}/img/lugares/${evento.lugarImagen}`} alt="Logo del Lugar" className="logo-lugar" />
+              )}
               <div className="porteros__cont--bg--data--info">
                 <h3>{evento.nombre}</h3>
                 <span>{new Date(evento.fecha).toLocaleDateString()} - {evento.hora}</span>
-                <span> {evento.lugar}</span>
+                <span>{evento.lugarNombre || "Lugar desconocido"}</span> {/* 🔥 Nombre del lugar */}
+                <span>{evento.direccion || "Dirección no disponible"}</span> {/* 🔥 Dirección */}
               </div>
             </div>
 
