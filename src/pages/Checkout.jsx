@@ -46,6 +46,29 @@ function Checkout({ usuario }) {
     const [asientosDelSector, setAsientosDelSector] = useState([]);
     const [asientoSeleccionado, setAsientoSeleccionado] = useState(null);
 
+   const DURACION_TIEMPO = 600; // ⏳ 10 minutos en segundos
+
+    const [timeLeft, setTimeLeft] = useState(() => {
+        const tiempoGuardado = localStorage.getItem("checkoutTime");
+        
+        // 🚀 Si el usuario seleccionó un nuevo evento, reiniciamos el tiempo
+        const ultimoEventoId = localStorage.getItem("ultimoEventoId");
+        if (ultimoEventoId !== (evento.id || evento._id)) {
+            localStorage.setItem("checkoutTime", Date.now().toString()); // ⏳ Nuevo inicio
+            localStorage.setItem("ultimoEventoId", evento.id || evento._id); // 🔥 Guarda el nuevo evento
+            return DURACION_TIEMPO;
+        }
+
+        // 🚀 Si ya tenía un tiempo corriendo, calcular el tiempo restante
+        if (tiempoGuardado) {
+            const tiempoPasado = Math.floor((Date.now() - parseInt(tiempoGuardado)) / 1000);
+            return Math.max(DURACION_TIEMPO - tiempoPasado, 0);
+        }
+
+        // 🚀 Si no había tiempo guardado, iniciarlo
+        localStorage.setItem("checkoutTime", Date.now().toString());
+        return DURACION_TIEMPO;
+    });
 
     
     useEffect(() => {
@@ -162,6 +185,36 @@ function Checkout({ usuario }) {
     }, [modalOpen, sectores]); // ✅ Se ejecuta cuando `modalOpen` o `sectores` cambia.
 
 
+     useEffect(() => {
+        if (timeLeft <= 0) {
+            Swal.fire({
+                title: "Tiempo agotado",
+                text: "Tu reserva ha expirado. Volverás al detalle del evento.",
+                icon: "warning",
+                confirmButtonText: "Entendido",
+                timer: 5000,
+                timerProgressBar: true,
+            }).then(() => {
+                localStorage.removeItem("carrito");
+                localStorage.removeItem("evento");
+                localStorage.removeItem("cantidades");
+                localStorage.removeItem("checkoutTime"); 
+                localStorage.removeItem("ultimoEventoId"); // 🚀 Limpiamos el evento también
+
+                navigate(`/evento/${evento.id || evento._id}`);
+            });
+        }
+
+        const timer = setInterval(() => {
+            setTimeLeft(prevTime => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [timeLeft, navigate, evento.id]);
+
+    // ⏳ Convertir `timeLeft` a minutos y segundos
+    const minutos = Math.floor(timeLeft / 60);
+    const segundos = timeLeft % 60;
 
 
     const handleFilaChange = (index, e) => {
@@ -343,7 +396,15 @@ const handleConfirmarAsiento = () => {
                     icon: "success",
                     confirmButtonText: "Aceptar"
                 });
-                navigate("/");
+
+                // 🚀 Borrar carrito y resetear tiempo al finalizar la compra
+                localStorage.removeItem("carrito");
+                localStorage.removeItem("evento");
+                localStorage.removeItem("cantidades");
+                localStorage.removeItem("checkoutTime"); 
+                localStorage.removeItem("ultimoEventoId"); // 🚀 Borramos la referencia del evento
+
+                navigate("/mis-tickets");
             } else {
                 Swal.fire({ title: "Error", text: data.message || "Hubo un error", icon: "error" });
             }
@@ -356,6 +417,14 @@ const handleConfirmarAsiento = () => {
 
     return (
         <main className="checkout">
+
+            {/* 🔥 Contador de tiempo bien visible */}
+            <div className="checkout-timer">
+                <span>
+                    ⏳ Tienes <strong>{minutos}:{segundos < 10 ? `0${segundos}` : segundos}</strong> minutos para finalizar tu compra.
+                </span>
+            </div>
+
             <h1>Confirmar Compra</h1>
             <div className="checkout__user">
                 <h2>Tus datos:</h2>

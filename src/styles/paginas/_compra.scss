@@ -247,7 +247,21 @@
         }
     }  
 
-
+    .checkout-timer {
+        position: sticky;
+        height: fit-content;
+        top: 15px;
+        left: 15px;
+        width: fit-content;
+        background-color: $amarelo;
+        color: $colorPrimario;
+        z-index: 5000;
+        padding: 15px;
+        border-radius: 10px;
+        @include flex();
+        justify-content: center;
+        margin: 0 auto;
+    }
     
 }
 
