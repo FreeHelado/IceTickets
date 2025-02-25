@@ -83,6 +83,11 @@ function Checkout({ usuario }) {
         }
     };
 
+    useEffect(() => {
+    console.log("📌 Estado actualizado de asientos:", asientos);
+}, [asientos]);
+
+
 
     useEffect(() => {
         const obtenerSectores = async () => {
@@ -196,47 +201,37 @@ function Checkout({ usuario }) {
             return [];
         }
 
-        const asientosDisponibles = sectorEncontrado.filas.flatMap(fila => fila.asientos)
-            .filter(asiento => asiento.disponible && !asiento.ocupado);
+        const asientosTotales = sectorEncontrado.filas.flatMap(fila =>
+            fila.asientos.map(asiento => ({
+                ...asiento,
+                seleccionado: false // 🔥 Agregamos la propiedad desde el principio
+            }))
+        );
 
-        console.log(`📌 Asientos obtenidos para el sector ${sectorId}:`, asientosDisponibles);
+        console.log(`📌 Asientos obtenidos para el sector ${sectorId}:`, asientosTotales);
 
-        return asientosDisponibles;
+        return asientosTotales; 
     };
 
 
-
     const handleClickEnMapa = (asiento) => {
-    if (!asiento || asiento.ocupado) return; // Evita errores y bloquea ocupados
+        if (!asiento || asiento.ocupado) return; // 🔴 Bloqueamos los ocupados
 
-    console.log("🪑 Asiento seleccionado correctamente:", asiento); 
+            console.log("🪑 Asiento seleccionado correctamente:", asiento);
 
-    setAsientoSeleccionado(asiento); // ✅ Guardamos el asiento en estado global
+            // 🔥 Actualizamos el estado de TODOS los asientos
+            setAsientos(prevAsientos =>
+                prevAsientos.map(a => ({
+                    ...a,
+                    seleccionado: a._id === asiento._id, // ✅ Solo este asiento se marca como seleccionado
+                }))
+            );
 
-    setFormularios(prev =>
-        prev.map((form, i) =>
-            i === modalOpen
-                ? {
-                      ...form,
-                      fila: asiento.fila || "", // ✅ Carga la fila en el formulario
-                      asiento: asiento.nombreAsiento, // ✅ Carga el asiento en el formulario
-                  }
-                : form
-        )
-    );
+            setAsientoSeleccionado(asiento); // ✅ Guardamos el seleccionado
 
-    // ✅ Actualizar el estado de los asientos para reflejar la selección
-    setAsientos(prev =>
-        prev.map(a => ({
-            ...a,
-            seleccionado: a._id === asiento._id, // Solo este asiento se marca como seleccionado
-        }))
-    );
-};
-
-
-
-
+            // 🔥 FORZAMOS UN RE-RENDER en React (truco ninja)
+            setAsientos(prevAsientos => [...prevAsientos]); // 💥 Esto obliga a React a redibujar
+        };
 
 
 
@@ -474,60 +469,58 @@ function Checkout({ usuario }) {
                                                 </div>
 
                                                 <div className="modal-mapa__content--mapa">
-                                                        <svg
-                                                        viewBox="0 0 800 800"
-                                                        width="100%"
-                                                        height="100%"
-                                                        onClick={handleClickEnMapa}
-                                                        >
-                                                        {/* 🔥 Imagen del mapa */}
-                                                        <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
+                                                <svg viewBox="0 0 800 800" width="100%" height="100%">
+                                                    {/* 🔥 Imagen de fondo */}
+                                                    <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
 
-                                                        {/* 🔥 Dibujar los asientos con el mismo path del editor */}
-{asientos.length > 0 ? (
-  <>
-    {asientos.map((asiento, index) => (
-      <g
-        key={index}
-        transform={`translate(${asiento.coordenadas?.x || 0}, ${asiento.coordenadas?.y || 0})`}
-        onClick={() => handleClickEnMapa(asiento)} // ✅ Ahora se pasa el asiento correctamente
-        style={{ cursor: "pointer" }}
-      >
-        <path
-           d="M3.9,18.6v3.9c0,1.5,1.4,2.8,3,2.8h10.9c1.7,0,3-1.3,3-2.8v-3.9c2.2-0.3,3.9-2.2,3.9-4.5V4.5  
-  c0-2.5-2-4.5-4.4-4.5H4.4C2,0,0,2,0,4.5v9.6C0,16.5,1.7,18.3,3.9,18.6z"
-          fill={
-            asientoSeleccionado?._id === asiento._id 
-              ? "blue" // 🔥 Azul si está seleccionado
-              : asiento.ocupado
-              ? "red"  // 🔥 Rojo si está ocupado
-              : "yellow" // 🔥 Amarillo si está disponible
-          }
-          stroke="black"
-          strokeWidth="1"
-          opacity="1"
-        />
-        
-        {/* 🔤 Nombre del asiento */}
-        <text
-          x="12"
-          y="16"
-          fontSize="10px"
-          fontFamily="Arial, sans-serif"
-          fill="black"
-          textAnchor="middle"
-        >
-          {asiento.nombreAsiento}
-        </text>
-      </g>
-    ))}
-  </>
-) : (
-  <p>No hay asientos disponibles</p>
-)}
+                                                    {/* 🔥 Dibujar los asientos como DIVS en foreignObject */}
+                                                    {asientos.length > 0 ? (
+                                                        asientos.map((asiento, index) => (
+                                                            <foreignObject
+                                                                key={index}
+                                                                x={asiento.coordenadas?.x || 0}
+                                                                y={asiento.coordenadas?.y || 0}
+                                                                width="25"
+                                                                height="25"
+                                                                style={{
+                                                                    cursor: asiento.ocupado ? "not-allowed" : "pointer"
+                                                                }}
+                                                                onClick={() => handleClickEnMapa(asiento)}
+                                                            >
+                                                                <div
+                                                                    className="asiento-box"
+                                                                    style={{
+                                                                        width: "100%",
+                                                                        height: "100%",
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        justifyContent: "center",
+                                                                        borderRadius: "5px",
+                                                                        backgroundColor: asiento.seleccionado
+                                                                            ? "yellow"  // si está seleccionado
+                                                                            : asiento.ocupado
+                                                                            ? "#9f0d3e"   // si está ocupado
+                                                                            : "#e8e7f1", // si está disponible
+                                                                        opacity: asiento.seleccionado
+                                                                            ? "1"  // si está seleccionado
+                                                                            : asiento.ocupado
+                                                                            ? ".5"   // si está ocupado
+                                                                            : "1", // si está disponible
+                                                                        border: "1px solid #2c2948",
+                                                                        color: "#2c2948",
+                                                                        fontSize: "10px",
+                                                                        fontFamily: "Arial, sans-serif"
+                                                                    }}
+                                                                >
+                                                                    {asiento.nombreAsiento}
+                                                                </div>
+                                                            </foreignObject>
+                                                        ))
+                                                    ) : (
+                                                        <p>No hay asientos disponibles</p>
+                                                    )}
+                                                </svg>
 
-
-                                                        </svg>
                                             </div>
                                             
                                             <button
