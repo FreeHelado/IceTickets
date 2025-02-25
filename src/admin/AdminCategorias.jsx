@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import * as FaIcons from "react-icons/fa"; // Importamos TODOS los iconos
-import config from "../config"; // Configuración de backend
-import Swal from "sweetalert2"; // Importamos SweetAlert2
+import * as FaIcons from "react-icons/fa";
+import config from "../config";
+import AdminTools from "./AdminTools";
+import Swal from "sweetalert2";
 
 const AdminCategorias = () => {
   const [categorias, setCategorias] = useState([]);
@@ -148,7 +149,14 @@ const AdminCategorias = () => {
 
           
         </form>
+
+        <div className="adminPanel__cont--zona3">
+          <AdminTools />
+        </div>
       </div>
+
+      
+
     </main>
   );
 };
