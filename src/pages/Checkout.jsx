@@ -512,56 +512,60 @@ const handleConfirmarAsiento = () => {
                                                 </div>
 
                                                 <div className="modal-mapa__content--mapa">
-                                                <svg viewBox="0 0 680 680" width="100%" height="100%">
+                                                <svg viewBox="0 0 675 675" width="100%" height="100%">
                                                     {/* 🔥 Imagen de fondo */}
                                                     <image x="0" y="0" width="100%" height="100%" href={mapaImagen} />
 
                                                     {/* 🔥 Dibujar los asientos como DIVS en foreignObject */}
-                                                    {asientos.length > 0 ? (
-                                                        asientos.map((asiento, index) => (
-                                                            <foreignObject
-                                                                key={index}
-                                                                x={asiento.coordenadas?.x || 0}
-                                                                y={asiento.coordenadas?.y || 0}
-                                                                width="25"
-                                                                height="25"
-                                                                style={{
-                                                                    cursor: asiento.ocupado ? "not-allowed" : "pointer"
-                                                                }}
-                                                                onClick={() => handleClickEnMapa(asiento)}
-                                                            >
-                                                                <div
-                                                                    className="asiento-box"
-                                                                    style={{
-                                                                        width: "100%",
-                                                                        height: "100%",
-                                                                        display: "flex",
-                                                                        alignItems: "center",
-                                                                        justifyContent: "center",
-                                                                        borderRadius: "5px",
-                                                                        backgroundColor: asiento.seleccionado
-                                                                            ? "yellow"  // si está seleccionado
-                                                                            : asiento.ocupado
-                                                                            ? "#9f0d3e"   // si está ocupado
-                                                                            : "#e8e7f1", // si está disponible
-                                                                        opacity: asiento.seleccionado
-                                                                            ? "1"  // si está seleccionado
-                                                                            : asiento.ocupado
-                                                                            ? ".5"   // si está ocupado
-                                                                            : "1", // si está disponible
-                                                                        border: "1px solid #2c2948",
-                                                                        color: "#2c2948",
-                                                                        fontSize: "10px",
-                                                                        fontFamily: "Arial, sans-serif"
-                                                                    }}
-                                                                >
-                                                                    {asiento.nombreAsiento}
-                                                                </div>
-                                                            </foreignObject>
-                                                        ))
-                                                    ) : (
-                                                        <p>No hay asientos disponibles</p>
-                                                    )}
+                                                    {/* 🔥 Dibujar los asientos como DIVS en foreignObject */}
+{asientos.length > 0 ? (
+    asientos
+        .filter(asiento => asiento.disponible) // 🔥 Solo mostramos los disponibles
+        .map((asiento, index) => (
+            <foreignObject
+                key={index}
+                x={asiento.coordenadas?.x || 0}
+                y={asiento.coordenadas?.y || 0}
+                width="25"
+                height="25"
+                style={{
+                    cursor: asiento.ocupado ? "not-allowed" : "pointer"
+                }}
+                onClick={() => !asiento.ocupado && handleClickEnMapa(asiento)} // 🔥 Evita selección de ocupados
+            >
+                <div
+                    className="asiento-box"
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "5px",
+                        backgroundColor: asiento.seleccionado
+                            ? "yellow"  // si está seleccionado
+                            : asiento.ocupado
+                            ? "#9f0d3e"   // si está ocupado
+                            : "#e8e7f1", // si está disponible
+                        opacity: asiento.seleccionado
+                            ? "1"  // si está seleccionado
+                            : asiento.ocupado
+                            ? ".5"   // si está ocupado
+                            : "1", // si está disponible
+                        border: "1px solid #2c2948",
+                        color: "#2c2948",
+                        fontSize: "10px",
+                        fontFamily: "Arial, sans-serif"
+                    }}
+                >
+                    {asiento.nombreAsiento}
+                </div>
+            </foreignObject>
+        ))
+) : (
+    <p>No hay asientos disponibles</p>
+)}
+
                                                 </svg>
 
                                             </div>
